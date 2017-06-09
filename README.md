@@ -3,8 +3,12 @@ ES6/ES2015   node.js, socket.io, gulp, webpack (for client) and babel (for serve
 
 
 # Run
+If you don't have MongoDB locally, install `brew install mongodb`, and then run with `mongod`
+
+```
 npm install
 gulp watch
+```
 
 # API Docs
 
