@@ -29,12 +29,9 @@ var sockets = {};
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/vrworld');
 app.use((0, _compression2.default)({}));
-//app.use(express['static'](__dirname + '/../client'));
-app.use('/users', require('./controllers/users.js'));
-app.use('/queues', require('./controllers/users.js'));
+app.use('/api', require('./controllers/routes.js'));
 app.get('/', function (req, res) {
-    res.status(200);
-    res.send('Root!');
+    res.status(200).send('Root!');
 });
 io.on('connection', function (socket) {
     var nick = socket.handshake.query.nick;
