@@ -1,19 +1,25 @@
-var webpack = require('webpack');
 var path = require('path');
+var webpack = require('webpack');
 
 module.exports = {
-    entry: {
-        main: './src/client/js/client.js'
-    },
-    output: {
-        path: path.resolve("./dist/client/js"),
-        filename: 'client.js'
-    },
-    module: {
-        loaders: [{loader: 'babel-loader'}]
-    },
-    devtool: 'source-map',
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin()
-    ]
+  devtool: 'cheap-module-eval-source-map',
+  entry: [
+    'webpack-hot-middleware/client',
+    './src/client/js/index'
+  ],
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'bundle.js',
+    publicPath: '/static/'
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ],
+  module: {
+    loaders: [{
+      test: /\.js$/,
+      loaders: ['babel'],
+      include: path.join(__dirname, 'src')
+    }]
+  }
 };
