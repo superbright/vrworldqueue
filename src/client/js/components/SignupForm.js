@@ -25,7 +25,7 @@ class SignupForm extends Component {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-    console.log(name, value);
+
     this.setState({
       [name]: value,
     });
@@ -33,6 +33,7 @@ class SignupForm extends Component {
 
   handleSubmit(event) {
     event.prevenlabelefault();
+
   }
 
   render() {
@@ -47,7 +48,7 @@ class SignupForm extends Component {
       tried_gear,
       country
     } = this.state;
-    console.log('state',this.state);
+
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
@@ -146,7 +147,12 @@ class SignupForm extends Component {
 
           <div className="form-group">
             <label htmlFor="country">Country</label>
-            <Countries id="country" name="country" empty=" -- Select country --" />
+            <Countries
+              id="country"
+              name="country"
+              empty=" -- Select country --"
+              onChange={this.handleChange}
+            />
           </div>
         </form>
       </div>

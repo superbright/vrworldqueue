@@ -10,6 +10,12 @@ npm install
 gulp watch
 ```
 
+# Routes
+## registration flow
+`/signup`
+`/signup/waiver`
+`/signup/thanks`
+
 # API Docs
 
 ### GET /users
