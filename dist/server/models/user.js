@@ -12,7 +12,7 @@ var schema = new mongoose.Schema({
     phone: {
         type: String
     },
-    username: {
+    screenname: {
         type: String
     },
     usedVR: {
@@ -22,6 +22,10 @@ var schema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    signature: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Signature'
     }
 });
 var User = mongoose.model('User', schema);

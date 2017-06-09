@@ -16,12 +16,9 @@ let sockets = {};
 let mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/vrworld');
 app.use(compression({}));
-//app.use(express['static'](__dirname + '/../client'));
-app.use('/users', require('./controllers/users.js'));
-app.use('/queues', require('./controllers/users.js'));
+app.use('/api', require('./controllers/routes.js'));
 app.get('/', (req, res) => {
-    res.status(200);
-    res.send('Root!');
+    res.status(200).send('Root!');
 })
 io.on('connection', (socket) => {
     let nick = socket.handshake.query.nick;
