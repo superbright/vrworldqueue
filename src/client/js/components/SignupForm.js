@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Countries from 'react-select-country';
 import { Redirect } from 'react-router-dom';
 import Waiver from './Waiver';
 
@@ -9,10 +8,6 @@ const formInit = {
   email: '',
   phone: '',
   screenname: '',
-  tried_oculus: false,
-  tried_vive: false,
-  tried_gear: false,
-  country: '',
 };
 
 class SignupForm extends Component {
@@ -38,7 +33,9 @@ class SignupForm extends Component {
     const name = target.name;
 
     this.setState({
-      [name]: value,
+      form: {
+        [name]: value,
+      }
     });
   }
 
@@ -75,9 +72,6 @@ class SignupForm extends Component {
         email,
         phone,
         screenname,
-        tried_oculus,
-        tried_vive,
-        tried_gear,
       },
     } = this.state;
 
