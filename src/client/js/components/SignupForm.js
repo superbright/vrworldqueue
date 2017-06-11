@@ -1,29 +1,35 @@
 import React, { Component } from 'react';
 import Countries from 'react-select-country';
 import { Redirect } from 'react-router-dom';
+import Waiver from './Waiver';
+
+const formInit = {
+  firstname: '',
+  lastname: '',
+  email: '',
+  phone: '',
+  screenname: '',
+  tried_oculus: false,
+  tried_vive: false,
+  tried_gear: false,
+  country: '',
+};
 
 class SignupForm extends Component {
   constructor() {
     super();
 
     this.state = {
-      form: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        handle: '',
-        tried_oculus: false,
-        tried_vive: false,
-        tried_gear: false,
-        country: '',
-      },
+      form: formInit,
       showWaiver: false,
       waiverAccepted: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleWaiver = this.handleWaiver.bind(this);
+    this.clearForm = this.clearForm.bind(this);
+    this.renderForm = this.renderForm.bind(this);
   }
 
   handleChange(event) {
@@ -39,47 +45,64 @@ class SignupForm extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    this.setState({ waiverAccepted: true });
+    this.setState({ showWaiver: true });
   }
 
-  render() {
+  handleWaiver(accept) {
+    if (accept) {
+      fetch('api/users', {
+        method: 'post',
+      }).then((res) => {
+        console.log(res);
+      }).catch((err) => {
+        console.log('error', err);
+      });
+      return this.setState({ waiverAccepted: true });
+    }
+
+    this.clearForm();
+    this.setState({ showWaiver: false });
+  }
+
+  clearForm() {
+    this.setState({ form: formInit });
+  }
+
+  renderForm() {
     const { form: {
-        first_name,
-        last_name,
+        firstname,
+        lastname,
         email,
         phone,
-        handle,
+        screenname,
         tried_oculus,
         tried_vive,
         tried_gear,
       },
-      waiverAccepted,
     } = this.state;
 
-    return waiverAccepted
-      ? <Redirect to={{ pathname: '/signup/thanks' }}/>
-      : (
+    return (
       <div>
         <form onSubmit={this.handleSubmit}>
           <div>
-            <label htmlFor="first_name">First Name</label>
+            <label htmlFor="firstname">First Name</label>
             <input
               type="text"
-              name="first_name"
-              id="first_name"
-              value={first_name}
+              name="firstname"
+              id="firstname"
+              value={firstname}
               placeholder="Name"
               onChange={this.handleChange}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="last_name">Last Name</label>
+            <label htmlFor="lastname">Last Name</label>
             <input
               type="text"
-              name="last_name"
-              id="last_name"
-              value={last_name}
+              name="lastname"
+              id="lastname"
+              value={lastname}
               placeholder="Last Name"
               onChange={this.handleChange}
             />
@@ -113,53 +136,10 @@ class SignupForm extends Component {
             <label htmlFor="handle">Screen Name</label>
             <input
               type="text"
-              name="handle"
-              id="handle"
-              value={handle}
+              name="screenname"
+              id="screenname"
+              value={screenname}
               placeholder="Screen Name"
-              onChange={this.handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="tried_vive">Tried Vive VR?</label>
-            <input
-              type="checkbox"
-              name="tried_vive"
-              id="tried_vive"
-              checked={tried_vive}
-              onChange={this.handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="tried_oculus">Tried Oculus VR?</label>
-            <input
-              type="checkbox"
-              name="tried_oculus"
-              id="tried_oculus"
-              checked={tried_oculus}
-              onChange={this.handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="tried_gear">Tried Gear VR?</label>
-            <input
-              type="checkbox"
-              name="tried_gear"
-              id="tried_gear"
-              checked={tried_gear}
-              onChange={this.handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="country">Country</label>
-            <Countries
-              id="country"
-              name="country"
-              empty=" -- Select country --"
               onChange={this.handleChange}
             />
           </div>
@@ -170,6 +150,21 @@ class SignupForm extends Component {
         </form>
       </div>
     );
+  }
+
+  render() {
+    const {
+      showWaiver,
+      waiverAccepted,
+    } = this.state;
+
+    if (waiverAccepted) {
+      return (<Redirect to={{ pathname: '/signup/thanks' }} />);
+    }
+
+    return showWaiver
+      ? <Waiver handleWaiver={this.handleWaiver} />
+      : this.renderForm();
   }
 }
 
