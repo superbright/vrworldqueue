@@ -4,9 +4,6 @@ var bodyParser = require('body-parser');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-    extended: true
-}));
 router.get('/:userId?', (req, res) => {
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);

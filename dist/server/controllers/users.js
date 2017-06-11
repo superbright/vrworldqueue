@@ -6,9 +6,6 @@ var bodyParser = require('body-parser');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-    extended: true
-}));
 router.get('/:userId?', function (req, res) {
     if (req.params.userId) User.findById(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
@@ -29,6 +26,7 @@ router.get('/:userId/signature', function (req, res) {
     });
 });
 router.post('/', function (req, res) {
+    console.log(req.body);
     var signature = new Signature({
         image: {
             data: req.body.signaturedate,

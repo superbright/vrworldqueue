@@ -3,9 +3,6 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var Signature = require('../models/signature').Signature;
 router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-    extended: true
-}));
 router.get('/:signatureId?', (req, res) => {
     if (req.params.signatureId) Signature.findById(req.params.signatureId, (err, signature) => {
         if (err) res.status(500).send(err);

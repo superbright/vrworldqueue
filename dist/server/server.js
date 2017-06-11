@@ -18,6 +18,18 @@ var _compression2 = _interopRequireDefault(_compression);
 
 var _util = require('../shared/util');
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _webpack = require('webpack');
+
+var _webpack2 = _interopRequireDefault(_webpack);
+
+var _webpack3 = require('../../webpack.config');
+
+var _webpack4 = _interopRequireDefault(_webpack3);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var app = (0, _express2.default)();
@@ -27,12 +39,22 @@ var port = process.env.PORT || 3000;
 var users = [];
 var sockets = {};
 var mongoose = require('mongoose');
+var compiler = (0, _webpack2.default)(_webpack4.default);
+
+// webpack hot reload
+app.use(require('webpack-dev-middleware')(compiler, {
+    publicPath: _webpack4.default.output.publicPath
+}));
+app.use(require('webpack-hot-middleware')(compiler));
+
 mongoose.connect('mongodb://localhost/vrworld');
 app.use((0, _compression2.default)({}));
+
 app.use('/api', require('./controllers/routes.js'));
-app.get('/', function (req, res) {
-    res.status(200).send('Root!');
+app.get('*', function (req, res) {
+    res.sendFile(_path2.default.join(__dirname, '../../index.html'));
 });
+
 io.on('connection', function (socket) {
     var nick = socket.handshake.query.nick;
     var currentUser = {

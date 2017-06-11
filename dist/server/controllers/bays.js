@@ -4,9 +4,6 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({
-    extended: true
-}));
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
 router.get('/:bayId?', function (req, res) {
