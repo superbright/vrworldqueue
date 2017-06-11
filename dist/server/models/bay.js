@@ -9,6 +9,9 @@ var schema = new mongoose.Schema({
     name: {
         type: String
     },
+    game: {
+        type: String
+    },
     queue: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,

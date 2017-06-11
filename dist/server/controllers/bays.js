@@ -8,7 +8,6 @@ router.use(bodyParser.urlencoded({
     extended: true
 }));
 var Bay = require('../models/bay').Bay;
-var Queue = require('../models/queue').Queue;
 var User = require('../models/user').User;
 router.get('/:bayId?', function (req, res) {
     if (req.params.bayId) {
@@ -23,7 +22,8 @@ router.get('/:bayId?', function (req, res) {
 router.post('/', function (req, res) {
     var newBay = new Bay({
         id: req.body.id,
-        name: req.body.name
+        name: req.body.name,
+        game: req.body.game
     });
     newBay.save();
     res.status(200).send(newBay);
@@ -50,9 +50,21 @@ router.post('/:bayId/enqueue', function (req, res) {
         } else res.status(404).send('User not found');
     });
 });
+router.get('/:bayId/dequeue', function (req, res) {
+    Bay.findById(req.params.bayId, function (err, bay) {
+        if (err) res.status(500).send(err);else if (bay) {
+            var user = bay.queue.shift();
+            if (user) {
+                res.status(200).send(user);
+                bay.queue.pull(user);
+                bay.save();
+            } else res.status(404).send('There are no users in the queue');
+        } else res.status(404).send('No bay found with that ID');
+    });
+});
 router.delete('/:bayId', function (req, res) {
     Bay.findByIdAndRemove(req.params.bayId, function (err, bay) {
-        if (err) res.send(err);
+        if (err) res.status(500).send(err);
         if (bay) {
             delete bay._id;
             res.status(200).send('Bay with id ' + bay._id + ' deleted');
