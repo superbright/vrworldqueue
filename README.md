@@ -10,6 +10,9 @@ npm install
 gulp watch
 ```
 
+To try out the frontend, things have changed and need to be smoothed out. But
+development now, run `npm run start`. Then check out `localhost:3000/signup`
+
 # Routes
 ## registration flow
 `/signup`
@@ -62,5 +65,3 @@ form data:
 
 #### DELETE /bays/[bayId]
 Deleteds record of bay with given ID if it exists. Otherwise returns message indicating bay is not found. (also deletes signature if it exists.
-
-
