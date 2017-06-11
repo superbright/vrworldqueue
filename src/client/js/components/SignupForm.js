@@ -34,6 +34,7 @@ class SignupForm extends Component {
 
     this.setState({
       form: {
+        ...this.state.form,
         [name]: value,
       }
     });
@@ -47,14 +48,15 @@ class SignupForm extends Component {
 
   handleWaiver(accept) {
     if (accept) {
-      fetch('api/users', {
+      return fetch('api/users', {
         method: 'post',
+        data: this.state.form,
       }).then((res) => {
         console.log(res);
+        this.setState({ waiverAccepted: true });
       }).catch((err) => {
         console.log('error', err);
       });
-      return this.setState({ waiverAccepted: true });
     }
 
     this.clearForm();
