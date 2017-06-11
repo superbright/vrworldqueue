@@ -5,7 +5,7 @@ import webpackStream  from 'webpack-stream';
 import nodemon from 'gulp-nodemon';
 import babel from 'gulp-babel';
 
-gulp.task('build', ['build-client', 'build-server']);
+gulp.task('build', ['build-server']);
 
 gulp.task('build-client', ['copy-assets', 'build-shared'], () =>
     gulp.src('src/client/js/client.js')
@@ -31,9 +31,9 @@ gulp.task('build-shared', () =>
 );
 
 gulp.task('watch', ['build'], () => {
-    gulp.watch(['src/client/**/*.*'], ['build-client']);
+    // gulp.watch(['src/client/**/*.*'], ['build-client']);
     gulp.watch(['src/server/**/*.*'], ['build-server']);
-    gulp.watch(['src/shared/**/*.*'], ['build-server', 'build-client']);
+    gulp.watch(['src/shared/**/*.*'], ['build-server']);
     gulp.start('run');
 });
 

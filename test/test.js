@@ -19,8 +19,13 @@ var agent = supertest.agent('http://localhost:3000');
 //});
 describe('GET /', function () {
     it('should return home page', function (done) {
-        agent.get('/').end((err, res) => {
-            console.log(res);
-        })
+        agent
+        	.get('/')
+        	.expect(200)
+        	.end(function(err, res) {
+            	if (err) return done(err)
+            	console.log(res);
+            	done();
+        	})
     });
 });

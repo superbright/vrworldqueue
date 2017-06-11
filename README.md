@@ -3,8 +3,21 @@ ES6/ES2015   node.js, socket.io, gulp, webpack (for client) and babel (for serve
 
 
 # Run
+If you don't have MongoDB locally, install `brew install mongodb`, and then run with `mongod`
+
+```
 npm install
 gulp watch
+```
+
+To try out the frontend, things have changed and need to be smoothed out. But
+development now, run `npm run start`. Then check out `localhost:3000/signup`
+
+# Routes
+## registration flow
+`/signup`
+`/signup/waiver`
+`/signup/thanks`
 
 # API Docs
 base endpoint is /api all others are subdomains of that
@@ -52,5 +65,3 @@ form data:
 
 #### DELETE /bays/[bayId]
 Deleteds record of bay with given ID if it exists. Otherwise returns message indicating bay is not found. (also deletes signature if it exists.
-
-

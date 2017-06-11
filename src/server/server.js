@@ -5,21 +5,35 @@ import SocketIO from 'socket.io';
 import compression from 'compression';
 import {
     validNick, findIndex, sanitizeString
-}
-from '../shared/util';
-let app = express();
-let server = http.Server(app);
+} from '../shared/util';
+import path from 'path';
+
+import webpack from 'webpack';
+import config from '../../webpack.config';
+
+const app = express();
+const server = http.Server(app);
 let io = new SocketIO(server);
 let port = process.env.PORT || 3000;
 let users = [];
 let sockets = {};
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const compiler = webpack(config);
+
+// webpack hot reload
+app.use(require('webpack-dev-middleware')(compiler, {
+  publicPath: config.output.publicPath
+}));
+app.use(require('webpack-hot-middleware')(compiler));
+
 mongoose.connect('mongodb://localhost/vrworld');
 app.use(compression({}));
+
 app.use('/api', require('./controllers/routes.js'));
-app.get('/', (req, res) => {
-    res.status(200).send('Root!');
-})
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, '../../index.html'));
+});
+
 io.on('connection', (socket) => {
     let nick = socket.handshake.query.nick;
     let currentUser = {
