@@ -1,20 +1,25 @@
 import React, { Component } from 'react';
 import Countries from 'react-select-country';
+import { Redirect } from 'react-router-dom';
 
 class SignupForm extends Component {
   constructor() {
     super();
 
     this.state = {
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone: '',
-      handle: '',
-      tried_oculus: false,
-      tried_vive: false,
-      tried_gear: false,
-      country: '',
+      form: {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        handle: '',
+        tried_oculus: false,
+        tried_vive: false,
+        tried_gear: false,
+        country: '',
+      },
+      showWaiver: false,
+      waiverAccepted: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -32,24 +37,28 @@ class SignupForm extends Component {
   }
 
   handleSubmit(event) {
-    event.prevenlabelefault();
+    event.preventDefault();
 
+    this.setState({ waiverAccepted: true });
   }
 
   render() {
-    const {
-      first_name,
-      last_name,
-      email,
-      phone,
-      handle,
-      tried_oculus,
-      tried_vive,
-      tried_gear,
-      country
+    const { form: {
+        first_name,
+        last_name,
+        email,
+        phone,
+        handle,
+        tried_oculus,
+        tried_vive,
+        tried_gear,
+      },
+      waiverAccepted,
     } = this.state;
 
-    return (
+    return waiverAccepted
+      ? <Redirect to={{ pathname: '/signup/thanks' }}/>
+      : (
       <div>
         <form onSubmit={this.handleSubmit}>
           <div>
@@ -153,6 +162,10 @@ class SignupForm extends Component {
               empty=" -- Select country --"
               onChange={this.handleChange}
             />
+          </div>
+
+          <div className="form-group">
+            <button>Submit</button>
           </div>
         </form>
       </div>

@@ -28,21 +28,12 @@ app.use(require('webpack-hot-middleware')(compiler));
 
 mongoose.connect('mongodb://localhost/vrworld');
 app.use(compression({}));
-<<<<<<< HEAD
-// app.use(express['static'](__dirname + '/../client'));
-app.use('/users', require('./controllers/users.js'));
-app.use('/queues', require('./controllers/users.js'));
 
+app.use('/api', require('./controllers/routes.js'));
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, '../../index.html'));
 });
 
-=======
-app.use('/api', require('./controllers/routes.js'));
-app.get('/', (req, res) => {
-    res.status(200).send('Root!');
-})
->>>>>>> master
 io.on('connection', (socket) => {
     let nick = socket.handshake.query.nick;
     let currentUser = {
