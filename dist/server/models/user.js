@@ -26,6 +26,15 @@ var schema = new mongoose.Schema({
     signature: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Signature'
+    },
+    rfid: {
+        id: {
+            type: String
+        },
+        expiresAt: {
+            type: Date,
+            default: new Date(new Date().setHours(24, 0, 0, 0))
+        }
     }
 });
 var User = mongoose.model('User', schema);
