@@ -38,6 +38,9 @@ exports.postUserSignature = (req, res) => {
         , phone: req.body.phone
         , screenname: req.body.screenname
         , signature: signature._id
+        , rfid: {
+            id: req.body.rfid
+        }
     };
     var query = {
         'email': req.body.email
