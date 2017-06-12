@@ -1,55 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-class AdminList extends Component {
-  constructor() {
-    super();
+const AdminList = ({ users, match: { params: { adminid } } }) => (
+  <div>
+    <div className="user-search simple-container">
+      <input type="text" placeholder="Search Users" />
+    </div>
 
-    this.state = {
-      users: [],
-    }
-  }
+    <ul>
+      {
+        users.map(user => (
+          <li
+            className="user-list-item flex space-between align-center"
+            key={user._id}
+          >
+            <div>
+              <div className="big-font">{user.name}</div>
+              <div className="small-font">{user.screenname}</div>
+            </div>
 
-  componentWillMount() {
-    return fetch('/api/users', {
-      method: 'get',
-    }).then((res) => res.json()).then((users) => {
-      this.setState({ users });
-    }).catch((err) => {
-      console.log('error', err);
-    });
-  }
-
-  render() {
-    const { users } = this.state;
-    // const { match: { params: { id } } } = this.props;
-
-    return (
-      <div>
-        <div className="user-search simple-container">
-          <input type="text" placeholder="Search Users" />
-        </div>
-
-        <ul>
-          {
-            users.map((user) => {
-              return (
-                <li className="user-list-item flex space-between align-center" key={user._id}>
-                  <div>
-                    <div className="big-font">{user.name}</div>
-                    <div className="small-font">{user.screenname}</div>
-                  </div>
-
-                  <div className="flex">
-                    <button>Edit</button>
-                  </div>
-                </li>
-              );
-            })
-          }
-        </ul>
-      </div>
-    );
-  }
-}
+            <div className="flex">
+              <Link to={`/admin/${adminid}/user/${user._id}`}><button>Edit</button></Link>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+);
 
 export default AdminList;
