@@ -20,4 +20,4 @@ exports.deleteSignature = (req, res) => {
         else res.status(404).send("No signature found with that ID");
     })
 };
-module.exports.socketHandler = (endpoint, socket) => {}
+module.exports.socketHandler = (socket) => {}

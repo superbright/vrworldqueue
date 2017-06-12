@@ -38,6 +38,9 @@ module.exports.setupSockets = (server) => {
                 bayId: currentBay.bayNumber
             });
         });
+        userController.socketHandler(socket);
+        rfidController.socketHandler(socket);
+        bayController.socketHandler(socket);
     });
 };
 exports.sendToGame = (gameId, endpoint, message, callback) => {

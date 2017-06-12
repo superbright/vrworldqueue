@@ -17,4 +17,4 @@ exports.deleteSignature = function (req, res) {
         } else res.status(404).send("No signature found with that ID");
     });
 };
-module.exports.socketHandler = function (endpoint, socket) {};
+module.exports.socketHandler = function (socket) {};

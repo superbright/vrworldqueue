@@ -14,4 +14,9 @@ router.post('/:bayId', function (req, res) {
         }
     });
 });
-module.exports.socketHandler = function (endpoint, socket) {};
+module.exports.socketHandler = function (socket) {
+    console.log('RFID listening to socket');
+    socket.on('rfid', function (msg) {
+        console.log("[RFID Socket] " + msg);
+    });
+};

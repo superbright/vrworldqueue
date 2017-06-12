@@ -64,4 +64,6 @@ exports.deleteUser = (req, res) => {
         else res.status(404).send("No User found with that ID");
     });
 };
-module.exports.socketHandler = (endpoint, socket) => {}
+module.exports.socketHandler = (socket) => {
+    /* Add Socket Handling Logic Here */
+};
