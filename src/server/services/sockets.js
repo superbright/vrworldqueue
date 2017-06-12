@@ -1,13 +1,12 @@
 var bayController = require('../controllers/bays');
 var rfidController = require('../controllers/rfid');
 var signatureController = require('../controllers/signatures');
-var userController = require('../controllers/bays');
+var userController = require('../controllers/users');
 let sockets = {
     game: {}
     , button: {}
     , queue: {}
 };
-let bays = [];
 import SocketIO from 'socket.io';
 import {
     findIndex, sanitizeString
@@ -24,18 +23,17 @@ module.exports.setupSockets = (server) => {
             , bayNumber: bayId
             , clientType: clientType
         };
-        if (findIndex(bays, currentBay.id) > -1) {
+        if (sockets[clientType][bayId] != null) {
             console.log('[INFO] bay ID is already connected, kicking.');
             socket.disconnect();
         }
         else {
-            sockets[currentBay.clientType][currentBay.id] = socket;
+            sockets[currentBay.clientType][currentBay.bayNumber] = socket;
             console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
-            bays.push(currentBay);
         }
         socket.on('disconnect', () => {
-            if (findIndex(bays, currentBay.id) > -1) bays.splice(findIndex(bays, currentBay.id), 1);
             console.log('[INFO] ' + currentBay.clientType + " " + currentBay.bayNumber + ' disconnected!');
+            sockets[currentBay.clientType][currentBay.bayNumber] = null;
             socket.broadcast.emit('bayDisconnect', {
                 bayId: currentBay.bayNumber
             });
@@ -43,23 +41,34 @@ module.exports.setupSockets = (server) => {
     });
 };
 exports.sendToGame = (gameId, endpoint, message, callback) => {
-    sendToClient('game', endpoint, message, callback);
+    exports.sendToClient('game', gameId, endpoint, message, callback);
 };
 exports.sendToButton = (buttonId, endpoint, message, callback) => {
-    sendToClient('button', endpoint, message, callback);
+    exports.sendToClient('button', buttonId, endpoint, message, callback);
 };
-exports.sentToQueue = (queueId, endpoint, message, callback) => {
-    sendToClient('queue', endpoint, message, callback);
+exports.sendToQueue = (queueId, endpoint, message, callback) => {
+    exports.sendToClient('queue', queueId, endpoint, message, callback);
 };
-expports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
-    var returnValue = {};
+exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
+    var returnValue = {
+        request: {
+            clientType: clientType
+            , clientId: clientId
+            , endpoint: endpoint
+            , message: message
+        }
+    }
     var socket = sockets[clientType][clientId];
     if (!socket) {
         returnValue.error = "Socket not found";
+    }
+    else if (!socket.connected) {
+        returnValue.error = "Socket Not Connected";
     }
     else {
         socket.emit(endpoint, message);
         returnValue.status = "ok";
     }
-    callback(returnValue);
+    callback && callback(returnValue);
 }
+exports.sockets = sockets;
