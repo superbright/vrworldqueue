@@ -19,6 +19,10 @@ development now, run `npm run start`. Then check out `localhost:3000/signup`
 `/signup/waiver`
 `/signup/thanks`
 
+## admin
+`/admin/:adminid`
+`/admin/:adminid/user/:userid`
+
 # API Docs
 base endpoint is /api all others are subdomains of that
 
