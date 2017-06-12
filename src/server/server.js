@@ -7,7 +7,7 @@ import webpack from 'webpack';
 import config from '../../webpack.config';
 const app = express();
 const server = http.Server(app);
-var socketController = require('./controllers/sockets');
+var socketController = require('./services/sockets');
 socketController.setupSockets(server);
 let port = process.env.PORT || 3000;
 const mongoose = require('mongoose');

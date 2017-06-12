@@ -1,7 +1,7 @@
-var bayController = require('./bays');
-var rfidController = require('./rfid');
-var signatureController = require('./signatures');
-var userController = require('./bays');
+var bayController = require('../controllers/bays');
+var rfidController = require('../controllers/rfid');
+var signatureController = require('../controllers/signatures');
+var userController = require('../controllers/bays');
 let sockets = {
     game: {}
     , button: {}
@@ -10,7 +10,7 @@ let sockets = {
 let bays = [];
 import SocketIO from 'socket.io';
 import {
-    validNick, findIndex, sanitizeString
+    findIndex, sanitizeString
 }
 from '../../shared/util';
 module.exports.setupSockets = (server) => {
