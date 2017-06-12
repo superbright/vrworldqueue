@@ -48,19 +48,21 @@ class SignupForm extends Component {
 
   handleWaiver(accept) {
     if (accept) {
-      return fetch('api/users', {
+      fetch('/api/users', {
         method: 'post',
-        data: this.state.form,
-      }).then((res) => {
-        console.log(res);
+        body: JSON.stringify(this.state.form),
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+      }).then(res => res.json()).then(() => {
         this.setState({ waiverAccepted: true });
       }).catch((err) => {
         console.log('error', err);
       });
+    } else {
+      this.clearForm();
+      this.setState({ showWaiver: false });
     }
-
-    this.clearForm();
-    this.setState({ showWaiver: false });
   }
 
   clearForm() {
