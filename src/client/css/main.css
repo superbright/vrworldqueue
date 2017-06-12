@@ -8,6 +8,10 @@ a {
   color: #283593;
 }
 
+a:hover {
+  color: #1A237E;
+}
+
 h1, h2, h3, h4, h5, .big-font {
   font-family: 'Rubik Mono One', sans-serif;
 }
