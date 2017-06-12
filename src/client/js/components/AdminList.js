@@ -26,7 +26,7 @@ class AdminList extends Component {
     return (
       <div>
         <div className="user-search simple-container">
-          <input type="text" placeholder="search" />
+          <input type="text" placeholder="Search Users" />
         </div>
 
         <ul>
