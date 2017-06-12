@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const AdminList = ({ users, match: { params: { adminid } } }) => (
   <div>
-    <div className="user-search simple-container">
+    <div className="user-search vertical-margin simple-container">
       <input type="text" placeholder="Search Users" />
     </div>
 
