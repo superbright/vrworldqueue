@@ -1,15 +1,22 @@
-
-
 body {
   background-color: #ECEFF1;
   color: #283593;
+  padding-top: 80px;
 }
 
-h1, h2, h3, h4, h5 {
+a {
+  color: #283593;
+}
+
+a:hover {
+  color: #1A237E;
+}
+
+h1, h2, h3, h4, h5, .big-font {
   font-family: 'Rubik Mono One', sans-serif;
 }
 
-div, p, span {
+div, p, span, .small-font {
   font-family: 'Roboto Mono', monospace;
 }
 
@@ -17,18 +24,12 @@ ul {
   list-style: none;
 }
 
-header {
-  margin-top: 50px;
-  margin-bottom: 25px;
-}
-
 header .container {
   border-bottom: 2px solid #283593;
 }
 
-header h2 {
-  margin-left: 10px;
-  margin-right: 10px;
+header h2, header h5 {
+  margin: 0px 25px;
 }
 
 button {
@@ -39,6 +40,7 @@ button {
   border: none;
   transition: all 0.25s ease;
   font-size: 14px;
+  margin-bottom: 0px;
 }
 
 button:hover {
@@ -46,10 +48,87 @@ button:hover {
   color: white;
 }
 
+::placeholder {
+  color: #5C6BC0;
+}
+
 input, input[type="text"], input[type="text"]:focus {
   border: none;
+  border-bottom: 2px solid #283593;
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 0;
+  color: #283593;
+  transition: all 0.25s ease;
+}
+
+input[type="text"]:focus {
+  border-bottom: 4px solid #283593;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 form {
   margin-bottom: 0px;
+}
+
+header {
+  background-color: white;
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 80px;
+}
+
+.simple-container {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.flex {
+  display: flex;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.user-list {
+
+}
+
+.user-list-item {
+  padding: 15px 0px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.user-list-item:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.user-search {
+  margin-top: 50px;
+  margin-bottom: 25px;
+}
+
+.user-search input {
+  width: 100%;
+}
+
+
+.admin-user-page {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.admin-user-page h2 {
+  margin-bottom: 0px;
+}
+
+.admin-user-page-info {
+  margin-top: 25px;
 }
