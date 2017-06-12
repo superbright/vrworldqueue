@@ -21,7 +21,8 @@
     "react-router-dom": "^4.1.1",
     "react-select-country": "0.0.15",
     "socket.io": "^1.4.6",
-    "socket.io-client": "^1.4.6"
+    "socket.io-client": "^1.4.6",
+    "style-loader": "^0.18.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
