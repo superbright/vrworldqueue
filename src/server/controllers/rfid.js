@@ -12,3 +12,4 @@ router.post('/:bayId', (req, res) => {
         }
     });
 });
+module.exports.socketHandler = (endpoint, socket) => {}

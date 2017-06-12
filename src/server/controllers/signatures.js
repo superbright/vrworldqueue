@@ -1,9 +1,5 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
 var Signature = require('../models/signature').Signature;
-router.use(bodyParser.json());
-router.get('/:signatureId?', (req, res) => {
+exports.getSignatures = (req, res) => {
     if (req.params.signatureId) Signature.findById(req.params.signatureId, (err, signature) => {
         if (err) res.status(500).send(err);
         else if (signature) res.status(200).send(signature);
@@ -13,8 +9,8 @@ router.get('/:signatureId?', (req, res) => {
         if (err) res.status(500).send(err);
         else res.status(200).send(signatures);
     })
-});
-router.delete('/:signatureId', (req, res) => {
+};
+exports.deleteSignature = (req, res) => {
     Signature.findByIdAndRemove(req.params.signatureId, (err, signature) => {
         if (err) res.status(500).send(err);
         if (signature) {
@@ -23,5 +19,5 @@ router.delete('/:signatureId', (req, res) => {
         }
         else res.status(404).send("No signature found with that ID");
     })
-})
-module.exports = router;
+};
+module.exports.socketHandler = (endpoint, socket) => {}

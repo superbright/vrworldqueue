@@ -1,10 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
-router.use(bodyParser.json());
-router.get('/:userId?', (req, res) => {
+exports.getUsers = (req, res) => {
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
         if (user) res.status(200).send(user);
@@ -14,8 +10,8 @@ router.get('/:userId?', (req, res) => {
         if (err) res.status(500).send(err);
         else res.status(200).send(users);
     });
-});
-router.get('/:userId/signature', (req, res) => {
+}
+exports.getUserSignature = (req, res) => {
     User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
         if (user) {
@@ -27,8 +23,8 @@ router.get('/:userId/signature', (req, res) => {
         }
         else res.json("No User found with that ID");
     });
-});
-router.post('/', (req, res) => {
+};
+exports.postUserSignature = (req, res) => {
     var signature = new Signature({
         image: {
             data: req.body.signaturedate
@@ -53,8 +49,8 @@ router.post('/', (req, res) => {
         if (err) res.status(500).send(err);
         else res.status(200).send(doc);
     });
-});
-router.delete('/:userId', (req, res) => {
+};
+exports.deleteUser = (req, res) => {
     User.findByIdAndRemove(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
         if (user) {
@@ -64,5 +60,5 @@ router.delete('/:userId', (req, res) => {
         }
         else res.status(404).send("No User found with that ID");
     });
-});
-module.exports = router;
+};
+module.exports.socketHandler = (endpoint, socket) => {}

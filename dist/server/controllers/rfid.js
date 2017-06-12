@@ -3,9 +3,6 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({
-    extended: true
-}));
 var Bay = require('../models/bay').Bay;
 router.post('/:bayId', function (req, res) {
     Bay.find({
@@ -17,3 +14,4 @@ router.post('/:bayId', function (req, res) {
         }
     });
 });
+module.exports.socketHandler = function (endpoint, socket) {};

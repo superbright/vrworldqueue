@@ -1,0 +1,10 @@
+var express = require('express');
+var router = express.Router();
+var bodyParser = require('body-parser');
+var controller = require('../controllers/users.js');
+router.use(bodyParser.json());
+router.get('/:userId?', controller.getUsers);
+router.get('/:userId/signature', controller.getUserSignature);
+router.post('/', controller.postUserSignature);
+router.delete('/:userId', controller.deleteUser);
+module.exports = router;

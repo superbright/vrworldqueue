@@ -1,10 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
-router.use(bodyParser.json());
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
-router.get('/:bayId?', (req, res) => {
+exports.getBays = (req, res) => {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, (err, bay) => {
             if (err) res.status(500).send(err);
@@ -16,8 +12,8 @@ router.get('/:bayId?', (req, res) => {
         if (err) res.status(500).send(err);
         else res.status(200).send(bays);
     });
-});
-router.post('/', (req, res) => {
+};
+exports.upsertBay = (req, res) => {
     var newBay = new Bay({
         id: req.body.id
         , name: req.body.name
@@ -25,8 +21,8 @@ router.post('/', (req, res) => {
     });
     newBay.save();
     res.status(200).send(newBay);
-});
-router.post('/:bayId/enqueue', (req, res) => {
+};
+exports.enqueueUser = (req, res) => {
     User.findById(req.body.userId, (err, user) => {
         if (err) res.status(500).send(err);
         else if (user) {
@@ -51,8 +47,8 @@ router.post('/:bayId/enqueue', (req, res) => {
         }
         else res.status(404).send('User not found');
     });
-});
-router.get('/:bayId/dequeue', (req, res) => {
+};
+exports.dequeueUser = (req, res) => {
     Bay.findById(req.params.bayId, (err, bay) => {
         if (err) res.status(500).send(err);
         else if (bay) {
@@ -66,8 +62,8 @@ router.get('/:bayId/dequeue', (req, res) => {
         }
         else res.status(404).send('No bay found with that ID');
     })
-});
-router.delete('/:bayId', (req, res) => {
+};
+exports.deleteBay = (req, res) => {
     Bay.findByIdAndRemove(req.params.bayId, (err, bay) => {
         if (err) res.status(500).send(err);
         if (bay) {
@@ -76,5 +72,5 @@ router.delete('/:bayId', (req, res) => {
         }
         else res.status(404).send("No Bay found with that ID");
     });
-});
-module.exports = router;
+};
+module.exports.socketHandler = (endpoint, socket) => {}

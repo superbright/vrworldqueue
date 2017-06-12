@@ -1,20 +1,16 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
-router.use(bodyParser.json());
-router.get('/:userId?', function (req, res) {
+exports.getUsers = function (req, res) {
     if (req.params.userId) User.findById(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
         if (user) res.status(200).send(user);else res.status(404).send("No User found with that ID");
     });else User.find({}, function (err, users) {
         if (err) res.status(500).send(err);else res.status(200).send(users);
     });
-});
-router.get('/:userId/signature', function (req, res) {
+};
+exports.getUserSignature = function (req, res) {
     User.findById(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
         if (user) {
@@ -24,9 +20,8 @@ router.get('/:userId/signature', function (req, res) {
             });
         } else res.json("No User found with that ID");
     });
-});
-router.post('/', function (req, res) {
-    console.log(req.body);
+};
+exports.postUserSignature = function (req, res) {
     var signature = new Signature({
         image: {
             data: req.body.signaturedate,
@@ -50,8 +45,8 @@ router.post('/', function (req, res) {
     }, function (err, doc) {
         if (err) res.status(500).send(err);else res.status(200).send(doc);
     });
-});
-router.delete('/:userId', function (req, res) {
+};
+exports.deleteUser = function (req, res) {
     User.findByIdAndRemove(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
         if (user) {
@@ -60,5 +55,5 @@ router.delete('/:userId', function (req, res) {
             if (user.signature) delete user.signature._id;
         } else res.status(404).send("No User found with that ID");
     });
-});
-module.exports = router;
+};
+module.exports.socketHandler = function (endpoint, socket) {};

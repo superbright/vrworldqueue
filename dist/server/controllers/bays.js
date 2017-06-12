@@ -1,12 +1,8 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
-router.use(bodyParser.json());
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
-router.get('/:bayId?', function (req, res) {
+exports.getBays = function (req, res) {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, function (err, bay) {
             if (err) res.status(500).send(err);
@@ -15,8 +11,8 @@ router.get('/:bayId?', function (req, res) {
     } else Bay.find({}, function (err, bays) {
         if (err) res.status(500).send(err);else res.status(200).send(bays);
     });
-});
-router.post('/', function (req, res) {
+};
+exports.upsertBay = function (req, res) {
     var newBay = new Bay({
         id: req.body.id,
         name: req.body.name,
@@ -24,8 +20,8 @@ router.post('/', function (req, res) {
     });
     newBay.save();
     res.status(200).send(newBay);
-});
-router.post('/:bayId/enqueue', function (req, res) {
+};
+exports.enqueueUser = function (req, res) {
     User.findById(req.body.userId, function (err, user) {
         if (err) res.status(500).send(err);else if (user) {
             Bay.findOneAndUpdate({
@@ -46,8 +42,8 @@ router.post('/:bayId/enqueue', function (req, res) {
             });
         } else res.status(404).send('User not found');
     });
-});
-router.get('/:bayId/dequeue', function (req, res) {
+};
+exports.dequeueUser = function (req, res) {
     Bay.findById(req.params.bayId, function (err, bay) {
         if (err) res.status(500).send(err);else if (bay) {
             var user = bay.queue.shift();
@@ -58,8 +54,8 @@ router.get('/:bayId/dequeue', function (req, res) {
             } else res.status(404).send('There are no users in the queue');
         } else res.status(404).send('No bay found with that ID');
     });
-});
-router.delete('/:bayId', function (req, res) {
+};
+exports.deleteBay = function (req, res) {
     Bay.findByIdAndRemove(req.params.bayId, function (err, bay) {
         if (err) res.status(500).send(err);
         if (bay) {
@@ -67,5 +63,5 @@ router.delete('/:bayId', function (req, res) {
             res.status(200).send('Bay with id ' + bay._id + ' deleted');
         } else res.status(404).send("No Bay found with that ID");
     });
-});
-module.exports = router;
+};
+module.exports.socketHandler = function (endpoint, socket) {};

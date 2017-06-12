@@ -8,10 +8,6 @@ var _http = require('http');
 
 var _http2 = _interopRequireDefault(_http);
 
-var _socket = require('socket.io');
-
-var _socket2 = _interopRequireDefault(_socket);
-
 var _compression = require('compression');
 
 var _compression2 = _interopRequireDefault(_compression);
@@ -34,68 +30,33 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = (0, _express2.default)();
 var server = _http2.default.Server(app);
-var io = new _socket2.default(server);
+var socketController = require('./controllers/sockets');
+socketController.setupSockets(server);
 var port = process.env.PORT || 3000;
-var users = [];
-var sockets = {};
 var mongoose = require('mongoose');
 var compiler = (0, _webpack2.default)(_webpack4.default);
-
 // webpack hot reload
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: _webpack4.default.output.publicPath
 }));
 app.use(require('webpack-hot-middleware')(compiler));
-
 mongoose.connect('mongodb://localhost/vrworld');
 app.use((0, _compression2.default)({}));
-
-app.use('/api', require('./controllers/routes.js'));
+app.use('/api', require('./routes/routes.js'));
+app.get('/start', function (req, res) {
+    sockets['game'][bays[0].id].emit('startGame');
+    res.send('ok');
+});
+app.get('/stop', function (req, res) {
+    sockets['game'][bays[0].id].emit('endGame');
+    res.send('ok');
+});
+app.get('/restart', function (req, res) {
+    sockets['game'][bays[0].id].emit('rebootGame');
+    res.send('ok');
+});
 app.get('*', function (req, res) {
     res.sendFile(_path2.default.join(__dirname, '../../index.html'));
-});
-
-io.on('connection', function (socket) {
-    var nick = socket.handshake.query.nick;
-    var currentUser = {
-        id: socket.id,
-        nick: nick
-    };
-    if ((0, _util.findIndex)(users, currentUser.id) > -1) {
-        console.log('[INFO] User ID is already connected, kicking.');
-        socket.disconnect();
-    } else if (!(0, _util.validNick)(currentUser.nick)) {
-        socket.disconnect();
-    } else {
-        console.log('[INFO] User ' + currentUser.nick + ' connected!');
-        sockets[currentUser.id] = socket;
-        users.push(currentUser);
-        io.emit('userJoin', {
-            nick: currentUser.nick
-        });
-        console.log('[INFO] Total users: ' + users.length);
-    }
-    socket.on('ding', function () {
-        socket.emit('dong');
-    });
-    socket.on('disconnect', function () {
-        if ((0, _util.findIndex)(users, currentUser.id) > -1) users.splice((0, _util.findIndex)(users, currentUser.id), 1);
-        console.log('[INFO] User ' + currentUser.nick + ' disconnected!');
-        socket.broadcast.emit('userDisconnect', {
-            nick: currentUser.nick
-        });
-    });
-    socket.on('userChat', function (data) {
-        var _nick = (0, _util.sanitizeString)(data.nick);
-        var _message = (0, _util.sanitizeString)(data.message);
-        var date = new Date();
-        var time = ("0" + date.getHours()).slice(-2) + ("0" + date.getMinutes()).slice(-2);
-        console.log('[CHAT] [' + time + '] ' + _nick + ': ' + _message);
-        socket.broadcast.emit('serverSendUserChat', {
-            nick: _nick,
-            message: _message
-        });
-    });
 });
 server.listen(port, function () {
     console.log('[INFO] Listening on *:' + port);
