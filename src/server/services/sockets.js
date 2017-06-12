@@ -42,3 +42,24 @@ module.exports.setupSockets = (server) => {
         });
     });
 };
+exports.sendToGame = (gameId, endpoint, message, callback) => {
+    sendToClient('game', endpoint, message, callback);
+};
+exports.sendToButton = (buttonId, endpoint, message, callback) => {
+    sendToClient('button', endpoint, message, callback);
+};
+exports.sentToQueue = (queueId, endpoint, message, callback) => {
+    sendToClient('queue', endpoint, message, callback);
+};
+expports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
+    var returnValue = {};
+    var socket = sockets[clientType][clientId];
+    if (!socket) {
+        returnValue.error = "Socket not found";
+    }
+    else {
+        socket.emit(endpoint, message);
+        returnValue.status = "ok";
+    }
+    callback(returnValue);
+}
