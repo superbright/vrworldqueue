@@ -11,6 +11,10 @@ class Admin extends Component {
 
     return (
       <div>
+        <header className="flex space-between align-center">
+          <h2>vrworld admin</h2>
+        </header>
+
         <Route path={`${match.url}/:id`} component={AdminList} />
         <Route exact path={match.url} component={NoId} />
       </div>
