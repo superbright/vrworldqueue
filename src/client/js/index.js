@@ -1,9 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import {
-  BrowserRouter as Router,
-  Route,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import '../css/normalize_skeleton.css';
 import '../css/main.css';
@@ -18,11 +15,11 @@ import Bay from './components/Bay';
 const AppRouter = () => (
   <Router>
     <div>
-      <Route exact path="/signup/" component={SignupForm} />
-      <Route exact path="/signup/waiver" component={Waiver} />
-      <Route exact path="/signup/thanks" component={Thanks} />
-      <Route exact path="/admin" component={Admin} />
-      <Route exact path="/bay" component={Bay} />
+      <Route path="/signup/" component={SignupForm} />
+      <Route path="/signup/waiver" component={Waiver} />
+      <Route path="/signup/thanks" component={Thanks} />
+      <Route path="/admin" component={Admin} />
+      <Route path="/bay" component={Bay} />
     </div>
   </Router>
 );
