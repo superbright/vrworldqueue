@@ -31,7 +31,7 @@ var schema = new mongoose.Schema({
         }
         , expiresAt: {
             type: Date
-            , default: new Date(new Date().setHours(24, 0, 0, 0))
+            , default: new Date(new Date().setHours(0, 0, 0, 0))
         }
     }
 })

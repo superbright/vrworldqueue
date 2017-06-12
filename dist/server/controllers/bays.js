@@ -2,6 +2,11 @@
 
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
+var scheduler = require("../services/scheduler");
+var schedulerTasks = {
+    userTimeout: {},
+    gameTimeout: {}
+};
 exports.getBays = function (req, res) {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, function (err, bay) {
@@ -50,7 +55,11 @@ exports.dequeueUser = function (req, res) {
             if (user) {
                 res.status(200).send(user);
                 bay.queue.pull(user);
+                bay.timeouts.user = Date.now() + 60000;
                 bay.save();
+                userTimeouts[bay.id] = scheduler.addToSchedule(Date.now() + 60000, function () {
+                    console.log("User Timeout");
+                });
             } else res.status(404).send('There are no users in the queue');
         } else res.status(404).send('No bay found with that ID');
     });
@@ -66,4 +75,5 @@ exports.deleteBay = function (req, res) {
 };
 module.exports.socketHandler = function (socket) {
     /* Add Socket Handling Logic Here */
+    socket.on('startButtonPressed', function (data) {});
 };

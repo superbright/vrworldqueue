@@ -13,7 +13,7 @@ router.post('/:bayId', (req, res) => {
     });
 });
 module.exports.socketHandler = (socket) => {
-    console.log('RFID listening to socket');
+    /* Add Socket Handling Logic Here */
     socket.on('rfid', (msg) => {
         console.log("[RFID Socket] " + msg);
     });

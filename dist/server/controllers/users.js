@@ -21,7 +21,7 @@ exports.getUserSignature = function (req, res) {
         } else res.json("No User found with that ID");
     });
 };
-exports.postUserSignature = function (req, res) {
+exports.postUser = function (req, res) {
     var signature = new Signature({
         image: {
             data: req.body.signaturedate,

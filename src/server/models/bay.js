@@ -21,6 +21,14 @@ var schema = new mongoose.Schema({
         }
         , _id: false
     }]
+    , timeouts: {
+        user: {
+            type: Date
+        }
+        , game: {
+            type: Date
+        }
+    }
 });
 var Bay = mongoose.model('Bay', schema);
 module.exports = {
