@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "compression": "^1.6.1",
+    "css-loader": "^0.28.4",
     "express": "^4.13.4",
     "mongoose": "^4.10.5",
     "react": "^15.5.4",
