@@ -28,7 +28,7 @@ class AdminList extends Component {
         user,
         socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
       });
-
+      this.connectSocket();
     }).catch((err) => {
       console.log('error', err);
     });
