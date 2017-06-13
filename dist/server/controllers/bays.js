@@ -58,7 +58,7 @@ exports.dequeueUser = function (req, res) {
                 bay.queue.pull(user);
                 bay.timeouts.user = Date.now() + 60000;
                 bay.save();
-                schedulerTasks[userTimeout][bay.id] = scheduler.addToSchedule(Date.now() + 60000, function () {
+                schedulerTasks['userTimeout'][bay.id] = scheduler.addToSchedule(Date.now() + 60000, function () {
                     console.log("User Timeout");
                 });
             } else res.status(404).send('There are no users in the queue');

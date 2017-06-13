@@ -49,11 +49,17 @@ exports.postUser = function (req, res) {
         if (err) res.status(500).send(err);else res.status(200).send(doc);
     });
 };
-exports.validateScreenname = function (req, res) {
+exports.validateUser = function (req, res) {
     User.find({
         screenname: req.body.screenname
     }, function (err, doc) {
-        if (err) res.status(500).send(err);else res.status(200).send(doc);
+        var response = {};
+        if (err) res.status(500).send(err);else if (doc) response = {
+            valid: false
+        };else response = {
+            valid: true
+        };
+        res.status(200).send(response);
     });
 };
 exports.deleteUser = function (req, res) {

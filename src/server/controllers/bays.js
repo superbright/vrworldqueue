@@ -64,7 +64,7 @@ exports.dequeueUser = (req, res) => {
                 bay.queue.pull(user);
                 bay.timeouts.user = Date.now() + 60000;
                 bay.save();
-                schedulerTasks[userTimeout][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
+                schedulerTasks['userTimeout'][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
                     console.log("User Timeout");
                 });
             }
