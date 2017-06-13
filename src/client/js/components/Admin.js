@@ -14,9 +14,11 @@ class Admin extends Component {
     this.state = {
       users: [],
       socket: null,
+      tempRFID: '',
     };
     this.updateUser = this.updateUser.bind(this);
     this.connectSocket = this.connectSocket.bind(this);
+    this.clearTempRFID = this.clearTempRFID.bind(this);
   }
 
   componentWillMount() {
@@ -44,13 +46,18 @@ class Admin extends Component {
   connectSocket() {
     const { socket } = this.state;
 
-    socket.on('rfid', (res) => {
+    socket.on('rfid', (rfid) => {
       console.log('RFID message', rfid);
+      this.setState({ tempRFID: rfid });
     });
   }
 
+  clearTempRFID() {
+    this.setState({ tempRFID: '' });
+  }
+
   render() {
-    const { users } = this.state;
+    const { users, tempRFID } = this.state;
     const { match } = this.props;
 
     return (
@@ -62,7 +69,7 @@ class Admin extends Component {
         <Route
           exact
           path={`${match.url}/:adminid/user/:userid`}
-          component={props => <AdminUser {...props} updateUser={this.updateUser} />}
+          component={props => <AdminUser {...props} updateUser={this.updateUser} tempRFID={tempRFID} />}
         />
         <Route
           exact

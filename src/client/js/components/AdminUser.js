@@ -27,10 +27,11 @@ class AdminList extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    const { email, phone, screenname } = this.state.user;
 
     fetch('/api/users', {
       method: 'post',
-      body: JSON.stringify(this.state.user),
+      body: JSON.stringify({ email, phone, screenname}),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
@@ -56,7 +57,7 @@ class AdminList extends Component {
 
   render() {
     const { user } = this.state;
-    const { match: { params: { userid, adminid } } } = this.props;
+    const { tempRFID, match: { params: { userid, adminid } } } = this.props;
 
     return (
       <div className="admin-user-page simple-container" key={userid}>
@@ -66,6 +67,7 @@ class AdminList extends Component {
           user && (
             <div className="admin-user-page-info">
               <h2>{user.name}</h2>
+              <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
           )
