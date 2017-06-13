@@ -70,6 +70,8 @@ class AdminList extends Component {
             <div className="admin-user-page-info">
               <h2>{user.name}</h2>
               <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
+              {user.rfid.id ? user.rfid.id.type :'no rfid set yet' }
+
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
           )
