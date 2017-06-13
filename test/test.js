@@ -21,6 +21,7 @@ var expect = require("chai").expect;
 //            .expect(200, done)
 //    })
 //});
+
 describe('GET /', function () {
     it('should return home page', function (done) {
         agent
@@ -200,19 +201,37 @@ describe('Bay', function() {
     });
 
     // POST /:bayId/enqueue
+    var userId_01;
     it('should enqueue user', function(done) {
+        // Add user
         agent
-            .post('/api/bays/' + bayId + '/enqueue')
-            .set('Accept', 'applications/json')
+            .post('/api/users')
             .send({
-                userId: "593dbd5e2c139429db49d0dc"
+                firstname: "Sample",
+                lastname: "Example",
+                email: "nope@no.nah",
+                phone: "1234567890",
+                screenname: "aloe",
+                rfid: '1'
             })
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err, res) {
-                expect(res.body.queue[0].user).to.equal("593dbd5e2c139429db49d0dc");
                 if (err) return done(err)
-                done();
+                userId_01 = res.body._id;
+                agent
+                    .post('/api/bays/' + bayId + '/enqueue')
+                    .set('Accept', 'applications/json')
+                    .send({
+                        userId: userId_01
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .end(function(err, res) {
+                        expect(res.body.queue[0].user).to.equal(userId_01);
+                        if (err) return done(err)
+                        done();
+                    });
             });
     });
 
@@ -221,7 +240,7 @@ describe('Bay', function() {
             .post('/api/bays/' + bayId + '/enqueue')
             .set('Accept', 'applications/json')
             .send({
-                userId: "593dbd5e2c139429db49d0dc"
+                userId: userId_01
             })
             .expect(404)
             .end(function(err, res) {
@@ -237,7 +256,7 @@ describe('Bay', function() {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err, res) {
-                expect(res.body.user).to.equal("593dbd5e2c139429db49d0dc");
+                expect(res.body.user).to.equal(userId_01);
                 agent
                     .get('/api/bays/' + bayId)
                     .end(function(err, res) {
