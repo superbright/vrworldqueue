@@ -102,12 +102,12 @@ module.exports.socketHandler = (socket) => {
             console.log(result);
         });
     });
-//    socket.on('rfid', (data) => {
-//        console.log('rfid socket endpoint');
-//        var bayId = data.bayId;
-//        if (schedulerTasks[userTimeout][bayId] != null) {
-//            schedulerTasks[userTimeout][bayId].cancel();
-//            schedulerTasks[userTimeout][bayId] = null;
-//        }
-//    });
+    //    socket.on('rfid', (data) => {
+    //        console.log('rfid socket endpoint');
+    //        var bayId = data.bayId;
+    //        if (schedulerTasks[userTimeout][bayId] != null) {
+    //            schedulerTasks[userTimeout][bayId].cancel();
+    //            schedulerTasks[userTimeout][bayId] = null;
+    //        }
+    //    });
 };

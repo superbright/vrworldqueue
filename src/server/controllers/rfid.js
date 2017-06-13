@@ -16,12 +16,20 @@ router.post('/:bayId', (req, res) => {
 module.exports.socketHandler = (socket) => {
     /* Add Socket Handling Logic Here */
     socket.on('rfid', (msg) => {
-        var json = JSON.parse(msg);
-        json.endpoint = 'rfid';
-        json.message = 'rfid';
-        console.log("[RFID Socket] " + json.tag);
-        sockets.sendBlob(json, (result) => {
-            console.log(result);
-        });
+        var req = JSON.parse(msg);
+        var res = req;
+        if (req.clientId) res.endpoint = 'rfid';
+        if (req.clientType == 'registration') res.clientType = 'admin';
+        switch (req.clientType) {
+        case 'admin':
+            res.clientType = 'registration';
+            sockets.sendBlob(res, (result) => {
+                console.log(result);
+            });
+            break;
+        case 'queue':
+            break;
+        }
+        console.log("RFID tag scanned from " + json.clientType + " #" + json.clientId);
     });
 };

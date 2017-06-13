@@ -4,8 +4,10 @@ var signatureController = require('../controllers/signatures');
 var userController = require('../controllers/users');
 let sockets = {
     game: {}
-    , button: {}
+    , startButton: {}
     , queue: {}
+    , admin: {}
+    , registration: {}
 };
 import SocketIO from 'socket.io';
 import {
@@ -16,14 +18,14 @@ module.exports.setupSockets = (server) => {
     let io = new SocketIO(server);
     io.on('connection', (socket) => {
         console.log('Incoming WS Connection');
-        let bayId = socket.handshake.query.bayId;
+        let clientId = socket.handshake.query.clientId;
         let clientType = socket.handshake.query.clientType;
         let currentBay = {
             id: socket.id
-            , bayNumber: bayId
+            , bayNumber: clientId
             , clientType: clientType
         };
-        if (sockets[clientType][bayId] != null) {
+        if (sockets[clientType][clientId] != null) {
             console.log('[INFO] bay ID is already connected, kicking.');
             socket.disconnect();
         }
@@ -35,7 +37,7 @@ module.exports.setupSockets = (server) => {
             console.log('[INFO] ' + currentBay.clientType + " " + currentBay.bayNumber + ' disconnected!');
             sockets[currentBay.clientType][currentBay.bayNumber] = null;
             socket.broadcast.emit('bayDisconnect', {
-                bayId: currentBay.bayNumber
+                clientId: currentBay.bayNumber
             });
         });
         userController.socketHandler(socket);
@@ -52,6 +54,9 @@ exports.sendToButton = (buttonId, endpoint, message, callback) => {
 exports.sendToQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('queue', queueId, endpoint, message, callback);
 };
+exports.sendToAdmin = (adminId, endpoint, message, callnacl) => {
+    exports.sendToClient('admin', adminId, endpoint, message, callback);
+}
 exports.sendBlob = (req, callback) => {
     exports.sendToClient(req.clientType, req.clientId, req.endpoint, req.message, callback);
 }
