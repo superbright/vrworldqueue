@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import '../css/normalize_skeleton.css';
 import '../css/main.css';
 
-import SignupForm from './components/SignupForm';
+import Signup from './components/Signup';
 import Waiver from './components/Waiver';
 import Thanks from './components/Thanks';
 
@@ -15,7 +15,7 @@ import Bay from './components/Bay';
 const AppRouter = () => (
   <Router>
     <div>
-      <Route path="/signup/" component={SignupForm} />
+      <Route path="/signup/" component={Signup} />
       <Route path="/signup/waiver" component={Waiver} />
       <Route path="/signup/thanks" component={Thanks} />
       <Route path="/admin" component={Admin} />

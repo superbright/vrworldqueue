@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-
+import update from 'immutability-helper';
 import AdminList from './AdminList';
 import AdminUser from './AdminUser';
 
@@ -13,6 +13,7 @@ class Admin extends Component {
     this.state = {
       users: [],
     };
+    this.updateUser = this.updateUser.bind(this);
   }
 
   componentWillMount() {
@@ -23,6 +24,12 @@ class Admin extends Component {
     }).catch((err) => {
       console.log('error', err);
     });
+  }
+
+  updateUser(userIdx, key, value) {
+    this.setState({
+      users: update(this.state.users, {[userIdx]: {[key]: {$set: value}}})
+    })
   }
 
   render() {
@@ -38,7 +45,7 @@ class Admin extends Component {
         <Route
           exact
           path={`${match.url}/:adminid/user/:userid`}
-          component={props => <AdminUser {...props} users={users} />}
+          component={props => <AdminUser {...props} updateUser={this.updateUser} />}
         />
         <Route
           exact
