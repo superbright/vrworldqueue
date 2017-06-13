@@ -4,8 +4,10 @@ var signatureController = require('../controllers/signatures');
 var userController = require('../controllers/users');
 let sockets = {
     game: {}
-    , button: {}
+    , startButton: {}
     , queue: {}
+    , admin: {}
+    , registration: {}
 };
 import SocketIO from 'socket.io';
 import {
@@ -52,6 +54,9 @@ exports.sendToButton = (buttonId, endpoint, message, callback) => {
 exports.sendToQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('queue', queueId, endpoint, message, callback);
 };
+exports.sendToAdmin = (adminId, endpoint, message, callnacl) => {
+    exports.sendToClient('admin', adminId, endpoint, message, callback);
+}
 exports.sendBlob = (req, callback) => {
     exports.sendToClient(req.clientType, req.clientId, req.endpoint, req.message, callback);
 }

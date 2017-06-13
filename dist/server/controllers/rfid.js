@@ -18,10 +18,12 @@ router.post('/:bayId', function (req, res) {
 module.exports.socketHandler = function (socket) {
     /* Add Socket Handling Logic Here */
     socket.on('rfid', function (msg) {
-        var json = JSON.parse(msg);
-        json.endpoint = 'rfid';
+        var req = JSON.parse(msg);
+        var res = req;
+        if (req.clientId) res.endpoint = 'rfid';
+        if (json.clientType == 'registration') res.clientType = 'admin';
         json.message = 'rfid';
-        console.log("[RFID Socket] " + json.tag);
+        console.log("RFID tag scanned from " + json.clientType + " #" + json.clientId);
         sockets.sendBlob(json, function (result) {
             console.log(result);
         });
