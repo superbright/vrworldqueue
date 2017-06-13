@@ -19,10 +19,11 @@ module.exports.socketHandler = (socket) => {
         var req = JSON.parse(msg);
         var res = req;
         if (req.clientId) res.endpoint = 'rfid';
-        if (req.clientType == 'registration') res.clientType = 'admin';
+
         switch (req.clientType) {
-        case 'admin':
-            res.clientType = 'registration';
+        case 'registration':
+            res.clientType = 'admin';
+            res.message = req.tag;
             sockets.sendBlob(res, (result) => {
                 console.log(result);
             });

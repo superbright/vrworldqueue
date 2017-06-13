@@ -25,14 +25,15 @@ module.exports.setupSockets = (server) => {
             , bayNumber: clientId
             , clientType: clientType
         };
-        if (sockets[clientType][clientId] != null) {
-            console.log('[INFO] bay ID is already connected, kicking.');
-            socket.disconnect();
-        }
-        else {
+        // if (sockets[clientType][clientId] != null) {
+        //     console.log('[INFO] bay ID is already connected, kicking.');
+        //     socket.disconnect();
+        // }
+        // else {
             sockets[currentBay.clientType][currentBay.bayNumber] = socket;
+            socket.emit('rfid', 'hello');
             console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
-        }
+        // }
         socket.on('disconnect', () => {
             console.log('[INFO] ' + currentBay.clientType + " " + currentBay.bayNumber + ' disconnected!');
             sockets[currentBay.clientType][currentBay.bayNumber] = null;
@@ -77,6 +78,7 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         returnValue.error = "Socket Not Connected";
     }
     else {
+      socket.emit('rfid','test');
         socket.emit(endpoint, message);
         returnValue.status = "ok";
     }

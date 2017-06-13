@@ -36,11 +36,13 @@ class AdminList extends Component {
 
   connectSocket() {
     const { socket } = this.state;
-
-    socket.on('rfid', (res) => {
-      console.log('RFID message', res);
-      this.setState({ tempRFID: res.tag });
-    });
+    if (socket) {
+      console.log('--', socket);
+      socket.on('rfid', (res) => {
+        console.log('RFID message', res);
+        this.setState({ tempRFID: res.tag });
+      });
+    }
   }
 
   clearTempRFID() {
