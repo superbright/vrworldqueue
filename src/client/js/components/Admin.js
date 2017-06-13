@@ -46,9 +46,9 @@ class Admin extends Component {
   connectSocket() {
     const { socket } = this.state;
 
-    socket.on('rfid', (rfid) => {
-      console.log('RFID message', rfid);
-      this.setState({ tempRFID: rfid });
+    socket.on('rfid', (res) => {
+      console.log('RFID message', res);
+      this.setState({ tempRFID: res.tag });
     });
   }
 
