@@ -31,7 +31,6 @@ module.exports.setupSockets = (server) => {
         // }
         // else {
             sockets[currentBay.clientType][currentBay.bayNumber] = socket;
-            socket.emit('rfid', 'hello');
             console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
         // }
         socket.on('disconnect', () => {
@@ -78,7 +77,6 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         returnValue.error = "Socket Not Connected";
     }
     else {
-      socket.emit('rfid','test');
         socket.emit(endpoint, message);
         returnValue.status = "ok";
     }

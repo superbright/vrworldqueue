@@ -40,7 +40,7 @@ class AdminList extends Component {
       console.log('--', socket);
       socket.on('rfid', (res) => {
         console.log('RFID message', res);
-        this.setState({ tempRFID: res.tag });
+        this.setState({ tempRFID: res });
       });
     }
   }
@@ -51,7 +51,7 @@ class AdminList extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const { email, phone, screenname, tempRFID } = this.state.user;
+    const {user: {email, phone, screenname}, tempRFID } = this.state;
 
     fetch('/api/users', {
       method: 'post',
@@ -93,7 +93,7 @@ class AdminList extends Component {
             <div className="admin-user-page-info">
               <h2>{user.name}</h2>
               <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
-              {user.rfid.id ? user.rfid.id.type :'no rfid set yet' }
+              {user.rfid.id || 'no rfid set yet' }
 
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
