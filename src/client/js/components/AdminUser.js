@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import UserForm from './UserForm';
+import io from 'socket.io-client';
 
 class AdminList extends Component {
   constructor() {
@@ -8,27 +9,47 @@ class AdminList extends Component {
 
     this.state = {
       user: null,
+      socket: null,
+      tempRFID: '',
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.connectSocket = this.connectSocket.bind(this);
+    this.clearTempRFID = this.clearTempRFID.bind(this);
   }
 
   componentWillMount() {
-    const { match: { params: { userid } } } = this.props;
+    const { match: { params: { userid, adminid } } } = this.props;
     return fetch(`/api/users/${userid}`, {
       method: 'get',
     }).then(res => res.json()).then((user) => {
-      this.setState({ user });
+      this.setState({
+        user,
+        socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
+      });
+
     }).catch((err) => {
       console.log('error', err);
     });
   }
 
+  connectSocket() {
+    const { socket } = this.state;
+
+    socket.on('rfid', (res) => {
+      console.log('RFID message', res);
+      this.setState({ tempRFID: res.tag });
+    });
+  }
+
+  clearTempRFID() {
+    this.setState({ tempRFID: '' });
+  }
+
   handleSubmit(event) {
     event.preventDefault();
-    const { email, phone, screenname } = this.state.user;
-    const { tempRFID } = this.props;
+    const { email, phone, screenname, tempRFID } = this.state.user;
 
     fetch('/api/users', {
       method: 'post',
@@ -38,7 +59,7 @@ class AdminList extends Component {
       }),
     }).then(res => res.json()).then((res) => {
       console.log('success', res);
-      this.props.clearTempRFID()
+      this.clearTempRFID();
     }).catch((err) => {
       console.log('error', err);
     });
@@ -58,8 +79,8 @@ class AdminList extends Component {
   }
 
   render() {
-    const { user } = this.state;
-    const { tempRFID, match: { params: { userid, adminid } } } = this.props;
+    const { user, tempRFID } = this.state;
+    const { match: { params: { userid, adminid } } } = this.props;
 
     return (
       <div className="admin-user-page simple-container" key={userid}>

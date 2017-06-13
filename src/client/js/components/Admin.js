@@ -3,7 +3,6 @@ import { Route } from 'react-router-dom';
 import update from 'immutability-helper';
 import AdminList from './AdminList';
 import AdminUser from './AdminUser';
-import io from 'socket.io-client';
 
 const NoId = () => <div>No Admin ID in route, try: /admin/*ADMIN_ID*</div>;
 
@@ -17,21 +16,14 @@ class Admin extends Component {
       tempRFID: '',
     };
     this.updateUser = this.updateUser.bind(this);
-    this.connectSocket = this.connectSocket.bind(this);
-    this.clearTempRFID = this.clearTempRFID.bind(this);
+
   }
 
   componentWillMount() {
-    const { match: { params: { adminid } } } = this.props;
     return fetch('/api/users', {
       method: 'get',
     }).then(res => res.json()).then((users) => {
-      this.setState({
-        users,
-        socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
-      });
-
-      this.connectSocket();
+      this.setState({ users });
     }).catch((err) => {
       console.log('error', err);
     });
@@ -41,19 +33,6 @@ class Admin extends Component {
     this.setState({
       users: update(this.state.users, {[userIdx]: {[key]: {$set: value}}})
     })
-  }
-
-  connectSocket() {
-    const { socket } = this.state;
-
-    socket.on('rfid', (res) => {
-      console.log('RFID message', res);
-      this.setState({ tempRFID: res.tag });
-    });
-  }
-
-  clearTempRFID() {
-    this.setState({ tempRFID: '' });
   }
 
   render() {
@@ -69,7 +48,7 @@ class Admin extends Component {
         <Route
           exact
           path={`${match.url}/:adminid/user/:userid`}
-          component={props => <AdminUser {...props} updateUser={this.updateUser} tempRFID={tempRFID} clearTempRFID={this.clearTempRFID} />}
+          component={props => <AdminUser {...props} updateUser={this.updateUser} />}
         />
         <Route
           exact
