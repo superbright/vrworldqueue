@@ -69,7 +69,7 @@ class Admin extends Component {
         <Route
           exact
           path={`${match.url}/:adminid/user/:userid`}
-          component={props => <AdminUser {...props} updateUser={this.updateUser} tempRFID={tempRFID} />}
+          component={props => <AdminUser {...props} updateUser={this.updateUser} tempRFID={tempRFID} clearTempRFID={this.clearTempRFID} />}
         />
         <Route
           exact

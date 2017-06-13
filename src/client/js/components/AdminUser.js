@@ -28,15 +28,17 @@ class AdminList extends Component {
   handleSubmit(event) {
     event.preventDefault();
     const { email, phone, screenname } = this.state.user;
+    const { tempRFID } = this.props;
 
     fetch('/api/users', {
       method: 'post',
-      body: JSON.stringify({ email, phone, screenname}),
+      body: JSON.stringify({ email, phone, screenname, rfid: tempRFID }),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
       console.log('success', res);
+      this.props.clearTempRFID()
     }).catch((err) => {
       console.log('error', err);
     });
