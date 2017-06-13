@@ -30,6 +30,6 @@ module.exports.socketHandler = (socket) => {
         case 'queue':
             break;
         }
-        console.log("RFID tag scanned from " + json.clientType + " #" + json.clientId);
+        console.log("RFID tag scanned from " + req.clientType + " #" + req.clientId);
     });
 };
