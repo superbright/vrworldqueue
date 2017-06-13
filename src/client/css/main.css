@@ -97,9 +97,18 @@ header {
   display: flex;
 }
 
+.waiver button {
+  margin: 10px 20px;
+}
+
 .space-between {
   justify-content: space-between;
 }
+
+.justify-center {
+  justify-content: center;
+}
+
 
 .align-center {
   align-items: center;
@@ -148,4 +157,8 @@ header {
 
 .form-group {
   margin-bottom: 25px;
+}
+
+.centered-message {
+  width: 75%;
 }

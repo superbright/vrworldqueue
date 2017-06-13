@@ -93,6 +93,7 @@ class SignupForm extends Component {
               name="firstname"
               id="firstname"
               value={firstname}
+              required
               onChange={this.handleChange}
             />
           </div>
@@ -104,6 +105,7 @@ class SignupForm extends Component {
               name="lastname"
               id="lastname"
               value={lastname}
+              required
               onChange={this.handleChange}
             />
           </div>
@@ -115,6 +117,7 @@ class SignupForm extends Component {
               name="email"
               id="email"
               value={email}
+              required
               onChange={this.handleChange}
             />
           </div>
@@ -137,6 +140,7 @@ class SignupForm extends Component {
               name="screenname"
               id="screenname"
               value={screenname}
+              required
               onChange={this.handleChange}
             />
           </div>
@@ -154,8 +158,9 @@ class SignupForm extends Component {
       showWaiver,
       waiverAccepted,
     } = this.state;
-
+    console.log('here');
     if (waiverAccepted) {
+      console.log('waiverAccepted');
       return (<Redirect to={{ pathname: '/signup/thanks' }} />);
     }
 
