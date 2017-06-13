@@ -12,7 +12,7 @@ a:hover {
   color: #1A237E;
 }
 
-h1, h2, h3, h4, h5, .big-font {
+h1, h2, h3, h4, h5, .big-font, label {
   font-family: 'Rubik Mono One', sans-serif;
 }
 
@@ -55,15 +55,24 @@ button:hover {
 input, input[type="text"], input[type="text"]:focus {
   border: none;
   border-bottom: 2px solid #283593;
+  margin-bottom: 2px;
   background-color: rgba(255, 255, 255, 0);
   border-radius: 0;
   color: #283593;
   transition: all 0.25s ease;
 }
 
+input {
+  width: 100%;
+  font-size: 16px;
+  height: auto;
+}
+
 input[type="text"]:focus {
   border-bottom: 4px solid #283593;
   background-color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0px;
+
 }
 
 form {
@@ -131,4 +140,12 @@ header {
 
 .admin-user-page-info {
   margin-top: 25px;
+}
+
+.signup-form {
+  margin-top: 25px;
+}
+
+.form-group {
+  margin-bottom: 25px;
 }
