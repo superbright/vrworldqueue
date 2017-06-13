@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
+import validate from 'validate.js';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 
@@ -9,6 +10,25 @@ const formInit = {
   email: '',
   phone: '',
   screenname: '',
+};
+
+const constraints = {
+  firstname: {
+    presence: true,
+  },
+  lastname: {
+    presence: true,
+  },
+  email: {
+    presence: true,
+    email: true,
+  },
+  phone: {
+    presence: true,
+    length: {
+      minimum: 10,
+    },
+  }
 };
 
 class Signup extends Component {
