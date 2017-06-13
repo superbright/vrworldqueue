@@ -8,4 +8,5 @@ router.post('/', controller.upsertBay);
 router.post('/:bayId/enqueue', controller.enqueueUser);
 router.get('/:bayId/dequeue', controller.dequeueUser);
 router.delete('/:bayId', controller.deleteBay);
+router.delete('/:bayId/queue', controller.clearQueue);
 module.exports = router;

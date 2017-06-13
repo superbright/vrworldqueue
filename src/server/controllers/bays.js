@@ -1,6 +1,7 @@
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
 var scheduler = require("../services/scheduler");
+var sockets = require('../services/sockets');
 var schedulerTasks = {
     userTimeout: {}
     , gameTimeout: {}
@@ -63,7 +64,7 @@ exports.dequeueUser = (req, res) => {
                 bay.queue.pull(user);
                 bay.timeouts.user = Date.now() + 60000;
                 bay.save();
-                userTimeouts[bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
+                schedulerTasks[userTimeout][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
                     console.log("User Timeout");
                 });
             }
@@ -82,7 +83,31 @@ exports.deleteBay = (req, res) => {
         else res.status(404).send("No Bay found with that ID");
     });
 };
+module.exports.clearQueue = (req, res) => {
+    Bay.findById(req.params.bayId, (err, bay) => {
+        if (err) res.status(500).send(err);
+        else if (bay) {
+            bay.queue = [];
+            bay.save();
+            res.status(200).send(bay);
+        }
+        else res.status(404).send("No Bay found with that ID");
+    });
+}
 module.exports.socketHandler = (socket) => {
     /* Add Socket Handling Logic Here */
-    socket.on('startButtonPressed', (data) => {});
+    socket.on('startButtonPressed', (data) => {
+        var bayId = data.bayId;
+        sockets.sendToGame(bayId, 'startGame', {}, (result) => {
+            console.log(result);
+        });
+    });
+    socket.on('rfid', (data) => {
+        console.log('rfid socket endpoint');
+        var bayId = data.bayId;
+        if (schedulerTasks[userTimeout][bayId] != null) {
+            schedulerTasks[userTimeout][bayId].cancel();
+            schedulerTasks[userTimeout][bayId] = null;
+        }
+    });
 };
