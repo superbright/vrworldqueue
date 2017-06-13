@@ -53,6 +53,21 @@ exports.postUser = (req, res) => {
         else res.status(200).send(doc);
     });
 };
+exports.validateUser = (req, res) => {
+    User.find({
+        screenname: req.body.screenname
+    }, (err, doc) => {
+        var response = {};
+        if (err) res.status(500).send(err);
+        else if (doc) response = {
+            valid: false
+        };
+        else response = {
+            valid: true
+        };
+        res.status(200).send(response);
+    });
+}
 exports.deleteUser = (req, res) => {
     User.findByIdAndRemove(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);

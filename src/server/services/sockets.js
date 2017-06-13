@@ -52,6 +52,9 @@ exports.sendToButton = (buttonId, endpoint, message, callback) => {
 exports.sendToQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('queue', queueId, endpoint, message, callback);
 };
+exports.sendBlob = (req, callback) => {
+    exports.sendToClient(req.clientType, req.clientId, req.endpoint, req.message, callback);
+}
 exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     var returnValue = {
         request: {
