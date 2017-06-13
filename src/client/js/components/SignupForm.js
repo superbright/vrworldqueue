@@ -80,16 +80,19 @@ class SignupForm extends Component {
     } = this.state;
 
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <div>
+      <div className="simple-container">
+        <header className="flex space-between align-center">
+          <h5>Sign Up</h5>
+        </header>
+
+        <form className="signup-form" onSubmit={this.handleSubmit}>
+          <div className="form-group">
             <label htmlFor="firstname">First Name</label>
             <input
               type="text"
               name="firstname"
               id="firstname"
               value={firstname}
-              placeholder="Name"
               onChange={this.handleChange}
             />
           </div>
@@ -101,7 +104,6 @@ class SignupForm extends Component {
               name="lastname"
               id="lastname"
               value={lastname}
-              placeholder="Last Name"
               onChange={this.handleChange}
             />
           </div>
@@ -113,7 +115,6 @@ class SignupForm extends Component {
               name="email"
               id="email"
               value={email}
-              placeholder="Email"
               onChange={this.handleChange}
             />
           </div>
@@ -125,7 +126,6 @@ class SignupForm extends Component {
               name="phone"
               id="phone"
               value={phone}
-              placeholder="Phone"
               onChange={this.handleChange}
             />
           </div>
@@ -137,7 +137,6 @@ class SignupForm extends Component {
               name="screenname"
               id="screenname"
               value={screenname}
-              placeholder="Screen Name"
               onChange={this.handleChange}
             />
           </div>

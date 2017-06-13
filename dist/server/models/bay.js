@@ -22,7 +22,15 @@ var schema = new mongoose.Schema({
             default: Date.now
         },
         _id: false
-    }]
+    }],
+    timeouts: {
+        user: {
+            type: Date
+        },
+        game: {
+            type: Date
+        }
+    }
 });
 var Bay = mongoose.model('Bay', schema);
 module.exports = {
