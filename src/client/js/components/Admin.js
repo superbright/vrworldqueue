@@ -7,10 +7,6 @@ import io from 'socket.io-client';
 
 const NoId = () => <div>No Admin ID in route, try: /admin/*ADMIN_ID*</div>;
 
-console.log('hello');
-// const socket = io('http://localhost:3000/', {query: { clientType: 'admin', clientId: 2 }});
-const socket = io('http://localhost:3000', {query: 'clientType=admin&clientId=2' });
-
 class Admin extends Component {
   constructor() {
     super();
@@ -20,6 +16,7 @@ class Admin extends Component {
       socket: null,
     };
     this.updateUser = this.updateUser.bind(this);
+    this.connectSocket = this.connectSocket.bind(this);
   }
 
   componentWillMount() {
@@ -27,8 +24,12 @@ class Admin extends Component {
     return fetch('/api/users', {
       method: 'get',
     }).then(res => res.json()).then((users) => {
+      this.setState({
+        users,
+        socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
+      });
 
-      this.setState({ users });
+      this.connectSocket();
     }).catch((err) => {
       console.log('error', err);
     });
@@ -38,6 +39,14 @@ class Admin extends Component {
     this.setState({
       users: update(this.state.users, {[userIdx]: {[key]: {$set: value}}})
     })
+  }
+
+  connectSocket() {
+    const { socket } = this.state;
+
+    socket.on('rfid', (res) => {
+      console.log('RFID message', rfid);
+    });
   }
 
   render() {
