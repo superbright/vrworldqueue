@@ -3,8 +3,13 @@ import { Route } from 'react-router-dom';
 import update from 'immutability-helper';
 import AdminList from './AdminList';
 import AdminUser from './AdminUser';
+import io from 'socket.io-client';
 
 const NoId = () => <div>No Admin ID in route, try: /admin/*ADMIN_ID*</div>;
+
+console.log('hello');
+// const socket = io('http://localhost:3000/', {query: { clientType: 'admin', clientId: 2 }});
+const socket = io('http://localhost:3000', {query: 'clientType=admin&clientId=2' });
 
 class Admin extends Component {
   constructor() {
@@ -12,14 +17,17 @@ class Admin extends Component {
 
     this.state = {
       users: [],
+      socket: null,
     };
     this.updateUser = this.updateUser.bind(this);
   }
 
   componentWillMount() {
+    const { match: { params: { adminid } } } = this.props;
     return fetch('/api/users', {
       method: 'get',
     }).then(res => res.json()).then((users) => {
+
       this.setState({ users });
     }).catch((err) => {
       console.log('error', err);
