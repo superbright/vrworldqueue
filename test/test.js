@@ -4,24 +4,17 @@ var testCase = require('mocha').describe;
 var agent = supertest.agent('http://localhost:3000');
 var should = require("chai").should();
 var expect = require("chai").expect;
-//var async = require("async");
 
-//var app = require('../src/server/server');
-//var express = require('express');
-////
-//
-//  User Account Tests
-//
-////
-//testCase('User', function () {
-//    var userapi = supertest
-//    it('should return a 200 response', function (done) {
-//        api.get('/users')
-//            //            .set('Accept', 'applications/json')
-//            .expect(200, done)
-//    })
-//});
+/*
 
+    TODO:
+    - Validate users
+    - Make sure users cannot queue a game if they are already queued in another
+    - 
+
+*/
+
+// GET /
 describe('GET /', function () {
     it('should return home page', function (done) {
         agent
@@ -34,10 +27,10 @@ describe('GET /', function () {
     });
 });
 
-var userId;
 describe('User', function() {
-    // TODO: GET /:userId/signature
+    var userId;
 
+    // GET /
     it('should return a 200 response', function(done) {
         agent
             .get('/api/users')
@@ -63,6 +56,7 @@ describe('User', function() {
             });
     });
 
+    // Validate data
     it('should be an object with keys and values', function(done) {
         agent
             .get('/api/users/' + userId)
@@ -91,7 +85,6 @@ describe('User', function() {
                 expect(res.body.email).to.equal("nope@no.nah");
                 expect(res.body.phone).to.equal("1234567890");
                 expect(res.body.screenname).to.equal("aloe");
-    //            console.log(res.body.rfid);
                 done();
             });
     });
@@ -121,19 +114,6 @@ describe('User', function() {
             });
     });
 
-// Uncaught AssertionError: expected Tue, 13 Jun 2017 04:00:00 GMT to equal Tue, 13 Jun 2017 04:00:00 GMT
-/*    it('should automatically set the correct expiration date', function(done) {
-        agent
-            .get('/api/users/' + userId)
-            .expect(200)
-            .end(function(err, res) {
-                var expectedDate = new Date(new Date().setHours(24, 0, 0, 0));
-                expect(new Date(res.body.rfid.expiresAt)).to.equal(expectedDate);
-                if (err) return done(err)
-                done();
-            });
-    });*/
-
     // DELETE /:userId
     it('should delete user', function(done) {
         agent
@@ -146,8 +126,13 @@ describe('User', function() {
     });
 });
 
-var bayId;
 describe('Bay', function() {
+    var bayId;
+    var userId;
+    var userId_01;
+    var userId_02;
+
+    // GET /
     it('should return a 200 response', function(done) {
         agent
             .get('/api/bays')
@@ -171,6 +156,7 @@ describe('Bay', function() {
             });
     });
 
+    // Validate data
     it('should be an object with keys and values', function(done) {
         agent
             .get('/api/bays/' + bayId)
@@ -201,46 +187,49 @@ describe('Bay', function() {
     });
 
     // POST /:bayId/enqueue
-    var userId_01;
-    it('should enqueue user', function(done) {
-        // Add user
-        agent
+    it('should enqueue user', function() {
+        return agent
+        // Create a new user
             .post('/api/users')
             .send({
                 firstname: "Sample",
                 lastname: "Example",
-                email: "nope@no.nah",
+                email: "nope@no.naah",
                 phone: "1234567890",
-                screenname: "aloe",
-                rfid: '1'
+                screenname: "aloe"
             })
             .expect('Content-Type', /json/)
             .expect(200)
-            .end(function(err, res) {
-                if (err) return done(err)
-                userId_01 = res.body._id;
-                agent
+        // Grab new user's ID
+            .then(function(res) {
+                userId = JSON.parse(res.text)._id;
+                return agent
+                    .get('/api/users/' + userId)
+                    .expect(200);
+            })
+        // Enqueue new user
+            .then(function(res) {
+                return agent
                     .post('/api/bays/' + bayId + '/enqueue')
-                    .set('Accept', 'applications/json')
                     .send({
-                        userId: userId_01
+                        userId: userId
                     })
                     .expect('Content-Type', /json/)
                     .expect(200)
-                    .end(function(err, res) {
-                        expect(res.body.queue[0].user).to.equal(userId_01);
-                        if (err) return done(err)
-                        done();
-                    });
-            });
+            })
+        // Make sure the first queued user is the right one
+            .then(function(res) {
+                assert(res.body.queue[0].user === userId, 'got the same ID back');
+            })
     });
 
+    // Testing whether or not user is already in queue for the same bay
     it('should throw 404 error', function(done) {
         agent
             .post('/api/bays/' + bayId + '/enqueue')
             .set('Accept', 'applications/json')
             .send({
-                userId: userId_01
+                userId: userId
             })
             .expect(404)
             .end(function(err, res) {
@@ -249,6 +238,7 @@ describe('Bay', function() {
             });
     });
 
+    // GET /:bayId/dequeue
     it('should dequeue user', function(done) {
         agent
             .get('/api/bays/' + bayId + '/dequeue')
@@ -256,7 +246,7 @@ describe('Bay', function() {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err, res) {
-                expect(res.body.user).to.equal(userId_01);
+                expect(res.body.user).to.equal(userId);
                 agent
                     .get('/api/bays/' + bayId)
                     .end(function(err, res) {
@@ -265,115 +255,116 @@ describe('Bay', function() {
                         done();
                     });
             });
-
-
-
-
-
-/*
-        async.series([
-            function(callback) {
-                agent
-                    .get('/api/bays/' + bayId + '/dequeue')
-                    .set('Accept', 'applications/json')
-                    .expect('Content-Type', /json/)
-                    .expect(200)
-                    .end(function(err, res) {
-                        expect(res.body.user).to.equal("593dbd5e2c139429db49d0dc");
-                    });
-
-                    console.log("asdfg");
-                    callback();
-
-                //callback();
-            },
-            function(callback) {
-                agent
-                    .get('/api/bays/' + bayId)
-                    .end(function(err, res) {
-                        expect(res.body.queue.length).to.equal(0);
-                    });
-
-                    callback();
-                    console.log("1234");
-                //callback(null, expect(res.body.queue.length).to.equal(0));
-            }
-        ], done());*/
-
-
-
-
-
-
-        
     });
 
-    // Boilerplate to test multiple enqueues    
-    it('should dequeue oldest user and newest user should still be in queue', function(done) {
-        agent
-            .post('/api/bays/' + bayId + '/enqueue')
-            .send({ userId: "593dbd5e2c139429db49d0dc" })
-            .end(function() {
-                agent
-                    .post('/api/bays/' + bayId + '/enqueue')
-                    .send({ userId: "593dbd5b2c139429db49d0d9" })
-                    .end(function() {
-                        agent
-                            .get('/api/bays/' + bayId + '/dequeue')
-                            .set('Accept', 'applications/json')
-                            .expect('Content-Type', /json/)
-                            .expect(200)
-                            .end(function(err, res) {
-                                expect(res.body.user).to.equal("593dbd5e2c139429db49d0dc");
-                                agent
-                                    .get('/api/bays/' + bayId)
-                                    .end(function(err, res) {
-                                        expect(res.body.queue[0].user).to.equal("593dbd5b2c139429db49d0d9");
-                                        if (err) return done(err)
-                                        done();
-                                    });
-                            });
-                    });
-            });
-
-/*        async.series([
-            function(callback) {
-                agent
-                    .post('/api/bays/' + bayId + '/enqueue')
-                    .send({ userId: "593dbd5e2c139429db49d0dc" })
-                    .end(callback)
-            },
-            function(callback) {
-                agent
-                    .post('/api/bays/' + bayId + '/enqueue')
-                    .send({ userId: "593dbd5b2c139429db49d0d9" })
-                    .end(callback)
-            },
-            function(callback) {
-                agent
-                    .get('/api/bays/' + bayId + '/dequeue')
-                    .set('Accept', 'applications/json')
-                    .expect('Content-Type', /json/)
-                    .expect(200)
-                    .end(function(err, res) {
-                        expect(res.body.user).to.equal("593dbd5e2c139429db49d0dc");
+    // Test multiple enqueues and dequeue then make sure the right ones are dequeued and the queue still has the right users left
+    it('should dequeue oldest user and newest user should still be in queue', function() {
+            return agent
+            // Create a new user
+                .post('/api/users')
+                .send({
+                    firstname: "Sample",
+                    lastname: "Example",
+                    email: "nope@no.naah",
+                    phone: "1234567890",
+                    screenname: "aloe"
+                })
+                .expect('Content-Type', /json/)
+                .expect(200)
+            // Grab new user's ID
+                .then(function(res) {
+                    userId_01 = res.body._id;
+                })
+            // Create a new user again
+                .then(function() {
+                    return agent
+                    .post('/api/users')
+                    .send({
+                        firstname: "Sample",
+                        lastname: "Example",
+                        email: "nope@no.nah",
+                        phone: "1234567890",
+                        screenname: "aloe"
                     })
-            }
-        ]);
+                    .expect('Content-Type', /json/)
+                    .expect(200)
 
-        agent
-            .get('/api/bays/' + bayId)
-            .end(function(err, res) {
-                console.log(res.body)
-                expect(res.body.queue[0].user).to.equal("593dbd5b2c139429db49d0d9");
-                if (err) return done(err)
-                done();
-            });*/
-
-
-
+                })
+            // Grab second new user's ID
+                .then(function(res) {
+                    userId_02 = res.body._id;
+                })
+            // Enqueue user
+                .then(function() {
+                    return agent
+                        .post('/api/bays/' + bayId + '/enqueue')
+                        .send({
+                            userId: userId_01
+                        })
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                })
+            // Enqueue second user
+                .then(function() {
+                    return agent
+                        .post('/api/bays/' + bayId + '/enqueue')
+                        .send({
+                            userId: userId_02
+                        })
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                })
+            // Dequeue user
+                .then(function() {
+                    return agent
+                        .get('/api/bays/' + bayId + '/dequeue')
+                        .set('Accept', 'applications/json')
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                })
+            // Make sure right user was dequeued then grab bay info
+                .then(function(res) {
+                    assert(res.body.user === userId_01, 'first user was dequeued');
+                    return agent
+                        .get('/api/bays/' + bayId)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                })
+            // Make sure second user is still in queue
+                .then(function(res) {
+                    assert(res.body.queue[0].user === userId_02, 'second user still in queue');
+                })
     });
 
+    // DELETE /:bayId/queue
+    it('should clear queue', function() {
+        return agent
+        // Enqueue another user to the queue for further testing
+            .post('/api/bays/' + bayId + '/enqueue')
+            .send({
+                userId: userId_01
+            })
+            .expect('Content-Type', /json/)
+            .expect(200)
+        // Grab bay info
+            .then(function(res) {
+                return agent
+                    .get('/api/bays/' + bayId)
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+            })
+        // Check to see if the queue count is right then clear
+            .then(function(res) {
+                assert(res.body.queue.length === 2, 'queue should have 2 users');
+                return agent
+                    .delete('/api/bays/' + bayId + '/queue')
+                    .expect(200)
+            })
+        // Make sure queue is empty
+            .then(function(res) {
+                assert(res.body.queue.length === 0, 'queue should be empty')
+            })
+    })
 
     // DELETE /:bayId
     it('should delete bay', function(done) {
