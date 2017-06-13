@@ -10,7 +10,7 @@ import Waiver from './components/Waiver';
 import Thanks from './components/Thanks';
 
 import Admin from './components/Admin';
-import Bay from './components/Bay';
+import Bays from './components/Bays';
 
 const AppRouter = () => (
   <Router>
@@ -19,7 +19,7 @@ const AppRouter = () => (
       <Route path="/signup/waiver" component={Waiver} />
       <Route path="/signup/thanks" component={Thanks} />
       <Route path="/admin" component={Admin} />
-      <Route path="/bay" component={Bay} />
+      <Route path="/bay" component={Bays} />
     </div>
   </Router>
 );
