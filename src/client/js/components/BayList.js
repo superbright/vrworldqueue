@@ -29,7 +29,7 @@ class BayList extends Component {
         <ul>
           {
             bays &&
-            bays.map((bay) => (
+            bays.map(bay => (
               <li className="user-list-item flex space-between align-center">
                 <div><h2><Link to={`/bay/${bay._id}`}>{bay.name}</Link></h2></div>
               </li>

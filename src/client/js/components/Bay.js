@@ -6,7 +6,7 @@ class Bay extends Component {
 
     this.state = {
       bay: null,
-    }
+    };
   }
 
   componentWillMount() {
@@ -33,10 +33,23 @@ class Bay extends Component {
               <header className="flex space-between align-center">
                 <h5>{bay.name}</h5>
               </header>
-
-              <div>
-
-              </div>
+              {
+                bay.queue.length === 0
+                ? (
+                  <div className="simple-container"><h3>{'There\'s no one in line, register now!'}</h3></div>
+                )
+                : (
+                  <ul>
+                    {
+                      bay.queue.map(player => (
+                        <li className="user-list-item flex space-between align-center">
+                          <div>{player.screenname}</div>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                )
+              }
             </div>
           )
         }
