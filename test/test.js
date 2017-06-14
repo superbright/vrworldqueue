@@ -10,7 +10,6 @@ var expect = require("chai").expect;
     TODO:
     - Validate users
     - Make sure users cannot queue a game if they are already queued in another
-    - 
 
 */
 
@@ -29,6 +28,7 @@ describe('GET /', function () {
 
 describe('User', function() {
     var userId;
+    var date = new Date(new Date().setHours(0, 0, 0, 0)).toString();
 
     // GET /
     it('should return a 200 response', function(done) {
@@ -37,7 +37,8 @@ describe('User', function() {
             .expect(200, done)
     });
 
-    before(function(done) {
+    // POST /
+    it('should add a new user', function(done) {
         agent
             .post('/api/users')
             .send({
@@ -89,7 +90,20 @@ describe('User', function() {
             });
     });
 
-    // POST /
+    // Make sure the right expiresAt date is populated at start
+    it('expiresAt date should be ' + date, function() {
+            return agent
+            // Grab user
+                .get('/api/users/' + userId)
+                .set('Accept', 'applications/json')
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .then(function(res) {
+                    assert(new Date(res.body.rfid.expiresAt).toString() === date, 'default expiresAt date should already  be expired')
+                });
+    });
+
+    // Update user data with same email
     it('should update the user with the same email with updated info', function(done) {
         agent
             .post('/api/users')
@@ -139,7 +153,8 @@ describe('Bay', function() {
             .expect(200, done)
     });
 
-    before(function(done) {
+    // POST /
+    it('should make a new bay' ,function(done) {
         agent
             .post('/api/bays')
             .send({
@@ -239,101 +254,104 @@ describe('Bay', function() {
     });
 
     // GET /:bayId/dequeue
-    it('should dequeue user', function(done) {
-        agent
+    it('should dequeue user', function() {
+        return agent
+        // Dequeue user
             .get('/api/bays/' + bayId + '/dequeue')
             .set('Accept', 'applications/json')
             .expect('Content-Type', /json/)
             .expect(200)
-            .end(function(err, res) {
-                expect(res.body.user).to.equal(userId);
-                agent
+        // Check user was dequeued
+        // Grab bay
+            .then(function(res) {
+                assert(res.body.user === userId, 'user was dequeued');
+
+                return agent
                     .get('/api/bays/' + bayId)
-                    .end(function(err, res) {
-                        expect(res.body.queue.length).to.equal(0);
-                        if (err) return done(err)
-                        done();
-                    });
-            });
+                    .expect(200)
+            })
+        // Check if bay's queue is empty
+            .then(function(res) {
+                assert(res.body.queue.length === 0, 'queue is empty');
+            })
     });
 
     // Test multiple enqueues and dequeue then make sure the right ones are dequeued and the queue still has the right users left
     it('should dequeue oldest user and newest user should still be in queue', function() {
-            return agent
-            // Create a new user
+        return agent
+        // Create a new user
+            .post('/api/users')
+            .send({
+                firstname: "Sample",
+                lastname: "Example",
+                email: "nope@no.naah",
+                phone: "1234567890",
+                screenname: "aloe"
+            })
+            .expect('Content-Type', /json/)
+            .expect(200)
+        // Grab new user's ID
+        // Create a new user again
+            .then(function(res) {
+                userId_01 = res.body._id;
+
+                return agent
                 .post('/api/users')
                 .send({
                     firstname: "Sample",
                     lastname: "Example",
-                    email: "nope@no.naah",
+                    email: "nope@no.nah",
                     phone: "1234567890",
                     screenname: "aloe"
                 })
                 .expect('Content-Type', /json/)
                 .expect(200)
-            // Grab new user's ID
-                .then(function(res) {
-                    userId_01 = res.body._id;
-                })
-            // Create a new user again
-                .then(function() {
-                    return agent
-                    .post('/api/users')
+            })
+        // Grab second new user's ID
+        // Enqueue user
+            .then(function(res) {
+                userId_02 = res.body._id;
+
+                return agent
+                    .post('/api/bays/' + bayId + '/enqueue')
                     .send({
-                        firstname: "Sample",
-                        lastname: "Example",
-                        email: "nope@no.nah",
-                        phone: "1234567890",
-                        screenname: "aloe"
+                        userId: userId_01
                     })
                     .expect('Content-Type', /json/)
                     .expect(200)
+            })
+        // Enqueue second user
+            .then(function() {
+                return agent
+                    .post('/api/bays/' + bayId + '/enqueue')
+                    .send({
+                        userId: userId_02
+                    })
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+            })
+        // Dequeue user
+            .then(function() {
+                return agent
+                    .get('/api/bays/' + bayId + '/dequeue')
+                    .set('Accept', 'applications/json')
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+            })
+        // Make sure right user was dequeued
+        // Grab bay info
+            .then(function(res) {
+                assert(res.body.user === userId_01, 'first user was dequeued');
 
-                })
-            // Grab second new user's ID
-                .then(function(res) {
-                    userId_02 = res.body._id;
-                })
-            // Enqueue user
-                .then(function() {
-                    return agent
-                        .post('/api/bays/' + bayId + '/enqueue')
-                        .send({
-                            userId: userId_01
-                        })
-                        .expect('Content-Type', /json/)
-                        .expect(200)
-                })
-            // Enqueue second user
-                .then(function() {
-                    return agent
-                        .post('/api/bays/' + bayId + '/enqueue')
-                        .send({
-                            userId: userId_02
-                        })
-                        .expect('Content-Type', /json/)
-                        .expect(200)
-                })
-            // Dequeue user
-                .then(function() {
-                    return agent
-                        .get('/api/bays/' + bayId + '/dequeue')
-                        .set('Accept', 'applications/json')
-                        .expect('Content-Type', /json/)
-                        .expect(200)
-                })
-            // Make sure right user was dequeued then grab bay info
-                .then(function(res) {
-                    assert(res.body.user === userId_01, 'first user was dequeued');
-                    return agent
-                        .get('/api/bays/' + bayId)
-                        .expect('Content-Type', /json/)
-                        .expect(200)
-                })
-            // Make sure second user is still in queue
-                .then(function(res) {
-                    assert(res.body.queue[0].user === userId_02, 'second user still in queue');
-                })
+                return agent
+                    .get('/api/bays/' + bayId)
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+            })
+        // Make sure second user is still in queue
+            .then(function(res) {
+                assert(res.body.queue[0].user === userId_02, 'second user still in queue');
+            })
     });
 
     // DELETE /:bayId/queue
@@ -353,9 +371,11 @@ describe('Bay', function() {
                     .expect('Content-Type', /json/)
                     .expect(200)
             })
-        // Check to see if the queue count is right then clear
+        // Check to see if the queue count is right
+        // Clear queue
             .then(function(res) {
                 assert(res.body.queue.length === 2, 'queue should have 2 users');
+
                 return agent
                     .delete('/api/bays/' + bayId + '/queue')
                     .expect(200)
