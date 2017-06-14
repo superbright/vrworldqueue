@@ -13,6 +13,7 @@ class Admin extends Component {
     this.state = {
       users: [],
     };
+
     this.updateUser = this.updateUser.bind(this);
   }
 
