@@ -21,11 +21,18 @@ module.exports.socketHandler = function (socket) {
         var req = JSON.parse(msg);
         var res = req;
         if (req.clientId) res.endpoint = 'rfid';
-        if (json.clientType == 'registration') res.clientType = 'admin';
-        json.message = 'rfid';
-        console.log("RFID tag scanned from " + json.clientType + " #" + json.clientId);
-        sockets.sendBlob(json, function (result) {
-            console.log(result);
-        });
+
+        switch (req.clientType) {
+            case 'registration':
+                res.clientType = 'admin';
+                res.message = req.tag;
+                sockets.sendBlob(res, function (result) {
+                    console.log(result);
+                });
+                break;
+            case 'queue':
+                break;
+        }
+        console.log("RFID tag scanned from " + req.clientType + " #" + req.clientId);
     });
 };
