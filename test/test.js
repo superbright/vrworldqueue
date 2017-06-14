@@ -184,8 +184,8 @@ describe('Bay', function () {
             // Check user was dequeued
             // Grab bay
             .then(function (res) {
-                assert(res.body.user === userId, 'user was dequeued');
-                return agent.get('/api/bays/' + bayId).expect(200)
+                expect(res.body.user).to.equal(userId);
+                return agent.get('/api/bays/' + bayId + '/queue').expect(200)
             })
             // Check if bay's queue is empty
             .then(function (res) {
@@ -236,12 +236,12 @@ describe('Bay', function () {
             // Make sure right user was dequeued
             // Grab bay info
             .then(function (res) {
-                assert(res.body.user === userId_01, 'first user was dequeued');
-                return agent.get('/api/bays/' + bayId).expect('Content-Type', /json/).expect(200)
+                expect(res.body.user).to.equal(userId_01);
+                return agent.get('/api/bays/' + bayId + '/queue').expect('Content-Type', /json/).expect(200)
             })
             // Make sure second user is still in queue
             .then(function (res) {
-                assert(res.body.queue[0].user === userId_02, 'second user still in queue');
+                assert(res.body[0].user === userId_02, 'second user still in queue');
             })
     });
     // DELETE /:bayId/queue
@@ -253,17 +253,17 @@ describe('Bay', function () {
                 }).expect('Content-Type', /json/).expect(200)
                 // Grab bay info
                 .then(function (res) {
-                    return agent.get('/api/bays/' + bayId).expect('Content-Type', /json/).expect(200)
+                    return agent.get('/api/bays/' + bayId + '/queue').expect('Content-Type', /json/).expect(200)
                 })
                 // Check to see if the queue count is right
                 // Clear queue
                 .then(function (res) {
-                    assert(res.body.queue.length === 2, 'queue should have 2 users');
+                    assert(res.body.length === 2, 'queue should have 2 users');
                     return agent.delete('/api/bays/' + bayId + '/queue').expect(200)
                 })
                 // Make sure queue is empty
                 .then(function (res) {
-                    assert(res.body.queue.length === 0, 'queue should be empty')
+                    assert(res.body.length === 0, 'queue should be empty')
                 })
         })
         // DELETE /:bayId
