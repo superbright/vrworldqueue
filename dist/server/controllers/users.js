@@ -37,9 +37,15 @@ exports.postUser = function (req, res) {
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
     userData.signature = signature._id;
     if (req.body.rfid) {
+<<<<<<< HEAD
         console.log('Adding RFID');
         userData.rfid = {};
         userData.rfid.id = req.body.rfid;
+=======
+        console.log('Adding time to band');
+        //        userData['rfid'].id = req.body.rfid;
+        //        userData['rfid'].expiresAt = new Date().setHours(24, 0, 0, 0);
+>>>>>>> add queue model
     }
     var query = {
         'email': req.body.email
