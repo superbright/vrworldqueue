@@ -1,5 +1,6 @@
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
+var Queue = require('../models/queue').Queue;
 var scheduler = require("../services/scheduler");
 var sockets = require('../services/sockets');
 var schedulerTasks = {
@@ -24,54 +25,89 @@ exports.upsertBay = (req, res) => {
         id: req.body.id
         , name: req.body.name
         , game: req.body.game
+        , queue: new Queue()
     });
-    newBay.save();
-    res.status(200).send(newBay);
+    newBay.queue.save();
+    newBay.save((err, doc) => {
+        if (err) res.status(500).send(err);
+        res.status(200).send(doc);
+    });
 };
 exports.enqueueUser = (req, res) => {
     User.findById(req.body.userId, (err, user) => {
         if (err) res.status(500).send(err);
         else if (user) {
-            Bay.findOneAndUpdate({
+            if (user.queue != null) {
+                console.log("user already in queue");
+                console.log(user.queue);
+                res.status(404).send('User already in queue');
+            }
+            else Bay.findById({
                 _id: req.params.bayId
-                , 'queue.user': {
-                    $ne: req.body.userId
-                }
-            }, {
-                $addToSet: {
-                    queue: {
-                        user: user._id
-                    }
-                }
-            }, {
-                new: true
             }, (err, bay) => {
                 if (err) res.status(500).send(err);
-                else if (bay) res.status(200).send(bay);
-                else res.status(404).send("Bay does not exist or User is already in queue");
+                else if (bay) {
+                    Queue.findById(bay.queue, (err, queue) => {
+                        if (err) res.status(500).send(err);
+                        else if (queue) {
+                            user.queue = bay.queue;
+                            queue.users.push({
+                                user: user._id
+                            });
+                            user.save();
+                            queue.save();
+                            //                            queue.save((err, doc) => {
+                            //                                if (err) res.status(500).send(err);
+                            //                                else res.status(200).send(doc);
+                            //                            });
+                            res.status(200).send(queue);
+                        }
+                        else res.status(404).send('queue not found');
+                    });
+                }
+                else res.status(404).send("Bay not found");
             });
         }
-        else res.status(404).send('User not found');
+        else res.status(404).send("User not found");
     });
 };
 exports.dequeueUser = (req, res) => {
     Bay.findById(req.params.bayId, (err, bay) => {
         if (err) res.status(500).send(err);
         else if (bay) {
-            var user = bay.queue.shift();
-            if (user) {
-                res.status(200).send(user);
-                bay.queue.pull(user);
-                bay.timeouts.user = Date.now() + 60000;
-                bay.save();
-                schedulerTasks['userTimeout'][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
-                    console.log("User Timeout");
-                });
-            }
-            else res.status(404).send('There are no users in the queue');
+            Queue.findById(bay.queue, (err, queue) => {
+                if (err) res.status(500).send(err);
+                else if (queue) {
+                    var user = queue.users.shift();
+                    if (user) {
+                        user.queue = null;
+                        user.save;
+                        res.status(200).send(user);
+                        queue.users.pull(user);
+                        bay.timeouts.user = Date.now() + 60000;
+                        queue.save();
+                        //                        schedulerTasks['userTimeout'][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
+                        //                            console.log("User Timeout");
+                        //                        });
+                    }
+                    else res.status(404).send('There are no users in the queue');
+                }
+                else res.status(404).send('Queue not found');
+            });
         }
         else res.status(404).send('No bay found with that ID');
     })
+};
+exports.getQueue = (req, res) => {
+    Bay.findById(req.params.bayId, (err, bay) => {
+        if (err) res.status(500).send(err);
+        else if (bay) Queue.findById(bay.queue, (err, queue) => {
+            if (err) res.status(500).send(err);
+            else if (queue) res.status(200).send(queue);
+            else res.staus(404).send("queue not found");
+        });
+        else res.status(404).send("Bay not found");
+    });
 };
 exports.deleteBay = (req, res) => {
     Bay.findByIdAndRemove(req.params.bayId, (err, bay) => {
@@ -87,9 +123,15 @@ module.exports.clearQueue = (req, res) => {
     Bay.findById(req.params.bayId, (err, bay) => {
         if (err) res.status(500).send(err);
         else if (bay) {
-            bay.queue = [];
-            bay.save();
-            res.status(200).send(bay);
+            Queue.findById(bay.queue, (err, queue) => {
+                if (err) res.status(500).send(err);
+                else if (queue) {
+                    queue.users = [];
+                    queue.save();
+                    res.status(200).send(queue);
+                }
+                else res.status(404).send("Queue not found");
+            });
         }
         else res.status(404).send("No Bay found with that ID");
     });

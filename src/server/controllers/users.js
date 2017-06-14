@@ -41,8 +41,8 @@ exports.postUser = (req, res) => {
     };
     if (req.body.rfid) {
         console.log('Adding time to band');
-        userData.rfid.id = req.body.rfid;
-        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+        //        userData['rfid'].id = req.body.rfid;
+        //        userData['rfid'].expiresAt = new Date().setHours(24, 0, 0, 0);
     }
     var query = {
         'email': req.body.email
