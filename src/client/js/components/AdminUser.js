@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import UserForm from './UserForm';
 import io from 'socket.io-client';
+import UserForm from './UserForm';
 
 class AdminList extends Component {
   constructor() {
@@ -49,7 +49,7 @@ class AdminList extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const {user, tempRFID } = this.state;
+    const { user, tempRFID } = this.state;
     let data;
     if (tempRFID) {
       data = { ...user, rfid: tempRFID };
@@ -66,7 +66,7 @@ class AdminList extends Component {
       }),
     }).then(res => res.json()).then((res) => {
       this.setState({
-        user: res
+        user: res,
       });
       this.clearTempRFID();
     }).catch((err) => {

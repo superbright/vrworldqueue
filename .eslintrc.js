@@ -7,7 +7,9 @@ module.exports = {
         "import"
     ],
     "rules": {
-      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+      "react/prefer-stateless-function": [0],
+      "react/prop-types": [0]
     },
     "env": {
         "browser": true
