@@ -99,7 +99,7 @@ describe('User', function() {
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .then(function(res) {
-                    assert(new Date(res.body.rfid.expiresAt).toString() === date, 'default expiresAt date should already  be expired')
+                    assert(new Date(res.body.rfid.expiresAt).toString() === date, 'default expiresAt date should already be expired')
                 });
     });
 
@@ -112,8 +112,7 @@ describe('User', function() {
                 lastname: "Anymore",
                 email: "nope@no.nah",
                 phone: "0987654321",
-                screenname: "eola",
-                rfid: '1',
+                screenname: "eola"
             })
             .expect('Content-Type', /json/)
             .expect(200)
@@ -123,7 +122,6 @@ describe('User', function() {
                 expect(res.body.email).to.equal("nope@no.nah");
                 expect(res.body.phone).to.equal("0987654321");
                 expect(res.body.screenname).to.equal("eola");
-                expect(res.body.rfid.id).to.equal('1');
                 done();
             });
     });
