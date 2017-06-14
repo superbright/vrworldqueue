@@ -11,7 +11,7 @@ class AdminList extends Component {
       user: null,
       socket: null,
       tempRFID: '',
-    }
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -26,7 +26,7 @@ class AdminList extends Component {
     }).then(res => res.json()).then((user) => {
       this.setState({
         user,
-        socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
+        socket: io('http://localhost:3000', { query: `clientType=admin&clientId=${adminid}` }),
       });
       this.connectSocket();
     }).catch((err) => {
@@ -37,9 +37,7 @@ class AdminList extends Component {
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
-      console.log('--', socket);
       socket.on('rfid', (res) => {
-        console.log('RFID message', res);
         this.setState({ tempRFID: res });
       });
     }
@@ -51,16 +49,26 @@ class AdminList extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const {user: {email, phone, screenname}, tempRFID } = this.state;
+    const {user, tempRFID } = this.state;
+    let data;
+    if (tempRFID) {
+      data = { ...user, rfid: tempRFID };
+    } else {
+      const { rfid, ...restOfUser } = user;
+      data = restOfUser;
+    }
 
+    console.log(data);
     fetch('/api/users', {
       method: 'post',
-      body: JSON.stringify({ email, phone, screenname, rfid: tempRFID }),
+      body: JSON.stringify(data),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
-      console.log('success', res);
+      this.setState({
+        user: res
+      });
       this.clearTempRFID();
     }).catch((err) => {
       console.log('error', err);
@@ -76,7 +84,7 @@ class AdminList extends Component {
       user: {
         ...this.state.user,
         [name]: value,
-      }
+      },
     });
   }
 
@@ -86,12 +94,12 @@ class AdminList extends Component {
 
     return (
       <div className="admin-user-page simple-container" key={userid}>
-        <Link to={`/admin/${adminid}`}>{`< Return to Users List`}</Link>
+        <Link to={`/admin/${adminid}`}>{'< Return to Users List'}</Link>
 
         {
           user && (
             <div className="admin-user-page-info">
-              <h2>{user.name}</h2>
+              <h2>{user.firstname} {user.lastname}</h2>
               <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
               {user.rfid.id || 'no rfid set yet' }
 
