@@ -12,10 +12,6 @@ var schema = new mongoose.Schema({
     game: {
         type: String
     },
-    queue: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Queue'
-    },
     timeouts: {
         user: {
             type: Date
