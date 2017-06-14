@@ -163,15 +163,16 @@ describe('Bay', function () {
             })
             // Make sure the first queued user is the right one
             .then(function (res) {
-                assert(res.body.queue[0].user === userId, 'got the same ID back');
+                assert(res.body.user === userId, 'got the same ID back');
             })
     });
     // Testing whether or not user is already in queue for the same bay
     it('should throw 404 error', function (done) {
         agent.post('/api/bays/' + bayId + '/enqueue').set('Accept', 'applications/json').send({
             userId: userId
-        }).expect(404).end(function (err, res) {
+        }).expect(200).end(function (err, res) {
             if (err) return done(err)
+            expect(res.body.user).to.equal(userId);
             done();
         });
     });
@@ -188,7 +189,7 @@ describe('Bay', function () {
             })
             // Check if bay's queue is empty
             .then(function (res) {
-                assert(res.body.queue.length === 0, 'queue is empty');
+                assert(res.body.length === 0, 'queue is empty');
             })
     });
     // Test multiple enqueues and dequeue then make sure the right ones are dequeued and the queue still has the right users left
