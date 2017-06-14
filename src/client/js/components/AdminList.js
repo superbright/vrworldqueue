@@ -22,13 +22,14 @@ class AdminList extends Component {
   filterUsers() {
     const { searchValue } = this.state;
     const { users } = this.props;
+    const value = searchValue.toLowerCase();
 
     return searchValue
       ? users.filter(u => (
-        u.name.indexOf(searchValue) >= 0
+        u.name.toLowerCase().indexOf(value) >= 0
         || (
           u.email &&
-          u.email.indexOf(searchValue) >= 0
+          u.email.toLowerCase().indexOf(value) >= 0
         )
       ))
       : users;
