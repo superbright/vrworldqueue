@@ -12,9 +12,12 @@ class Admin extends Component {
 
     this.state = {
       users: [],
+      socket: null,
+      tempRFID: '',
     };
 
     this.updateUser = this.updateUser.bind(this);
+
   }
 
   componentWillMount() {
@@ -34,7 +37,7 @@ class Admin extends Component {
   }
 
   render() {
-    const { users } = this.state;
+    const { users, tempRFID } = this.state;
     const { match } = this.props;
 
     return (

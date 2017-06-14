@@ -34,11 +34,13 @@ exports.postUser = function (req, res) {
         email: req.body.email,
         phone: req.body.phone,
         screenname: req.body.screenname,
-        signature: signature._id,
-        rfid: {
-            id: req.body.rfid
-        }
+        signature: signature._id
     };
+    if (req.body.rfid) {
+        console.log('Adding time to band');
+        userData.rfid.id = req.body.rfid;
+        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+    }
     var query = {
         'email': req.body.email
     };
@@ -46,7 +48,9 @@ exports.postUser = function (req, res) {
         upsert: true,
         new: true
     }, function (err, doc) {
-        if (err) res.status(500).send(err);else res.status(200).send(doc);
+        if (err) res.status(500).send(err);else {
+            res.status(200).send(doc);
+        }
     });
 };
 exports.validateUser = function (req, res) {

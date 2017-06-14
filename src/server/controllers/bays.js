@@ -102,12 +102,27 @@ module.exports.socketHandler = (socket) => {
             console.log(result);
         });
     });
-    //    socket.on('rfid', (data) => {
-    //        console.log('rfid socket endpoint');
-    //        var bayId = data.bayId;
-    //        if (schedulerTasks[userTimeout][bayId] != null) {
-    //            schedulerTasks[userTimeout][bayId].cancel();
-    //            schedulerTasks[userTimeout][bayId] = null;
-    //        }
-    //    });
+    socket.on('rfid', (data) => {
+        //enqueue user
+        var req = JSON.parse(data);
+        switch (req.clientType) {
+        case 'game':
+            User.findOne({
+                'rfid.id': req.tag
+            }, (err, user) => {
+                if (err) console.log('[error] Cant enqueue user... ' + err);
+                else if (user) {
+                    if (user.rfid.expiresAt > new Date()) {
+                        console.log('[info] adding user to queue');
+                    }
+                    else {
+                        console.log('[info] User badge is expired')
+                            /*TODO: send response*/
+                    }
+                }
+                else console.log('[info] No user associated with tag' + data.tag);
+            });
+            break;
+        }
+    });
 };

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import UserForm from './UserForm';
+import io from 'socket.io-client';
 
 class AdminList extends Component {
   constructor() {
@@ -8,34 +9,59 @@ class AdminList extends Component {
 
     this.state = {
       user: null,
+      socket: null,
+      tempRFID: '',
     }
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.connectSocket = this.connectSocket.bind(this);
+    this.clearTempRFID = this.clearTempRFID.bind(this);
   }
 
   componentWillMount() {
-    const { match: { params: { userid } } } = this.props;
+    const { match: { params: { userid, adminid } } } = this.props;
     return fetch(`/api/users/${userid}`, {
       method: 'get',
     }).then(res => res.json()).then((user) => {
-      this.setState({ user });
+      this.setState({
+        user,
+        socket: io('http://localhost:3000', {query: `clientType=admin&clientId=${adminid}` }),
+      });
+      this.connectSocket();
     }).catch((err) => {
       console.log('error', err);
     });
   }
 
+  connectSocket() {
+    const { socket } = this.state;
+    if (socket) {
+      console.log('--', socket);
+      socket.on('rfid', (res) => {
+        console.log('RFID message', res);
+        this.setState({ tempRFID: res });
+      });
+    }
+  }
+
+  clearTempRFID() {
+    this.setState({ tempRFID: '' });
+  }
+
   handleSubmit(event) {
     event.preventDefault();
+    const {user: {email, phone, screenname}, tempRFID } = this.state;
 
     fetch('/api/users', {
       method: 'post',
-      body: JSON.stringify(this.state.user),
+      body: JSON.stringify({ email, phone, screenname, rfid: tempRFID }),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
       console.log('success', res);
+      this.clearTempRFID();
     }).catch((err) => {
       console.log('error', err);
     });
@@ -55,7 +81,7 @@ class AdminList extends Component {
   }
 
   render() {
-    const { user } = this.state;
+    const { user, tempRFID } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
 
     return (
@@ -66,6 +92,9 @@ class AdminList extends Component {
           user && (
             <div className="admin-user-page-info">
               <h2>{user.name}</h2>
+              <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
+              {user.rfid.id || 'no rfid set yet' }
+
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
           )
