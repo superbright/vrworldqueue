@@ -2,7 +2,10 @@
 
 var mongoose = require('mongoose');
 var schema = new mongoose.Schema({
-    name: {
+    firstname: {
+        type: String
+    },
+    lastname: {
         type: String
     },
     email: {

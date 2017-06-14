@@ -32,13 +32,13 @@ exports.postUser = (req, res) => {
         }
     });
     signature.save();
-    var userData = {
-        name: req.body.firstname + ' ' + req.body.lastname
-        , email: req.body.email
-        , phone: req.body.phone
-        , screenname: req.body.screenname
-        , signature: signature._id
-    };
+    var userData = {};
+    if (req.body.firstname != null) userData.firstname = req.body.firstname;
+    if (req.body.lastname != null) userData.lastname = req.body.lastname
+    if (req.body.email != null) userData.email = req.body.email;
+    if (req.body.phone != null) userData.phone = req.body.phone;
+    if (req.body.screenname != null) userData.screenname = req.body.screenname;
+    userData.signature = signature._id
     if (req.body.rfid) {
         console.log('Adding RFID');
         userData.rfid = {};
