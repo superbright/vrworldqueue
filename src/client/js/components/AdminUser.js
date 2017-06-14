@@ -58,7 +58,6 @@ class AdminList extends Component {
       data = restOfUser;
     }
 
-    console.log(data);
     fetch('/api/users', {
       method: 'post',
       body: JSON.stringify(data),
@@ -100,8 +99,12 @@ class AdminList extends Component {
           user && (
             <div className="admin-user-page-info">
               <h2>{user.firstname} {user.lastname}</h2>
-              <div><span className="big-font">RFID</span>: { tempRFID || 'no RFID scanned' }</div>
-              {user.rfid.id || 'no rfid set yet' }
+              { tempRFID && (
+                  <div className="detected-rfid"><h5>Detected RFID: {tempRFID}</h5></div>
+                )
+              }
+              <div><span className="big-font">RFID</span>: {user.rfid.id || 'no rfid set yet' }</div>
+
 
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>

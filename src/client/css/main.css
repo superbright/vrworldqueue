@@ -162,3 +162,14 @@ header {
 .centered-message {
   width: 75%;
 }
+
+.detected-rfid {
+  background-color: #283593;
+  padding: 10px 20px;
+  color: white;
+  margin: 10px 0px;
+}
+
+.detected-rfid h5 {
+  margin: 0px;
+}
