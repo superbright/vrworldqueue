@@ -40,9 +40,9 @@ exports.postUser = (req, res) => {
         , signature: signature._id
     };
     if (req.body.rfid) {
-        console.log('Adding time to band');
+        console.log('Adding RFID');
+        userData.rfid = {};
         userData.rfid.id = req.body.rfid;
-        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
     }
     var query = {
         'email': req.body.email
