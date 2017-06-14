@@ -14,7 +14,6 @@ class BayList extends Component {
     return fetch(`/api/bays`, {
       method: 'get',
     }).then(res => res.json()).then((bays) => {
-      console.log(bays);
       this.setState({ bays });
     }).catch((err) => {
       console.log('error', err);

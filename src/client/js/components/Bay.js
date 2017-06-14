@@ -36,7 +36,7 @@ class Bay extends Component {
               {
                 bay.queue.length === 0
                 ? (
-                  <div className="simple-container"><h3>{'There\'s no one in line, register now!'}</h3></div>
+                  <div className="simple-container user-search"><h3>{'There\'s no one in line, register now!'}</h3></div>
                 )
                 : (
                   <ul>
