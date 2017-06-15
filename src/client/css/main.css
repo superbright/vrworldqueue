@@ -163,6 +163,31 @@ header {
   width: 75%;
 }
 
+.modal {
+  width: 100%;
+  height: 100vh;
+  background-color: #283593;
+  color: white;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.modal button {
+  margin: 0px 20px;
+}
+
+.modal-container {
+  width: 50%;
+}
+
+button.button-white {
+  color: #283593;
+  background-color: white;
+}
+
 .detected-rfid {
   background-color: #283593;
   padding: 10px 20px;

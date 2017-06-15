@@ -30,8 +30,8 @@ module.exports.setupSockets = (server) => {
         //     socket.disconnect();
         // }
         // else {
-            sockets[currentBay.clientType][currentBay.bayNumber] = socket;
-            console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
+        sockets[currentBay.clientType][currentBay.bayNumber] = socket;
+        console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
         // }
         socket.on('disconnect', () => {
             console.log('[INFO] ' + currentBay.clientType + " " + currentBay.bayNumber + ' disconnected!');
@@ -54,7 +54,7 @@ exports.sendToButton = (buttonId, endpoint, message, callback) => {
 exports.sendToQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('queue', queueId, endpoint, message, callback);
 };
-exports.sendToAdmin = (adminId, endpoint, message, callnacl) => {
+exports.sendToAdmin = (adminId, endpoint, message, callback) => {
     exports.sendToClient('admin', adminId, endpoint, message, callback);
 }
 exports.sendBlob = (req, callback) => {

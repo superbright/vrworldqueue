@@ -163,15 +163,16 @@ describe('Bay', function () {
             })
             // Make sure the first queued user is the right one
             .then(function (res) {
-                assert(res.body.queue[0].user === userId, 'got the same ID back');
+                assert(res.body.user === userId, 'got the same ID back');
             })
     });
     // Testing whether or not user is already in queue for the same bay
     it('should throw 404 error', function (done) {
         agent.post('/api/bays/' + bayId + '/enqueue').set('Accept', 'applications/json').send({
             userId: userId
-        }).expect(404).end(function (err, res) {
+        }).expect(200).end(function (err, res) {
             if (err) return done(err)
+            expect(res.body.user).to.equal(userId);
             done();
         });
     });
@@ -183,12 +184,12 @@ describe('Bay', function () {
             // Check user was dequeued
             // Grab bay
             .then(function (res) {
-                assert(res.body.user === userId, 'user was dequeued');
-                return agent.get('/api/bays/' + bayId).expect(200)
+                expect(res.body.user).to.equal(userId);
+                return agent.get('/api/bays/' + bayId + '/queue').expect(200)
             })
             // Check if bay's queue is empty
             .then(function (res) {
-                assert(res.body.queue.length === 0, 'queue is empty');
+                assert(res.body.length === 0, 'queue is empty');
             })
     });
     // Test multiple enqueues and dequeue then make sure the right ones are dequeued and the queue still has the right users left
@@ -235,12 +236,12 @@ describe('Bay', function () {
             // Make sure right user was dequeued
             // Grab bay info
             .then(function (res) {
-                assert(res.body.user === userId_01, 'first user was dequeued');
-                return agent.get('/api/bays/' + bayId).expect('Content-Type', /json/).expect(200)
+                expect(res.body.user).to.equal(userId_01);
+                return agent.get('/api/bays/' + bayId + '/queue').expect('Content-Type', /json/).expect(200)
             })
             // Make sure second user is still in queue
             .then(function (res) {
-                assert(res.body.queue[0].user === userId_02, 'second user still in queue');
+                assert(res.body[0].user._id === userId_02, 'second user still in queue');
             })
     });
     // DELETE /:bayId/queue
@@ -252,17 +253,17 @@ describe('Bay', function () {
                 }).expect('Content-Type', /json/).expect(200)
                 // Grab bay info
                 .then(function (res) {
-                    return agent.get('/api/bays/' + bayId).expect('Content-Type', /json/).expect(200)
+                    return agent.get('/api/bays/' + bayId + '/queue').expect('Content-Type', /json/).expect(200)
                 })
                 // Check to see if the queue count is right
                 // Clear queue
                 .then(function (res) {
-                    assert(res.body.queue.length === 2, 'queue should have 2 users');
+                    assert(res.body.length === 2, 'queue should have 2 users');
                     return agent.delete('/api/bays/' + bayId + '/queue').expect(200)
                 })
                 // Make sure queue is empty
                 .then(function (res) {
-                    assert(res.body.queue.length === 0, 'queue should be empty')
+                    assert(res.body.length === 0, 'queue should be empty')
                 })
         })
         // DELETE /:bayId

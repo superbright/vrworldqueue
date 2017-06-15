@@ -1,5 +1,6 @@
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
+var Queue = require('../models/queue').Queue;
 var scheduler = require("../services/scheduler");
 var sockets = require('../services/sockets');
 var schedulerTasks = {
@@ -10,7 +11,7 @@ exports.getBays = (req, res) => {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, (err, bay) => {
             if (err) res.status(500).send(err);
-            if (bay) res.status(200).send(bay);
+            else if (bay) res.status(200).send(bay);
             else res.status(404).send("No Bay found with that ID");
         });
     }
@@ -25,53 +26,63 @@ exports.upsertBay = (req, res) => {
         , name: req.body.name
         , game: req.body.game
     });
-    newBay.save();
-    res.status(200).send(newBay);
+    newBay.save((err, doc) => {
+        if (err) res.status(500).send(err);
+        res.status(200).send(doc);
+    });
 };
 exports.enqueueUser = (req, res) => {
-    User.findById(req.body.userId, (err, user) => {
-        if (err) res.status(500).send(err);
-        else if (user) {
-            Bay.findOneAndUpdate({
-                _id: req.params.bayId
-                , 'queue.user': {
-                    $ne: req.body.userId
-                }
-            }, {
-                $addToSet: {
-                    queue: {
-                        user: user._id
-                    }
-                }
-            }, {
-                new: true
-            }, (err, bay) => {
-                if (err) res.status(500).send(err);
-                else if (bay) res.status(200).send(bay);
-                else res.status(404).send("Bay does not exist or User is already in queue");
+    Queue.findOne({
+        user: req.body.userId
+    }, (err, queue) => {
+        if (err) {
+            res.status(500).send(err)
+            return;
+        }
+        else {
+            if (queue) {
+                delete queue._id;
+            }
+            var q = new Queue({
+                user: req.body.userId
+                , bay: req.params.bayId
+            });
+            q.save((err, doc) => {
+                Queue.find({
+                    bay: req.params.bayId
+                }).populate('user bay').exec((err, fullQueue) => {
+                    if (err) res.status(500).send(err);
+                    else if (fullQueue) res.status(200).send(fullQueue);
+                    else res.status(404).send(fullQueue);
+                });
             });
         }
-        else res.status(404).send('User not found');
     });
 };
 exports.dequeueUser = (req, res) => {
-    Bay.findById(req.params.bayId, (err, bay) => {
+    Queue.findOneAndRemove({
+        bay: req.params.bayId
+    }).sort({
+        timeAdded: 1
+    }).exec((err, queue) => {
+        console.log(queue);
         if (err) res.status(500).send(err);
-        else if (bay) {
-            var user = bay.queue.shift();
-            if (user) {
-                res.status(200).send(user);
-                bay.queue.pull(user);
-                bay.timeouts.user = Date.now() + 60000;
-                bay.save();
-                schedulerTasks['userTimeout'][bay.id] = scheduler.addToSchedule(Date.now() + 60000, () => {
-                    console.log("User Timeout");
-                });
-            }
-            else res.status(404).send('There are no users in the queue');
-        }
-        else res.status(404).send('No bay found with that ID');
-    })
+        else if (queue) res.status(200).send(queue);
+        else res.status(404).send("No queues found for this bay");
+    });
+};
+exports.getQueue = (req, res) => {
+    Bay.findOne({
+        _id: req.params.bayId
+    }, (err, bay) => {
+        Queue.find({
+            bay: bay._id
+        }).populate('user bay').exec((err, doc) => {
+            if (err) res.status(500).send(err);
+            else if (doc) res.status(200).send(doc)
+            else res.status(404).send("No Queues found");
+        });
+    });
 };
 exports.deleteBay = (req, res) => {
     Bay.findByIdAndRemove(req.params.bayId, (err, bay) => {
@@ -84,14 +95,11 @@ exports.deleteBay = (req, res) => {
     });
 };
 module.exports.clearQueue = (req, res) => {
-    Bay.findById(req.params.bayId, (err, bay) => {
+    Queue.remove({
+        bay: req.params.bayId
+    }, (err) => {
         if (err) res.status(500).send(err);
-        else if (bay) {
-            bay.queue = [];
-            bay.save();
-            res.status(200).send(bay);
-        }
-        else res.status(404).send("No Bay found with that ID");
+        res.status(200).send([]);
     });
 }
 module.exports.socketHandler = (socket) => {
@@ -105,22 +113,67 @@ module.exports.socketHandler = (socket) => {
     socket.on('rfid', (data) => {
         //enqueue user
         var req = JSON.parse(data);
+        var res = {}
         switch (req.clientType) {
         case 'game':
+            console.log(req.tag + 'tapped in');
             User.findOne({
                 'rfid.id': req.tag
             }, (err, user) => {
                 if (err) console.log('[error] Cant enqueue user... ' + err);
                 else if (user) {
                     if (user.rfid.expiresAt > new Date()) {
-                        console.log('[info] adding user to queue');
+                        Bay.findOne({
+                            id: req.clientId
+                        }, (err, bay) => {
+                            var q = new Queue({})
+                            Queue.findOne({
+                                user: user._id
+                            }).populate('user bay').exec((err, queue) => {
+                                if (err) {
+                                    res.err = err;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                        //console.log(res);
+                                    });
+                                }
+                                else if (queue) {
+                                    res.data = queue;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                        //console.log(res);
+                                    });
+                                }
+                                else {
+                                    var q = new Queue({
+                                        user: user._id
+                                        , bay: bay._id
+                                    });
+                                    q.populate('user bay', (err) => {
+                                        console.log(q);
+                                        res.data = q;
+                                        sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                            console.log(res);
+                                        });
+                                    });
+                                }
+                            });
+                        });
                     }
                     else {
                         console.log('[info] User badge is expired')
-                            /*TODO: send response*/
+                        res.error = "badge expired";
                     }
                 }
-                else console.log('[info] No user associated with tag' + data.tag);
+                else {
+                    console.log('[info] No user associated with tag' + data.tag);
+                    res.error = "user not found";
+                    Bay.findOne({
+                        id: req.clientId
+                    }, (err, bay) => {
+                        if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                            console.log(res);
+                        });
+                    })
+                }
             });
             break;
         }

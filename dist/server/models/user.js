@@ -21,6 +21,10 @@ var schema = new mongoose.Schema({
     usedVR: {
         type: Boolean
     },
+    queue: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Queue'
+    },
     role: {
         type: String,
         enum: ['user', 'admin'],

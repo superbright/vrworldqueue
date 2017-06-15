@@ -43,6 +43,7 @@ exports.postUser = (req, res) => {
         console.log('Adding RFID');
         userData.rfid = {};
         userData.rfid.id = req.body.rfid;
+        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
     }
     var query = {
         'email': req.body.email
