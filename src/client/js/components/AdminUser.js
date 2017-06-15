@@ -26,7 +26,7 @@ class AdminList extends Component {
     }).then(res => res.json()).then((user) => {
       this.setState({
         user,
-        socket: io('http://localhost:3000', { query: `clientType=admin&clientId=${adminid}` }),
+        socket: io(window.location.origin, { query: `clientType=admin&clientId=${adminid}` }),
       });
       this.connectSocket();
     }).catch((err) => {

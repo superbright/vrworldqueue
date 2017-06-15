@@ -26,7 +26,7 @@ class Bay extends Component {
     }).then(res => res.json()).then((bay) => {
       this.setState({
         bay,
-        socket: io('http://localhost:3000', {
+        socket: io(window.location.origin, {
           query: `clientType=queue&clientId=${bayid}`,
         }),
       });

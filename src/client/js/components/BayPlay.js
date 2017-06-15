@@ -12,20 +12,20 @@ class BayPlay extends Component {
     this.onPlayButtonPressed = this.onPlayButtonPressed.bind(this);
 
   }
-    
+
   componentWillMount() {
     const { match: { params: { bayid } } } = this.props;
 
 
     this.setState({
-    socket: io('http://localhost:3000', {
+    socket: io(window.location.origin, {
         query: `clientType=startButton&clientId=${bayid}`,
        }),
     });
 
       this.connectSocket();
   }
-    
+
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
@@ -36,7 +36,7 @@ onPlayButtonPressed(){
     console.log('startButton Pressed');
     this.state.socket.emit('startButton', {'clientId': bayid});
 }
-    
+
   render() {
     return (
       <div className="bay-play flex justify-center align-center">
