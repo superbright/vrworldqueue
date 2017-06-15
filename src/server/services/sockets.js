@@ -17,7 +17,6 @@ from '../../shared/util';
 module.exports.setupSockets = (server) => {
     let io = new SocketIO(server);
     io.on('connection', (socket) => {
-        console.log('Incoming WS Connection');
         let clientId = socket.handshake.query.clientId;
         let clientType = socket.handshake.query.clientType;
         let currentBay = {
@@ -25,11 +24,16 @@ module.exports.setupSockets = (server) => {
             , bayNumber: clientId
             , clientType: clientType
         };
-        // if (sockets[clientType][clientId] != null) {
-        //     console.log('[INFO] bay ID is already connected, kicking.');
-        //     socket.disconnect();
-        // }
-        // else {
+                console.log('Incoming WS Connection from ' +clientType + ' # ' + clientId);
+
+        if(sockets[currentBay.clientType] == null)
+            {
+                console.log("unknown client type. Disconnecting...");
+                socket.disconnect();
+                return;
+            }
+        
+        
         sockets[currentBay.clientType][currentBay.bayNumber] = socket;
         console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
         // }

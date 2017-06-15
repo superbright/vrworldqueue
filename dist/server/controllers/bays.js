@@ -100,10 +100,20 @@ module.exports.socketHandler = function (socket) {
             console.log(result);
         });
     });
-    socket.on('rfid', function (data) {
-        //enqueue user
-        var req = JSON.parse(data);
+    socket.on('startButton', function (req) {
+        console.log(req);
         var res = {};
+        console.log('start button from ' + req.clientId + ' received');
+        Bay.findById(req.clientId, function (err, bay) {
+            if (err) console.log('error');else if (bay) sockets.sendToGame(bay.id, 'startGame', {}, function (res) {
+                console.log(res);
+            });
+        });
+    });
+    socket.on('rfid', function (data) {
+        var req = JSON.parse(data
+        //enqueue user
+        );var res = {};
         switch (req.clientType) {
             case 'game':
                 console.log(req.tag + 'tapped in');
@@ -160,6 +170,8 @@ module.exports.socketHandler = function (socket) {
                         });
                     }
                 });
+                break;
+            case 'startButton':
                 break;
         }
     });

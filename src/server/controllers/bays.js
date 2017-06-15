@@ -110,9 +110,20 @@ module.exports.socketHandler = (socket) => {
             console.log(result);
         });
     });
+    socket.on('startButton', (req) => {
+        console.log(req);
+        var res = {}
+        console.log('start button from ' + req.clientId + ' received');
+        Bay.findById(req.clientId, (err, bay) => {
+            if (err) console.log('error');
+            else if (bay) sockets.sendToGame(bay.id, 'startGame', {}, (res) => {
+                console.log(res);
+            });
+        });
+    });
     socket.on('rfid', (data) => {
+        var req = JSON.parse(data)
         //enqueue user
-        var req = JSON.parse(data);
         var res = {}
         switch (req.clientType) {
         case 'game':
@@ -175,6 +186,8 @@ module.exports.socketHandler = (socket) => {
                     })
                 }
             });
+            break;
+        case 'startButton':
             break;
         }
     });
