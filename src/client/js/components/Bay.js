@@ -9,9 +9,14 @@ class Bay extends Component {
       socket: null,
       queue: [],
     };
+
+    this.connectSocket = this.connectSocket.bind(this);
+    this.fetchQueue = this.fetchQueue.bind(this);
   }
+
   componentWillMount() {
     const { match: { params: { bayid } } } = this.props;
+
     return fetch(`/api/bays/${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
@@ -23,20 +28,22 @@ class Bay extends Component {
       });
 
       this.connectSocket();
-
-      return fetch(`/api/bays/${bayid}/queue`, {
-        method: 'get',
-      }).then(res => res.json()).then((queue) => {
-        this.setState({
-          queue,
-        });
-      }).catch((err) => {
-        console.log('error', err);
-      });
+      this.fetchQueue();
     }).catch((err) => {
       console.log('error', err);
     });
   }
+
+  fetchQueue() {
+    return fetch(`/api/bays/${bayid}/queue`, {
+      method: 'get',
+    }).then(res => res.json()).then((queue) => {
+      this.setState({ queue });
+    }).catch((err) => {
+      console.log('error', err);
+    });
+  }
+
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
@@ -45,6 +52,7 @@ class Bay extends Component {
       });
     }
   }
+
   render() {
     const { bay, queue } = this.state;
     const { match: { params: { bayid } } } = this.props;
