@@ -10,7 +10,7 @@ class BayPlay extends Component {
 
     this.connectSocket = this.connectSocket.bind(this);
     this.onPlayButtonPressed = this.onPlayButtonPressed.bind(this);
-
+      console.log(window.location);
   }
     
   componentWillMount() {

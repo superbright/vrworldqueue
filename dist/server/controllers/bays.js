@@ -30,28 +30,26 @@ exports.upsertBay = function (req, res) {
     });
 };
 exports.enqueueUser = function (req, res) {
-    Queue.findOne({
-        user: req.body.userId
-    }, function (err, queue) {
+    Queue.findOneAndRemove({ user: req.body.userId }, function (err, queue) {
+        console.log(req.body.userId);
         if (err) {
             res.status(500).send(err);
             return;
-        } else {
-            if (queue) {
-                delete queue._id;
-            }
-            var q = new Queue({
-                user: req.body.userId,
-                bay: req.params.bayId
-            });
-            q.save(function (err, doc) {
-                Queue.find({
-                    bay: req.params.bayId
-                }).populate('user bay').exec(function (err, fullQueue) {
-                    if (err) res.status(500).send(err);else if (fullQueue) res.status(200).send(fullQueue);else res.status(404).send(fullQueue);
-                });
-            });
+        } else if (queue) {
+            delete queue._id;
+            console.log('deleted user from queue');
         }
+        var q = new Queue({
+            user: req.body.userId,
+            bay: req.params.bayId
+        });
+        q.save(function (err, doc) {
+            Queue.find({
+                bay: req.params.bayId
+            }).populate('bay user').exec(function (err, fullQueue) {
+                if (err) res.status(500).send(err);else if (fullQueue) res.status(200).send(fullQueue);else res.status(404).send(fullQueue);
+            });
+        });
     });
 };
 exports.dequeueUser = function (req, res) {

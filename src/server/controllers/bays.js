@@ -32,31 +32,28 @@ exports.upsertBay = (req, res) => {
     });
 };
 exports.enqueueUser = (req, res) => {
-    Queue.findOne({
-        user: req.body.userId
-    }, (err, queue) => {
+    Queue.findOneAndRemove({user: req.body.userId}, (err, queue) => {
         if (err) {
             res.status(500).send(err)
             return;
         }
-        else {
-            if (queue) {
-                delete queue._id;
-            }
-            var q = new Queue({
-                user: req.body.userId
-                , bay: req.params.bayId
-            });
-            q.save((err, doc) => {
-                Queue.find({
-                    bay: req.params.bayId
-                }).populate('user bay').exec((err, fullQueue) => {
-                    if (err) res.status(500).send(err);
-                    else if (fullQueue) res.status(200).send(fullQueue);
-                    else res.status(404).send(fullQueue);
-                });
-            });
+        else if (queue) {
+            delete queue._id;
+            console.log('deleted user from queue');
         }
+        var q = new Queue({
+            user: req.body.userId
+            , bay: req.params.bayId
+        });
+        q.save((err, doc) => {
+            Queue.find({
+                bay: req.params.bayId
+            }).populate('bay user').exec((err, fullQueue) => {
+                if (err) res.status(500).send(err);
+                else if (fullQueue) res.status(200).send(fullQueue);
+                else res.status(404).send(fullQueue);
+            });
+        });
     });
 };
 exports.dequeueUser = (req, res) => {
@@ -123,7 +120,7 @@ module.exports.socketHandler = (socket) => {
     });
     socket.on('rfid', (data) => {
         var req = JSON.parse(data)
-        //enqueue user
+            //enqueue user
         var res = {}
         switch (req.clientType) {
         case 'game':
