@@ -29,6 +29,16 @@ class Bay extends Component {
                 })
             });
             this.connectSocket();
+            return fetch(`/api/bays/${bayid}/queue`, {
+                method: 'get'
+            }).then(res => res.json()).then((queue) => {
+                console.log(queue)
+                this.setState({
+                    queue
+                })
+            }).catch((err) => {
+                console.log('error', err);
+            })
         }).catch((err) => {
             console.log('error', err);
         });
@@ -49,8 +59,7 @@ class Bay extends Component {
     }
     render() {
             const {
-                bay
-                , queue
+                bay, queue
             } = this.state;
             const {
                 match: {
@@ -69,7 +78,7 @@ class Bay extends Component {
                                     'There\'s no one in line, register now!'
                                 } < /h3></div > ) : ( < ul > {
                                         queue.map(player => ( < li className = "user-list-item flex space-between align-center" > < div > {
-                                            player.screenname
+                                            player.user.screenname
                                         } < /div> < /li > ))
                                     } < /ul>)
                                 } < /div>)

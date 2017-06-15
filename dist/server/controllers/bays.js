@@ -12,10 +12,11 @@ var schedulerTasks = {
 exports.getBays = function (req, res) {
     if (req.params.bayId) {
         Bay.findOne({
-            id: req.params.bayId
+            $or: [{
+                id: req.params.bayId
+            }]
         }, function (err, bay) {
-            if (err) res.status(500).send(err);
-            if (bay) res.status(200).send(bay);else res.status(404).send("No Bay found with that ID");
+            if (err) res.status(500).send(err);else if (bay) res.status(200).send(bay);else res.status(404).send("No Bay found with that ID");
         });
     } else Bay.find({}, function (err, bays) {
         if (err) res.status(500).send(err);else res.status(200).send(bays);
@@ -64,10 +65,15 @@ exports.dequeueUser = function (req, res) {
     });
 };
 exports.getQueue = function (req, res) {
-    Queue.find({
-        bay: req.params.bayId
-    }, function (err, doc) {
-        if (err) res.status(500).send(err);else if (doc) res.status(200).send(doc);else res.status(404).send("No Queues found");
+    Bay.findOne({
+        id: req.params.bayId
+    }, function (err, bay) {
+        console.log('bay' + bay);
+        Queue.find({
+            bay: bay._id
+        }).populate('user bay').exec(function (err, doc) {
+            if (err) res.status(500).send(err);else if (doc) res.status(200).send(doc);else res.status(404).send("No Queues found");
+        });
     });
 };
 exports.deleteBay = function (req, res) {
