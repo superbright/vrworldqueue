@@ -9,11 +9,7 @@ var schedulerTasks = {
 };
 exports.getBays = (req, res) => {
     if (req.params.bayId) {
-        Bay.findOne({
-            $or: [{
-                id: req.params.bayId
-                }]
-        }, (err, bay) => {
+        Bay.findById(req.params.bayId, (err, bay) => {
             if (err) res.status(500).send(err);
             else if (bay) res.status(200).send(bay);
             else res.status(404).send("No Bay found with that ID");
@@ -74,7 +70,6 @@ exports.getQueue = (req, res) => {
     Bay.findOne({
         _id: req.params.bayId
     }, (err, bay) => {
-        console.log('bay' + bay);
         Queue.find({
             bay: bay._id
         }).populate('user bay').exec((err, doc) => {

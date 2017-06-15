@@ -241,7 +241,7 @@ describe('Bay', function () {
             })
             // Make sure second user is still in queue
             .then(function (res) {
-                assert(res.body[0].user === userId_02, 'second user still in queue');
+                assert(res.body[0].user._id === userId_02, 'second user still in queue');
             })
     });
     // DELETE /:bayId/queue
