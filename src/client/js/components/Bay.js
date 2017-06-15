@@ -8,10 +8,14 @@ class Bay extends Component {
       bay: null,
       socket: null,
       queue: [],
+      showModal: false,
+      userAttempt: null,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
     this.fetchQueue = this.fetchQueue.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.confirmUser = this.confirmUser.bind(this);
   }
 
   componentWillMount() {
@@ -35,9 +39,12 @@ class Bay extends Component {
   }
 
   fetchQueue() {
+    const { match: { params: { bayid } } } = this.props;
+
     return fetch(`/api/bays/${bayid}/queue`, {
       method: 'get',
     }).then(res => res.json()).then((queue) => {
+      console.log('fetching queue', queue);
       this.setState({ queue });
     }).catch((err) => {
       console.log('error', err);
@@ -50,11 +57,38 @@ class Bay extends Component {
       socket.on('queue', (res) => {
         this.setState({ queue: res });
       });
+      socket.on('userattempt', (res) => {
+        console.log('userAttempt', res);
+
+        // this.setState({ queue: res, showModal: true });
+
+      });
     }
   }
 
+  closeModal() {
+    const { showModal, userAttempt } = this.state
+    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt })
+  }
+
+  confirmUser() {
+    const { match: { params: { bayid } } } = this.props;
+
+    fetch(`/api/bay/${bayid}/enqueue`, {
+      method: 'post',
+      // body: JSON.stringify({ userId:  }), TODO
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    }).then(res => res.json()).then((res) => {
+      console.log('user added, queue updated', res);
+    }).catch((err) => {
+      console.log('error', err);
+    });
+  }
+
   render() {
-    const { bay, queue } = this.state;
+    const { bay, queue, showModal } = this.state;
     const { match: { params: { bayid } } } = this.props;
 
     return (
@@ -80,6 +114,21 @@ class Bay extends Component {
                       </li>
                     ))}
                   </ul>
+                )
+              }
+
+              {
+                showModal
+                && (
+                  <div className="modal flex justify-center align-center">
+                    <div className="modal-container">
+                      <h2>Are you sure?</h2>
+                      <div>
+                        <button className="button-white">YES</button>
+                        <button className="button-white" onClick={this.closeModal}>NO</button>
+                      </div>
+                    </div>
+                  </div>
                 )
               }
             </div>
