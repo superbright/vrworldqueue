@@ -111,7 +111,7 @@ class Bay extends Component {
                   <ul> {
                     queue.map(player => (
                       <li className="user-list-item flex space-between align-center">
-                        <div>{player.user.screenname}</div>
+                        <div><h5>{player.user.screenname}</h5></div>
                       </li>
                     ))}
                   </ul>
