@@ -45,7 +45,13 @@ exports.enqueueUser = function (req, res) {
                 bay: req.params.bayId
             });
             queue.save(function (err, doc) {
-                res.status(200).send(queue);
+                Queue.find({
+                    bay: req.params.bayId
+                }, function (err, fullQueue) {
+                    if (err) res.status(500).send(err);else if (fullQueue) res.status(200).send(fullQueue);else {
+                        res.status(404).send(fullQueue);
+                    }
+                });
             });
         }
     });
@@ -99,34 +105,35 @@ module.exports.socketHandler = function (socket) {
     socket.on('rfid', function (data) {
         //enqueue user
         var req = JSON.parse(data);
+        var res = {};
         switch (req.clientType) {
             case 'game':
+                console.log(req.tag + 'tapped in');
                 User.findOne({
                     'rfid.id': req.tag
                 }, function (err, user) {
                     if (err) console.log('[error] Cant enqueue user... ' + err);else if (user) {
                         if (user.rfid.expiresAt > new Date()) {
-                            console.log('[info] adding user to queue');
                             Bay.findOne({
                                 id: req.clientId
                             }, function (err, bay) {
-                                var q = new Queue({
-                                    user: user._id,
-                                    bay: bay._id
-                                });
-                                q.save();
-                                Queue.find({
-                                    bay: bay._id
+                                Queue.findOne({
+                                    user: user._id
                                 }).populate('user bay').exec(function (err, queue) {
-                                    sockets.sendToQueue(req.clientId, 'queue', queue, function (res) {});
+                                    res.data = queue;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res, function (res) {
+                                        console.log(res);
+                                    });
                                 });
                             });
                         } else {
-                            console.log('[info] User badge is expired'
-                            /*TODO: send response*/
-                            );
+                            console.log('[info] User badge is expired');
+                            res.error = "badge expired";
                         }
-                    } else console.log('[info] No user associated with tag' + data.tag);
+                    } else {
+                        console.log('[info] No user associated with tag' + data.tag);
+                        res.error = "user not found";
+                    }
                 });
                 break;
         }
