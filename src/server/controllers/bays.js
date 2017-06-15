@@ -39,24 +39,21 @@ exports.enqueueUser = (req, res) => {
             res.status(500).send(err)
             return;
         }
-        else if (queue) {
-            res.status(200).send(queue);
-            return;
-        }
         else {
-            var queue = new Queue({
+            if (queue) {
+                delete queue._id;
+            }
+            var q = new Queue({
                 user: req.body.userId
                 , bay: req.params.bayId
             });
-            queue.save((err, doc) => {
+            q.save((err, doc) => {
                 Queue.find({
                     bay: req.params.bayId
-                }, (err, fullQueue) => {
+                }).populate('user bay').exec((err, fullQueue) => {
                     if (err) res.status(500).send(err);
                     else if (fullQueue) res.status(200).send(fullQueue);
-                    else {
-                        res.status(404).send(fullQueue);
-                    }
+                    else res.status(404).send(fullQueue);
                 });
             });
         }
@@ -169,6 +166,13 @@ module.exports.socketHandler = (socket) => {
                 else {
                     console.log('[info] No user associated with tag' + data.tag);
                     res.error = "user not found";
+                    Bay.findOne({
+                        id: req.clientId
+                    }, (err, bay) => {
+                        if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                            console.log(res);
+                        });
+                    })
                 }
             });
             break;

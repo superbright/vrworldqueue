@@ -60,7 +60,7 @@ class Bay extends Component {
       socket.on('userattempt', (res) => {
         console.log('userAttempt', res);
 
-        // this.setState({ queue: res, showModal: true });
+         this.setState({ userAttempt: res, showModal: true });
 
       });
     }
@@ -72,16 +72,19 @@ class Bay extends Component {
   }
 
   confirmUser() {
+      const { userAttempt: {data:{user}} } = this.state;
     const { match: { params: { bayid } } } = this.props;
 
-    fetch(`/api/bay/${bayid}/enqueue`, {
+    fetch(`/api/bays/${bayid}/enqueue`, {
       method: 'post',
-      // body: JSON.stringify({ userId:  }), TODO
+      body: JSON.stringify({ userId: user._id  }),
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
       console.log('user added, queue updated', res);
+        this.setState({queue:res});
+        this.closeModal();
     }).catch((err) => {
       console.log('error', err);
     });
@@ -124,7 +127,7 @@ class Bay extends Component {
                     <div className="modal-container">
                       <h2>Are you sure?</h2>
                       <div>
-                        <button className="button-white">YES</button>
+                        <button className="button-white" onClick={this.confirmUser}>YES</button>
                         <button className="button-white" onClick={this.closeModal}>NO</button>
                       </div>
                     </div>
