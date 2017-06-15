@@ -37,7 +37,7 @@ class Signup extends Component {
       form: {
         ...this.state.form,
         [name]: value,
-      }
+      },
     });
   }
 

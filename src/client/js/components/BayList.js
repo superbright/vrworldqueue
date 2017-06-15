@@ -7,11 +7,11 @@ class BayList extends Component {
 
     this.state = {
       bays: null,
-    }
+    };
   }
 
   componentWillMount() {
-    return fetch(`/api/bays`, {
+    return fetch('/api/bays', {
       method: 'get',
     }).then(res => res.json()).then((bays) => {
       this.setState({ bays });

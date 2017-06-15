@@ -26,7 +26,7 @@ class AdminList extends Component {
 
     return searchValue
       ? users.filter(u => (
-        u.name.toLowerCase().indexOf(value) >= 0
+        `${u.firstname.toLowerCase()} ${u.lastname.toLowerCase()}`.indexOf(value) >= 0
         || (
           u.email &&
           u.email.toLowerCase().indexOf(value) >= 0
@@ -55,7 +55,7 @@ class AdminList extends Component {
                 key={user._id}
               >
                 <div>
-                  <div className="big-font">{user.name}</div>
+                  <div className="big-font">{user.firstname} {user.lastname}</div>
                   <div className="small-font">{user.email}</div>
                   <div className="small-font">{user.screenname}</div>
                 </div>
