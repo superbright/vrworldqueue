@@ -11,10 +11,50 @@ exports.getUsers = (req, res) => {
         else res.status(200).send(users);
     });
 }
+exports.activateUser = (req, res) => {
+    User.findById(req.params.userId, (err, user) => {
+        if (err) res.status(500).send(err);
+        else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            }
+            else {
+                user.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+                user.save((err, doc) => {
+                    if (err) res.status(500).send(err);
+                    else res.status(200).send(doc);
+                });
+            }
+        }
+        else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
+exports.deactivateUser = (req, res) => {
+    User.findById(req.params.userId, (err, user) => {
+        if (err) res.status(500).send(err);
+        else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            }
+            else {
+                user.rfid.expiresAt = new Date().setHours(0, 0, 0, 0);
+                user.save((err, doc) => {
+                    if (err) res.status(500).send(err);
+                    else res.status(200).send(doc);
+                });
+            }
+        }
+        else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
 exports.getUserSignature = (req, res) => {
     User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
-        if (user) {
+        else if (user) {
             Signature.findById(user.Signature, (err, signature) => {
                 if (err) res.status(500).send(err);
                 if (signature) res.status(200).send(signature);

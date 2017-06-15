@@ -10,10 +10,41 @@ exports.getUsers = function (req, res) {
         if (err) res.status(500).send(err);else res.status(200).send(users);
     });
 };
+exports.activateUser = function (req, res) {
+    User.findById(req.params.userId, function (err, user) {
+        if (err) res.status(500).send(err);else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            } else {
+                user.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+                user.save(function (err, doc) {
+                    if (err) res.status(500).send(err);else res.status(200).send(doc);
+                });
+            }
+        } else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
+exports.deactivateUser = function (req, res) {
+    User.findById(req.params.userId, function (err, user) {
+        if (err) res.status(500).send(err);else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            } else {
+                user.rfid.expiresAt = new Date().setHours(0, 0, 0, 0);
+                user.save(function (err, doc) {
+                    if (err) res.status(500).send(err);else res.status(200).send(doc);
+                });
+            }
+        } else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
 exports.getUserSignature = function (req, res) {
     User.findById(req.params.userId, function (err, user) {
-        if (err) res.status(500).send(err);
-        if (user) {
+        if (err) res.status(500).send(err);else if (user) {
             Signature.findById(user.Signature, function (err, signature) {
                 if (err) res.status(500).send(err);
                 if (signature) res.status(200).send(signature);else res.status(404).send('No signature found for that user');

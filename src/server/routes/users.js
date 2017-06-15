@@ -8,4 +8,6 @@ router.get('/:userId/signature', controller.getUserSignature);
 router.post('/validate', controller.validateUser);
 router.post('/', controller.postUser);
 router.delete('/:userId', controller.deleteUser);
+router.post('/:userId/activate', controller.activateUser);
+router.post('/:userId/deactivate',controller.deactivateUser);
 module.exports = router;
