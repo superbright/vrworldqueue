@@ -9,7 +9,9 @@ var schedulerTasks = {
 };
 exports.getBays = (req, res) => {
     if (req.params.bayId) {
-        Bay.findById(req.params.bayId, (err, bay) => {
+        Bay.findOne({
+            id: req.params.bayId
+        }, (err, bay) => {
             if (err) res.status(500).send(err);
             if (bay) res.status(200).send(bay);
             else res.status(404).send("No Bay found with that ID");
@@ -121,8 +123,10 @@ module.exports.socketHandler = (socket) => {
                                 , bay: bay._id
                             });
                             q.save();
-                            sockets.sendToQueue(req.clientId, 'refreshQueue', {}, (res) => {
-                                console.log(res);
+                            Queue.find({
+                                bay: bay._id
+                            }).populate('user bay').exec((err, queue) => {
+                                sockets.sendToQueue(req.clientId, 'queue', queue, (res) => {});
                             });
                         });
                     }
