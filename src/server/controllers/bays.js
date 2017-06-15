@@ -72,7 +72,7 @@ exports.dequeueUser = (req, res) => {
 };
 exports.getQueue = (req, res) => {
     Bay.findOne({
-        id: req.params.bayId
+        _id: req.params.bayId
     }, (err, bay) => {
         console.log('bay' + bay);
         Queue.find({
