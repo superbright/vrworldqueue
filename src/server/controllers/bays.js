@@ -129,13 +129,35 @@ module.exports.socketHandler = (socket) => {
                         Bay.findOne({
                             id: req.clientId
                         }, (err, bay) => {
+                            var q = new Queue({})
                             Queue.findOne({
                                 user: user._id
                             }).populate('user bay').exec((err, queue) => {
-                                res.data = queue
-                                sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
-                                    console.log(res);
-                                });
+                                if (err) {
+                                    res.err = err;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                        //console.log(res);
+                                    });
+                                }
+                                else if (queue) {
+                                    res.data = queue;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                        //console.log(res);
+                                    });
+                                }
+                                else {
+                                    var q = new Queue({
+                                        user: user._id
+                                        , bay: bay._id
+                                    });
+                                    q.populate('user bay', (err) => {
+                                        console.log(q);
+                                        res.data = q;
+                                        sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                            console.log(res);
+                                        });
+                                    });
+                                }
                             });
                         });
                     }
