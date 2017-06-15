@@ -5,25 +5,23 @@ class BayPlay extends Component {
   constructor() {
     super();
     this.state = {
-      socket: null
+      socket: null,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
     this.onPlayButtonPressed = this.onPlayButtonPressed.bind(this);
-
   }
 
   componentWillMount() {
     const { match: { params: { bayid } } } = this.props;
 
-
     this.setState({
-    socket: io(window.location.origin, {
+      socket: io(window.location.origin, {
         query: `clientType=startButton&clientId=${bayid}`,
-       }),
+      }),
     });
 
-      this.connectSocket();
+    this.connectSocket();
   }
 
   connectSocket() {
@@ -31,11 +29,12 @@ class BayPlay extends Component {
     if (socket) {
     }
   }
-onPlayButtonPressed(){
-     const { match: { params: { bayid } } } = this.props;
+
+  onPlayButtonPressed(){
+    const { match: { params: { bayid } } } = this.props;
     console.log('startButton Pressed');
-    this.state.socket.emit('startButton', {'clientId': bayid});
-}
+    this.state.socket.emit('startButton', { 'clientId': bayid });
+  }
 
   render() {
     return (
@@ -43,7 +42,11 @@ onPlayButtonPressed(){
         <div className="play-button">
           <svg viewBox="0 0 200 200" alt="Play video">
             <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
-            <polygon points="70, 55 70, 145 145, 100" fill="#fff" onClick={this.onPlayButtonPressed}/>
+            <polygon
+              points="70, 55 70, 145 145, 100"
+              fill="#fff"
+              onClick={this.onPlayButtonPressed}
+            />
           </svg>
         </div>
       </div>

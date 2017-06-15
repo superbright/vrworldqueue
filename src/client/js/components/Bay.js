@@ -66,8 +66,8 @@ class Bay extends Component {
   }
 
   closeModal() {
-    const { showModal, userAttempt } = this.state
-    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt })
+    const { showModal, userAttempt } = this.state;
+    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt });
   }
 
   confirmUser() {
