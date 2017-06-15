@@ -26,7 +26,7 @@ class Bay extends Component {
     }).then(res => res.json()).then((bay) => {
       this.setState({
         bay,
-        socket: io('http://localhost:3000', {
+        socket: io(window.location.origin, {
           query: `clientType=queue&clientId=${bayid}`,
         }),
       });
@@ -66,8 +66,8 @@ class Bay extends Component {
   }
 
   closeModal() {
-    const { showModal, userAttempt } = this.state
-    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt })
+    const { showModal, userAttempt } = this.state;
+    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt });
   }
 
   confirmUser() {
@@ -111,7 +111,7 @@ class Bay extends Component {
                   <ul> {
                     queue.map(player => (
                       <li className="user-list-item flex space-between align-center">
-                        <div>{player.user.screenname}</div>
+                        <div><h5>{player.user.screenname}</h5></div>
                       </li>
                     ))}
                   </ul>
