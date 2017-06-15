@@ -17,6 +17,7 @@ class AdminList extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.connectSocket = this.connectSocket.bind(this);
     this.clearTempRFID = this.clearTempRFID.bind(this);
+    this.activateUser = this.activateUser.bind(this);
   }
 
   componentWillMount() {
@@ -87,10 +88,30 @@ class AdminList extends Component {
     });
   }
 
+  activateUser() {
+    const { match: { params: { userid, adminid } } } = this.props;
+    fetch(`/api/users/${userid}/activate`, {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    }).then(res => res.json()).then((res) => {
+      this.setState({
+        user: res,
+      });
+      this.clearTempRFID();
+    }).catch((err) => {
+      console.log('error', err);
+    });
+  }
+
   render() {
     const { user, tempRFID } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
-
+    if (user) {
+      const time = ((new Date(user.rfid.expiresAt).getTime() - new Date().getTime()));
+      console.log(time);
+    }
     return (
       <div className="admin-user-page simple-container" key={userid}>
         <Link to={`/admin/${adminid}`}>{'< Return to Users List'}</Link>
@@ -104,7 +125,6 @@ class AdminList extends Component {
                 )
               }
               <div><span className="big-font">RFID</span>: {user.rfid.id || 'no rfid set yet' }</div>
-
 
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
