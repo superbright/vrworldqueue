@@ -88,14 +88,15 @@ class AdminList extends Component {
     });
   }
 
-  activateUser() {
+  activateUser(shouldActivate = true) {
     const { match: { params: { userid, adminid } } } = this.props;
-    fetch(`/api/users/${userid}/activate`, {
+    fetch(`/api/users/${userid}/${shouldActivate ? 'activate' : 'deactivate'}`, {
       method: 'post',
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
+      console.log('user activated', res);
       this.setState({
         user: res,
       });
@@ -108,10 +109,10 @@ class AdminList extends Component {
   render() {
     const { user, tempRFID } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
-    if (user) {
-      const time = ((new Date(user.rfid.expiresAt).getTime() - new Date().getTime()));
-      console.log(time);
-    }
+    const activated = user
+      ? (new Date(user.rfid.expiresAt).getTime() - new Date().getTime()) > 0
+      : false;
+
     return (
       <div className="admin-user-page simple-container" key={userid}>
         <Link to={`/admin/${adminid}`}>{'< Return to Users List'}</Link>
@@ -120,11 +121,24 @@ class AdminList extends Component {
           user && (
             <div className="admin-user-page-info">
               <h2>{user.firstname} {user.lastname}</h2>
-              { tempRFID && (
-                  <div className="detected-rfid"><h5>Detected RFID: {tempRFID}</h5></div>
+              { tempRFID &&
+                <div className="detected-rfid"><h5>Detected RFID: {tempRFID}</h5></div>
+              }
+              <div>
+                <span className="big-font">RFID</span>: {user.rfid.id || 'no rfid set yet' }
+              </div>
+
+              {
+                user.rfid.id && (
+                  <div>
+                    {
+                      activated
+                      ? <div>{'User\'s account activated!'} <button onClick={() => this.activateUser(false)}>Deactivate Account</button></div>
+                      : <button onClick={this.activateUser}>Activate Account</button>
+                    }
+                  </div>
                 )
               }
-              <div><span className="big-font">RFID</span>: {user.rfid.id || 'no rfid set yet' }</div>
 
               <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
             </div>
