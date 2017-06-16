@@ -47,6 +47,7 @@ exports.enqueueUser = function (req, res) {
                 currentUser[req.params.bayId] = doc;
                 startReady(req.params.bayId);
             });
+            res.status(200).send([]);
         } else {
             var q = new Queue({
                 user: req.body.userId,
