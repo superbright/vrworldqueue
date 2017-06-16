@@ -19,12 +19,9 @@ class BayPlay extends Component {
       socket: io(window.location.origin, {
         query: `clientType=button&clientId=${bayid}`,
       }),
+    }, ()=>{
+        this.connectSocket();
     });
-      /*hack since client wasn't connecting*/
-      setTimeout(()=>{
-            this.connectSocket();
-  
-      }, 1000);
   }
 
   connectSocket() {

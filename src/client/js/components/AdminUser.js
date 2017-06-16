@@ -28,8 +28,9 @@ class AdminList extends Component {
       this.setState({
         user,
         socket: io(window.location.origin, { query: `clientType=admin&clientId=${adminid}` }),
-      });
-      this.connectSocket();
+      }, ()=>{
+        this.connectSocket();
+        });
     }).catch((err) => {
       console.log('error', err);
     });
