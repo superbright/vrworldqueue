@@ -175,6 +175,13 @@ header {
   transition: all 0.25s ease;
 }
 
+.modal.modal-error {
+  background-color: #F44336;
+}
+.modal.modal-error button {
+  color: #F44336;
+}
+
 .modal button {
   margin: 0px 20px;
 }

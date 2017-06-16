@@ -9,6 +9,7 @@ class Bay extends Component {
       socket: null,
       queue: [],
       showModal: false,
+      isErrorModal: false,
       userAttempt: null,
     };
 
@@ -89,7 +90,7 @@ class Bay extends Component {
   }
 
   render() {
-    const { bay, queue, showModal } = this.state;
+    const { bay, queue, showModal, isErrorModal } = this.state;
     const { match: { params: { bayid } } } = this.props;
 
     return (
@@ -110,7 +111,7 @@ class Bay extends Component {
                 : (
                   <ul> {
                     queue.map(player => (
-                      <li className="user-list-item flex space-between align-center">
+                      <li key={player.user._id} className="user-list-item flex space-between align-center">
                         <div><h5>{player.user.screenname}</h5></div>
                       </li>
                     ))}
@@ -121,7 +122,7 @@ class Bay extends Component {
               {
                 showModal
                 && (
-                  <div className="modal flex justify-center align-center">
+                  <div className={`modal flex justify-center align-center ${isErrorModal ? 'modal-error' : ''}`}>
                     <div className="modal-container">
                       <h2>Are you sure?</h2>
                       <div>
