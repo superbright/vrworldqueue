@@ -256,6 +256,13 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
             } else {
                 console.log('[info] User badge is expired');
                 res.error = "badge expired";
+                Bay.findOne({
+                    id: bayId
+                }, function (err, bay) {
+                    if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, function (res) {
+                        console.log(res);
+                    });
+                });
             }
         } else {
             console.log('[info] No user associated with tag' + tag);

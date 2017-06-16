@@ -195,7 +195,7 @@ var startReady = (bayId) => {
     var data = {
         state: 'ready'
     }
-    sockets.sendToButton(bayId, 'setState', data,(res)=>{
+    sockets.sendToButton(bayId, 'setState', data, (res) => {
         console.log(res);
     });
 }
@@ -276,6 +276,13 @@ var addUserToQueue = (bayId, tag) => {
             else {
                 console.log('[info] User badge is expired')
                 res.error = "badge expired";
+                Bay.findOne({
+                    id: bayId
+                }, (err, bay) => {
+                    if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                        console.log(res);
+                    });
+                });
             }
         }
         else {
@@ -287,7 +294,7 @@ var addUserToQueue = (bayId, tag) => {
                 if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
                     console.log(res);
                 });
-            })
+            });
         }
     });
 };
