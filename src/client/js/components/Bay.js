@@ -92,7 +92,8 @@ class Bay extends Component {
   render() {
     const { bay, queue, showModal, isErrorModal } = this.state;
     const { match: { params: { bayid } } } = this.props;
-
+    const [onDeck, ...restOfQueue] = queue;
+console.log(onDeck);
     return (
       <div key={bayid}>
         {
@@ -109,13 +110,27 @@ class Bay extends Component {
                   </div>
                 )
                 : (
-                  <ul> {
-                    queue.map(player => (
-                      <li key={player.user._id} className="user-list-item flex space-between align-center">
-                        <div><h5>{player.user.screenname}</h5></div>
-                      </li>
-                    ))}
-                  </ul>
+                  <div>
+                    <div className="bay-on-deck">
+                      <div className="simple-container">
+                        <p>On Deck</p>
+                        <div className="flex space-between align-center">
+                          <h1>{onDeck.user.screenname}</h1>
+                          <h1>00:00</h1>
+                        </div>
+                      </div>
+                    </div>
+                    <ul> {
+                      restOfQueue.map(player => (
+                        <li
+                          key={player.user._id}
+                          className="user-list-item flex space-between align-center"
+                        >
+                          <h5>{player.user.screenname}</h5>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )
               }
 
