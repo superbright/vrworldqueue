@@ -27,6 +27,11 @@ class BayPlay extends Component {
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
+      socket.on('setState', (res) => {
+        console.log('setstate socket', res);
+
+        // this.setState({ userAttempt: res, showModal: true });
+      });
     }
   }
 

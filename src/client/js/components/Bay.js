@@ -63,6 +63,11 @@ class Bay extends Component {
 
         this.setState({ userAttempt: res, showModal: true });
       });
+      socket.on('setState', (res) => {
+        console.log('setstate socket', res);
+
+        // this.setState({ userAttempt: res, showModal: true });
+      });
     }
   }
 
@@ -74,7 +79,7 @@ class Bay extends Component {
   confirmUser() {
     const { userAttempt: { data: { user } } } = this.state;
     const { match: { params: { bayid } } } = this.props;
-
+    console.log('attepting confirmation');
     fetch(`/api/bays/${bayid}/enqueue`, {
       method: 'post',
       body: JSON.stringify({ userId: user._id }),
@@ -82,6 +87,7 @@ class Bay extends Component {
         'Content-Type': 'application/json',
       }),
     }).then(res => res.json()).then((res) => {
+      console.log('user confirmed', res);
       this.setState({ queue: res });
       this.closeModal();
     }).catch((err) => {
@@ -93,7 +99,7 @@ class Bay extends Component {
     const { bay, queue, showModal, isErrorModal } = this.state;
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
-console.log(onDeck);
+
     return (
       <div key={bayid}>
         {

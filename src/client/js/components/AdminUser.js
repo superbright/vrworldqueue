@@ -39,6 +39,7 @@ class AdminList extends Component {
     const { socket } = this.state;
     if (socket) {
       socket.on('rfid', (res) => {
+        console.log('rfid', res);
         this.setState({ tempRFID: res });
       });
     }
