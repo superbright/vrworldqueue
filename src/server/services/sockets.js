@@ -21,30 +21,33 @@ module.exports.setupSockets = (server) => {
         let clientType = socket.handshake.query.clientType;
         let currentBay = {
             id: socket.id
-            , bayNumber: clientId
+            , clientId: clientId
             , clientType: clientType
         };
-        console.log('Incoming WS Connection from ' + clientType + ' # ' + clientId);
-        if (sockets[currentBay.clientType] == null) {
-            console.log("unknown client type. Disconnecting...");
-            socket.disconnect();
-            return;
-        }
-        sockets[currentBay.clientType][currentBay.bayNumber] = socket;
-        console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
-        // }
-        socket.on('disconnect', () => {
-            console.log('[INFO] ' + currentBay.clientType + " " + currentBay.bayNumber + ' disconnected!');
-            sockets[currentBay.clientType][currentBay.bayNumber] = null;
-            socket.broadcast.emit('bayDisconnect', {
-                clientId: currentBay.bayNumber
-            });
-        });
-        userController.socketHandler(socket);
-        rfidController.socketHandler(socket);
-        bayController.socketHandler(socket);
+        registerSocket(socket, currentBay);
     });
 };
+var registerSocket = (socket, currentBay) => {
+    console.log('Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
+    if (sockets[currentBay.clientType] == null) {
+        console.log("unknown client type. Disconnecting...");
+        socket.disconnect();
+        return;
+    }
+    sockets[currentBay.clientType][currentBay.clientId] = socket;
+    console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.clientId + ' connected!');
+    socket.on('disconnect', () => {
+        console.log('[INFO] ' + currentBay.clientType + " " + currentBay.clientId + ' disconnected!');
+        sockets[currentBay.clientType][currentBay.clientId] = null;
+        socket.broadcast.emit('bayDisconnect', {
+            clientId: currentBay.bayNumber
+        });
+    });
+    socket.emit('hello', currentBay);
+    userController.socketHandler(socket);
+    rfidController.socketHandler(socket);
+    bayController.socketHandler(socket);
+}
 exports.sendToGame = (gameId, endpoint, message, callback) => {
     exports.sendToClient('game', gameId, endpoint, message, callback);
 };
@@ -70,10 +73,11 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         }
     }
     var socket = sockets[clientType][clientId];
-//    console.log('[INFO]: ');
-//    console.log(request);
+    //    console.log('[INFO]: ');
+    //    console.log(request);
     if (!socket) {
         console.log('[WARN]: Socket not found');
+        console.log(returnValue.request);
         returnValue.error = "Socket not found";
     }
     else if (!socket.connected) {

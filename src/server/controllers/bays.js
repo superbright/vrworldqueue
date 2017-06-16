@@ -216,7 +216,9 @@ var startGameplay = (bayId) => {
             state: 'gameplay'
             , endTime: endTime
         };
-        sockets.sendToGame(bayId, 'endGame', data);
+        Bay.findById(bayId, (err, bay) => {
+            if (bay) sockets.sendToGame(bay.id, 'startGame', data);
+        });
         sockets.sendToButton(bayId, 'setState', data);
         sockets.sendToQueue(bayId, 'setState', data);
     }
@@ -226,7 +228,9 @@ var endGameplay = (bayId) => {
     var data = {
         state: 'onboarding'
     };
-    sockets.sendToGame(bayId, 'endGame', data);
+    Bay.findById(bayId, (err, bay) => {
+        if (bay) sockets.sendToGame(bay.id, 'endGame', data);
+    });
     sockets.sendToButton(bayId, 'setState', data);
     sockets.sendToQueue(bayId, 'setState', data);
     startOnboarding(bayId);
