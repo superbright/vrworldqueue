@@ -1,12 +1,14 @@
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
-var scheduler = require("../services/scheduler");
+var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
-var schedulerTasks = {
-    userTimeout: {}
-    , gameTimeout: {}
-};
+var timers = {
+    onboarding: {}
+    , gameplay: {}
+}
+var bayState = {}
+var currentUser = {}
 exports.getBays = (req, res) => {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, (err, bay) => {
@@ -32,7 +34,9 @@ exports.upsertBay = (req, res) => {
     });
 };
 exports.enqueueUser = (req, res) => {
-    Queue.findOneAndRemove({user: req.body.userId}, (err, queue) => {
+    Queue.findOneAndRemove({
+        user: req.body.userId
+    }, (err, queue) => {
         if (err) {
             res.status(500).send(err)
             return;
@@ -99,93 +103,170 @@ module.exports.clearQueue = (req, res) => {
         res.status(200).send([]);
     });
 }
+exports.popUser = (bayId) => {
+    Queue.findOneAndRemove({
+        bay: bayId
+    }).sort({
+        timeAdded: 1
+    }).exec((err, queue) => {
+        if (err) return {}
+        else return queue;
+    });
+}
+exports.getState = (req, res) => {
+    res.status(200).send(bayState);
+}
+var startOnboarding = (bayId) => {
+    console.log('Onboarding, waiting for user...');
+    bayState[bayId] = 'Onboarding';
+    currentUser[bayId] = exports.popUser();
+    var endTime = new Date();
+    endTime.setSeconds(endTime.getSeconds() + 10);
+    if (timers.onboarding.bayId != null) {
+        timers.onboarding.bayId.cancel();
+    }
+    timers.onboarding.bayId = scheduler.scheduleJob(endTime, () => {
+        console.log('Onboarding timeout, moving to next person...');
+        startOnboarding(bayId);
+    });
+    var data = {
+        state: 'onboarding'
+        , data: {
+            nextUser: nextUp
+        }
+    }
+    sockets.sendToButton(bayId, 'setState', data);
+    sockets.sendToQueue(bayId, 'setState', data);
+};
+var startReady = (bayId) => {
+    if (timers.onboarding.bayId != null) {
+        timers.onboarding.bayId.cancel();
+    }
+    console.log('Bay ' + bayId + ' is Ready');
+    var data = {
+        state: 'ready'
+    }
+    sockets.sendToButton(bayId, 'setState', data);
+}
+var startGameplay = (bayId) => {
+    console.log('start Gameplay on bay ' + bayId);
+    if (bayState[bayId] == 'Playing') console.log('Already playing game...');
+    else {
+        bayState[bayId] = 'Playing';
+        var endTime = new Date();
+        endTime.setSeconds(endTime.getSeconds() + 10);
+        if (timers.onboarding.bayId != null) {
+            timers.onboarding.bayId.cancel();
+        }
+        timers.gameplay.bayId = scheduler.scheduleJob(endTime, () => {
+            endGameplay(bayId);
+        });
+    }
+};
+var endGameplay = (bayId) => {
+    console.log('Gameplay over!');
+    var data = {
+        state: 'onboarding'
+    };
+    sockets.sendToGame(bayId, 'endGame', data);
+    sockets.sendToButton(bayId, 'setState', data);
+    sockets.sendToQueue(bayId, 'setState', data);
+    startOnboarding(bayId);
+};
+var addUserToQueue = (bayId, tag) => {
+    var res = {}
+    User.findOne({
+        'rfid.id': tag
+    }, (err, user) => {
+        if (err) console.log('[error] Cant enqueue user... ' + err);
+        else if (user) {
+            if (user.rfid.expiresAt > new Date()) {
+                Bay.findOne({
+                    id: bayId
+                }, (err, bay) => {
+                    Queue.findOne({
+                        user: user._id
+                    }).populate('user bay').exec((err, queue) => {
+                        if (err) {
+                            res.err = err;
+                            sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                //console.log(res);
+                            });
+                        }
+                        else if (queue) {
+                            res.data = queue;
+                            sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                //console.log(res);
+                            });
+                        }
+                        else {
+                            var q = new Queue({
+                                user: user._id
+                                , bay: bay._id
+                            });
+                            q.populate('user bay', (err) => {
+                                console.log(q);
+                                res.data = q;
+                                sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                                    console.log(res);
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+            else {
+                console.log('[info] User badge is expired')
+                res.error = "badge expired";
+            }
+        }
+        else {
+            console.log('[info] No user associated with tag' + tag);
+            res.error = "user not found";
+            Bay.findOne({
+                id: bayId
+            }, (err, bay) => {
+                if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
+                    console.log(res);
+                });
+            })
+        }
+    });
+};
+var isCurrentUser = (bayId, tag) => {
+    User.findOne({
+        'rfid.id': tag
+    }, (err, user) => {
+        return (user == currentUser[bayId])
+    });
+}
 module.exports.socketHandler = (socket) => {
     /* Add Socket Handling Logic Here */
-    socket.on('startButtonPressed', (data) => {
-        var bayId = data.bayId;
-        sockets.sendToGame(bayId, 'startGame', {}, (result) => {
-            console.log(result);
-        });
-    });
+    socket.on('startButtonPressed', (data) => {});
     socket.on('startButton', (req) => {
-        console.log(req);
-        var res = {}
-        console.log('start button from ' + req.clientId + ' received');
-        Bay.findById(req.clientId, (err, bay) => {
-            if (err) console.log('error');
-            else if (bay) sockets.sendToGame(bay.id, 'startGame', {}, (res) => {
-                console.log(res);
-            });
-        });
+        var bayId = req.clientId;
+        startGameplay(bayId);
     });
     socket.on('rfid', (data) => {
         var req = JSON.parse(data)
             //enqueue user
         var res = {}
-        switch (req.clientType) {
-        case 'game':
+        Bay.findOne({
+            id: req.clientId
+        }, {}, (err, bay) => {
             console.log(req.tag + 'tapped in');
-            User.findOne({
-                'rfid.id': req.tag
-            }, (err, user) => {
-                if (err) console.log('[error] Cant enqueue user... ' + err);
-                else if (user) {
-                    if (user.rfid.expiresAt > new Date()) {
-                        Bay.findOne({
-                            id: req.clientId
-                        }, (err, bay) => {
-                            var q = new Queue({})
-                            Queue.findOne({
-                                user: user._id
-                            }).populate('user bay').exec((err, queue) => {
-                                if (err) {
-                                    res.err = err;
-                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
-                                        //console.log(res);
-                                    });
-                                }
-                                else if (queue) {
-                                    res.data = queue;
-                                    sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
-                                        //console.log(res);
-                                    });
-                                }
-                                else {
-                                    var q = new Queue({
-                                        user: user._id
-                                        , bay: bay._id
-                                    });
-                                    q.populate('user bay', (err) => {
-                                        console.log(q);
-                                        res.data = q;
-                                        sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
-                                            console.log(res);
-                                        });
-                                    });
-                                }
-                            });
-                        });
-                    }
-                    else {
-                        console.log('[info] User badge is expired')
-                        res.error = "badge expired";
-                    }
+            if (req.clientType == 'game') {
+                console.log('Bay ' + bay._id + 'in state: ' + bayState[bay._id]);
+                if (bayState[bay._id] == 'Onboarding') {
+                    console.log('Check if correct user');
+                    if (isCurrentUser(bay._id, req.tag)) startReady(bay._id);
+                    else addUserToQueue(req.clientId, req.tag);
                 }
                 else {
-                    console.log('[info] No user associated with tag' + data.tag);
-                    res.error = "user not found";
-                    Bay.findOne({
-                        id: req.clientId
-                    }, (err, bay) => {
-                        if (bay) sockets.sendToQueue(bay._id, 'userattempt', res, (res) => {
-                            console.log(res);
-                        });
-                    })
+                    console.log('attempting to add user to queue');
+                    addUserToQueue(req.clientId, req.tag);
                 }
-            });
-            break;
-        case 'startButton':
-            break;
-        }
+            }
+        });
     });
 };

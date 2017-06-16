@@ -4,7 +4,7 @@ var signatureController = require('../controllers/signatures');
 var userController = require('../controllers/users');
 let sockets = {
     game: {}
-    , startButton: {}
+    , button: {}
     , queue: {}
     , admin: {}
     , registration: {}

@@ -17,7 +17,7 @@ class BayPlay extends Component {
 
     this.setState({
       socket: io(window.location.origin, {
-        query: `clientType=startButton&clientId=${bayid}`,
+        query: `clientType=button&clientId=${bayid}`,
       }),
     });
 

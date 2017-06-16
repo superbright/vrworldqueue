@@ -19,6 +19,15 @@ var schema = new mongoose.Schema({
         game: {
             type: Date
         }
+    },
+    state: {
+        type: String,
+        enum: ['Idle', 'Waiting', 'Playing'],
+        default: 'Idle'
+    },
+    playTime: {
+        type: Number,
+        default: 10
     }
 });
 var Bay = mongoose.model('Bay', schema);

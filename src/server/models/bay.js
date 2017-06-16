@@ -18,6 +18,15 @@ var schema = new mongoose.Schema({
             type: Date
         }
     }
+    , state: {
+        type: String
+        , enum: ['Idle', 'Waiting', 'Playing']
+        , default: 'Idle'
+    },
+    playTime: {
+        type: Number,
+        default: 10
+    }
 });
 var Bay = mongoose.model('Bay', schema);
 module.exports = {
