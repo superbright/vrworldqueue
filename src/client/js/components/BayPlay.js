@@ -29,7 +29,8 @@ class BayPlay extends Component {
     const { socket } = this.state;
     if (socket) {
       socket.on('setState', (res) => {
-        this.setState({ playState: res.state });
+        console.log('setstate', res);
+        this.setState({ play: res });
       });
     }
   }
@@ -43,55 +44,47 @@ class BayPlay extends Component {
   render() {
     const { play } = this.state;
 
-    // let play;
-    //
-    // switch(playState) {
-    //   case 'idle':
-    //     // no players in line
-    //   case 'gameplay':
-    //     // persons playing
-    //     play = (
-    //       <div>
-    //         VRWORLD
-    //       </div>
-    //     )
-    //     break;
-    //   case 'onboarding':
-    //     // last person is done playing but next person hasn't swiped in yet
-    //     play = (
-    //       <div className="big-font">Waiting for next player to swipe in</div>
-    //     )
-    //     break;
-    //   case 'ready':
-    //     // next player has swiped in, display the play button
-    //     play = (
-    //       <div className="play-button">
-    //         <svg viewBox="0 0 200 200" alt="Play video">
-    //           <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
-    //           <polygon
-    //             points="70, 55 70, 145 145, 100"
-    //             fill="#fff"
-    //             onClick={this.onPlayButtonPressed}
-    //           />
-    //         </svg>
-    //       </div>
-    //     );
-    //     break;
-    // }
+    let playDom;
+
+    switch (play.state) {
+      case 'onboarding':
+        // last person is done playing but next person hasn't swiped in yet
+        playDom = (
+          <div className="big-font"><h3>Waiting for next player to swipe in</h3></div>
+        );
+        break;
+      case 'ready':
+        // next player has swiped in, display the play button
+        playDom = (
+          <div className="play-button">
+            <svg viewBox="0 0 200 200" alt="Play video">
+              <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
+              <polygon
+                points="70, 55 70, 145 145, 100"
+                fill="#fff"
+                onClick={this.onPlayButtonPressed}
+              />
+            </svg>
+          </div>
+        );
+        break;
+      case 'idle':
+        // no players in line
+      case 'gameplay':
+        // person is playing
+      default:
+        playDom = (
+          <div>
+            <h1>VRWORLD</h1>
+          </div>
+        );
+        break;
+    }
 
 
     return (
       <div className="bay-play flex justify-center align-center">
-        <div className="play-button">
-          <svg viewBox="0 0 200 200" alt="Play video">
-            <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
-            <polygon
-              points="70, 55 70, 145 145, 100"
-              fill="#fff"
-              onClick={this.onPlayButtonPressed}
-            />
-          </svg>
-        </div>
+        {playDom}
       </div>
     );
   }

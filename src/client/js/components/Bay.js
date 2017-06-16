@@ -79,7 +79,7 @@ class Bay extends Component {
   confirmUser() {
     const { userAttempt: { data: { user } } } = this.state;
     const { match: { params: { bayid } } } = this.props;
-    console.log('attepting confirmation');
+
     fetch(`/api/bays/${bayid}/enqueue`, {
       method: 'post',
       body: JSON.stringify({ userId: user._id }),
