@@ -39,6 +39,7 @@ class Signup extends Component {
       form: formInit,
       showWaiver: false,
       waiverAccepted: false,
+      waiverFetching: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -56,7 +57,7 @@ class Signup extends Component {
       form: {
         ...this.state.form,
         [name]: value,
-      }
+      },
     });
   }
 
@@ -68,6 +69,8 @@ class Signup extends Component {
 
   handleWaiver(accept) {
     if (accept) {
+      this.setState({ waiverFetching: true });
+
       fetch('/api/users', {
         method: 'post',
         body: JSON.stringify(this.state.form),
@@ -75,7 +78,7 @@ class Signup extends Component {
           'Content-Type': 'application/json',
         }),
       }).then(res => res.json()).then(() => {
-        this.setState({ waiverAccepted: true });
+        this.setState({ waiverAccepted: true, waiverFetching: false });
       }).catch((err) => {
         console.log('error', err);
       });
@@ -94,6 +97,7 @@ class Signup extends Component {
       showWaiver,
       waiverAccepted,
       form,
+      waiverFetching,
     } = this.state;
 
     if (waiverAccepted) {
@@ -101,7 +105,7 @@ class Signup extends Component {
     }
 
     return showWaiver
-      ? <Waiver handleWaiver={this.handleWaiver} />
+      ? <Waiver handleWaiver={this.handleWaiver} waiverFetching={waiverFetching} />
       : <div className="simple-container"><UserForm form={form} handleSubmit={this.handleSubmit} handleChange={this.handleChange} /></div>;
   }
 }

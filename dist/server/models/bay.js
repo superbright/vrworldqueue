@@ -12,17 +12,6 @@ var schema = new mongoose.Schema({
     game: {
         type: String
     },
-    queue: [{
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        },
-        timeAdded: {
-            type: Date,
-            default: Date.now
-        },
-        _id: false
-    }],
     timeouts: {
         user: {
             type: Date
@@ -30,6 +19,15 @@ var schema = new mongoose.Schema({
         game: {
             type: Date
         }
+    },
+    state: {
+        type: String,
+        enum: ['Idle', 'Waiting', 'Playing'],
+        default: 'Idle'
+    },
+    playTime: {
+        type: Number,
+        default: 10
     }
 });
 var Bay = mongoose.model('Bay', schema);

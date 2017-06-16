@@ -7,14 +7,13 @@ class BayList extends Component {
 
     this.state = {
       bays: null,
-    }
+    };
   }
 
   componentWillMount() {
-    return fetch(`/api/bays`, {
+    return fetch('/api/bays', {
       method: 'get',
     }).then(res => res.json()).then((bays) => {
-      console.log(bays);
       this.setState({ bays });
     }).catch((err) => {
       console.log('error', err);
@@ -30,7 +29,7 @@ class BayList extends Component {
           {
             bays &&
             bays.map(bay => (
-              <li className="user-list-item flex space-between align-center">
+              <li key={bay._id} className="user-list-item flex space-between align-center">
                 <div><h2><Link to={`/bay/${bay._id}`}>{bay.name}</Link></h2></div>
               </li>
             ))

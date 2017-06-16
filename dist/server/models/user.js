@@ -2,7 +2,10 @@
 
 var mongoose = require('mongoose');
 var schema = new mongoose.Schema({
-    name: {
+    firstname: {
+        type: String
+    },
+    lastname: {
         type: String
     },
     email: {
@@ -17,6 +20,10 @@ var schema = new mongoose.Schema({
     },
     usedVR: {
         type: Boolean
+    },
+    queue: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Queue'
     },
     role: {
         type: String,

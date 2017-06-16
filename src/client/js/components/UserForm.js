@@ -14,11 +14,10 @@ const UserForm = ({
 }) => (
   <div>
     <form className="signup-form" onSubmit={handleSubmit}>
-
       {
         (firstname || firstname === '') &&
         <div className="form-group">
-          <label htmlFor="firstname">First Name</label>
+          <label htmlFor="firstname">First Name <span className="small-font">*</span></label>
           <input
             type="text"
             name="firstname"
@@ -27,13 +26,14 @@ const UserForm = ({
             required
             onChange={handleChange}
           />
+          <div className="error-message"></div>
         </div>
       }
 
       {
         (lastname || lastname === '') &&
         <div className="form-group">
-          <label htmlFor="lastname">Last Name</label>
+          <label htmlFor="lastname">Last Name <span className="small-font">*</span></label>
           <input
             type="text"
             name="lastname"
@@ -48,7 +48,7 @@ const UserForm = ({
       {
         (email || email === '') &&
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Email <span className="small-font">*</span></label>
           <input
             type="text"
             name="email"
@@ -77,7 +77,7 @@ const UserForm = ({
       {
         (screenname || screenname === '') &&
         <div className="form-group">
-          <label htmlFor="handle">Screen Name</label>
+          <label htmlFor="handle">Screen Name <span className="small-font">*</span></label>
           <input
             type="text"
             name="screenname"
@@ -88,6 +88,8 @@ const UserForm = ({
           />
         </div>
       }
+
+      <p>* required</p>
 
       <div className="form-group">
         <button>{submitText || 'Submit'}</button>

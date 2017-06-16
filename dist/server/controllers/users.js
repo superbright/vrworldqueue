@@ -10,10 +10,41 @@ exports.getUsers = function (req, res) {
         if (err) res.status(500).send(err);else res.status(200).send(users);
     });
 };
+exports.activateUser = function (req, res) {
+    User.findById(req.params.userId, function (err, user) {
+        if (err) res.status(500).send(err);else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            } else {
+                user.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+                user.save(function (err, doc) {
+                    if (err) res.status(500).send(err);else res.status(200).send(doc);
+                });
+            }
+        } else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
+exports.deactivateUser = function (req, res) {
+    User.findById(req.params.userId, function (err, user) {
+        if (err) res.status(500).send(err);else if (user) {
+            if (!user.rfid) {
+                res.status(404).send("User does not have RFID");
+            } else {
+                user.rfid.expiresAt = new Date().setHours(0, 0, 0, 0);
+                user.save(function (err, doc) {
+                    if (err) res.status(500).send(err);else res.status(200).send(doc);
+                });
+            }
+        } else {
+            res.status(404).send("No user found with that ID");
+        }
+    });
+};
 exports.getUserSignature = function (req, res) {
     User.findById(req.params.userId, function (err, user) {
-        if (err) res.status(500).send(err);
-        if (user) {
+        if (err) res.status(500).send(err);else if (user) {
             Signature.findById(user.Signature, function (err, signature) {
                 if (err) res.status(500).send(err);
                 if (signature) res.status(200).send(signature);else res.status(404).send('No signature found for that user');
@@ -29,16 +60,19 @@ exports.postUser = function (req, res) {
         }
     });
     signature.save();
-    var userData = {
-        name: req.body.firstname + ' ' + req.body.lastname,
-        email: req.body.email,
-        phone: req.body.phone,
-        screenname: req.body.screenname,
-        signature: signature._id,
-        rfid: {
-            id: req.body.rfid
-        }
-    };
+    var userData = {};
+    if (req.body.firstname != null) userData.firstname = req.body.firstname;
+    if (req.body.lastname != null) userData.lastname = req.body.lastname;
+    if (req.body.email != null) userData.email = req.body.email;
+    if (req.body.phone != null) userData.phone = req.body.phone;
+    if (req.body.screenname != null) userData.screenname = req.body.screenname;
+    userData.signature = signature._id;
+    if (req.body.rfid) {
+        console.log('Adding RFID');
+        userData.rfid = {};
+        userData.rfid.id = req.body.rfid;
+        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+    }
     var query = {
         'email': req.body.email
     };
@@ -46,7 +80,9 @@ exports.postUser = function (req, res) {
         upsert: true,
         new: true
     }, function (err, doc) {
-        if (err) res.status(500).send(err);else res.status(200).send(doc);
+        if (err) res.status(500).send(err);else {
+            res.status(200).send(doc);
+        }
     });
 };
 exports.validateUser = function (req, res) {
