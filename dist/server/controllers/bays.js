@@ -42,7 +42,7 @@ exports.enqueueUser = function (req, res) {
             delete queue._id;
             console.log('deleted user from queue');
         }
-        if (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'idle') {
+        if (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle') {
             User.findById(req.body.userId, function (err, doc) {
                 currentUser[req.params.bayId] = doc;
                 startReady(req.params.bayId);
@@ -79,11 +79,14 @@ exports.getQueue = function (req, res) {
     Bay.findOne({
         _id: req.params.bayId
     }, function (err, bay) {
-        Queue.find({
-            bay: bay._id
-        }).populate('user bay').exec(function (err, doc) {
-            if (err) res.status(500).send(err);else if (doc) res.status(200).send(doc);else res.status(404).send("No Queues found");
-        });
+        if (err) res.status(500).send(err);
+        if (bay) {
+            Queue.find({
+                bay: bay._id
+            }).populate('user bay').exec(function (err, doc) {
+                if (err) res.status(500).send(err);else if (doc) res.status(200).send(doc);else res.status(404).send("No Queues found");
+            });
+        } else res.status(404).send("Bay not found");
     });
 };
 exports.deleteBay = function (req, res) {
@@ -120,8 +123,8 @@ var userOnDeck = function userOnDeck(bayId, callback) {
         bay: bayId
     }).sort({
         timeAdded: 1
-    }).exec(function (err, queue) {
-        if (err) callback(err);else callback(queue);
+    }).populate('user').exec(function (err, queue) {
+        if (err) callback(err);else callback(queue.user);
     });
 };
 var getQueue = function getQueue(bayId, callback) {
@@ -155,7 +158,7 @@ var startOnboarding = function startOnboarding(bayId) {
                 }
                 timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
                     console.log('Onboarding timeout, moving to next person...');
-                    popUser();
+                    popUser(bayId);
                     startOnboarding(bayId);
                 });
                 var data = {
@@ -172,7 +175,8 @@ var startOnboarding = function startOnboarding(bayId) {
     });
 };
 var startReady = function startReady(bayId) {
-    popUser();
+    popUser(bayId);
+    bayState[bayId] = 'Ready';
     if (timers.onboarding.bayId != null) {
         timers.onboarding.bayId.cancel();
     }
@@ -281,11 +285,15 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
         }
     });
 };
-var isCurrentUser = function isCurrentUser(bayId, tag) {
+var isCurrentUser = function isCurrentUser(bayId, tag, callback) {
     User.findOne({
         'rfid.id': tag
     }, function (err, user) {
-        return user == currentUser[bayId];
+        console.log('-------------------');
+        console.log(user);
+        console.log(currentUser[bayId]);
+        console.log('-------------------');
+        callback(user._id.equals(currentUser[bayId]._id));
     });
 };
 module.exports.socketHandler = function (socket) {
@@ -307,7 +315,10 @@ module.exports.socketHandler = function (socket) {
                 console.log('Bay ' + bay._id + 'in state: ' + bayState[bay._id]);
                 if (bayState[bay._id] == 'Onboarding') {
                     console.log('Check if correct user');
-                    if (isCurrentUser(bay._id, req.tag)) startReady(bay._id);else addUserToQueue(req.clientId, req.tag);
+                    isCurrentUser(bay._id, req.tag, function (isCurrentUser) {
+                        console.log(isCurrentUser);
+                        if (isCurrentUser) startReady(bay._id);else addUserToQueue(req.clientId, req.tag);
+                    });
                 } else {
                     console.log('attempting to add user to queue');
                     addUserToQueue(req.clientId, req.tag);
