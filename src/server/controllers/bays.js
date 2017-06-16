@@ -93,7 +93,10 @@ exports.getQueue = (req, res) => {
                 bay: bay._id
             }).populate('user bay').exec((err, doc) => {
                 if (err) res.status(500).send(err);
-                else if (doc) res.status(200).send(doc)
+                else if (doc) {
+                    if (doc.length > 0 && (!bayState[bay._id] || bayState[bay._id] == 'Idle')) startOnboarding(bay._id);
+                    res.status(200).send(doc);
+                }
                 else res.status(404).send("No Queues found");
             });
         }
@@ -118,14 +121,15 @@ module.exports.clearQueue = (req, res) => {
         res.status(200).send([]);
     });
 }
-var popUser = (bayId) => {
+var popUser = (bayId, callback) => {
     Queue.findOneAndRemove({
         bay: bayId
     }).sort({
         timeAdded: 1
     }).exec((err, queue) => {
-        if (err) return {}
-        else return queue;
+        if (err) {}
+        else
+        if (callback) callback(queue);
     });
 }
 exports.getState = (req, res) => {
@@ -175,7 +179,9 @@ var startOnboarding = (bayId) => {
                 }
                 timers.onboarding.bayId = scheduler.scheduleJob(endTime, () => {
                     console.log('Onboarding timeout, moving to next person...');
-                    popUser(bayId);
+                    popUser(bayId, (queue) => {
+                        sendQueue(bayId);
+                    });
                     startOnboarding(bayId);
                 });
                 var data = {
@@ -191,8 +197,16 @@ var startOnboarding = (bayId) => {
         }
     });
 };
+var sendQueue = (bayId) => {
+    getQueue(bayId, (queue) => {
+        if (queue) sockets.sendToQueue(bayId, queue);
+        else sockets.sendToQueue(bayId, []);
+    });
+};
 var startReady = (bayId) => {
-    popUser(bayId);
+    popUser(bayId, (queue) => {
+        sendQueue(bayId);
+    });
     bayState[bayId] = 'Ready';
     if (timers.onboarding.bayId != null) {
         timers.onboarding.bayId.cancel();

@@ -84,7 +84,10 @@ exports.getQueue = function (req, res) {
             Queue.find({
                 bay: bay._id
             }).populate('user bay').exec(function (err, doc) {
-                if (err) res.status(500).send(err);else if (doc) res.status(200).send(doc);else res.status(404).send("No Queues found");
+                if (err) res.status(500).send(err);else if (doc) {
+                    if (doc.length > 0 && (!bayState[bay._id] || bayState[bay._id] == 'Idle')) startOnboarding(bay._id);
+                    res.status(200).send(doc);
+                } else res.status(404).send("No Queues found");
             });
         } else res.status(404).send("Bay not found");
     });
@@ -106,13 +109,13 @@ module.exports.clearQueue = function (req, res) {
         res.status(200).send([]);
     });
 };
-var popUser = function popUser(bayId) {
+var popUser = function popUser(bayId, callback) {
     Queue.findOneAndRemove({
         bay: bayId
     }).sort({
         timeAdded: 1
     }).exec(function (err, queue) {
-        if (err) return {};else return queue;
+        if (err) {} else if (callback) callback(queue);
     });
 };
 exports.getState = function (req, res) {
@@ -158,7 +161,9 @@ var startOnboarding = function startOnboarding(bayId) {
                 }
                 timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
                     console.log('Onboarding timeout, moving to next person...');
-                    popUser(bayId);
+                    popUser(bayId, function (queue) {
+                        sendQueue(bayId);
+                    });
                     startOnboarding(bayId);
                 });
                 var data = {
@@ -174,8 +179,15 @@ var startOnboarding = function startOnboarding(bayId) {
         }
     });
 };
+var sendQueue = function sendQueue(bayId) {
+    getQueue(bayId, function (queue) {
+        if (queue) sockets.sendToQueue(bayId, queue);else sockets.sendToQueue(bayId, []);
+    });
+};
 var startReady = function startReady(bayId) {
-    popUser(bayId);
+    popUser(bayId, function (queue) {
+        sendQueue(bayId);
+    });
     bayState[bayId] = 'Ready';
     if (timers.onboarding.bayId != null) {
         timers.onboarding.bayId.cancel();
