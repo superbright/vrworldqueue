@@ -11,6 +11,7 @@ class Bay extends Component {
       showModal: false,
       isErrorModal: false,
       userAttempt: null,
+      play: null,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -56,6 +57,7 @@ class Bay extends Component {
     const { socket } = this.state;
     if (socket) {
       socket.on('queue', (res) => {
+        console.log('HELLO');
         this.setState({ queue: res });
       });
       socket.on('userattempt', (res) => {
@@ -66,7 +68,7 @@ class Bay extends Component {
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
 
-        // this.setState({ userAttempt: res, showModal: true });
+        this.setState({ play: res });
       });
     }
   }
