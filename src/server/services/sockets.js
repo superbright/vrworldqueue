@@ -70,7 +70,8 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         }
     }
     var socket = sockets[clientType][clientId];
-    console.log('[INFO]: ' + returnValue.request);
+//    console.log('[INFO]: ');
+//    console.log(request);
     if (!socket) {
         console.log('[WARN]: Socket not found');
         returnValue.error = "Socket not found";

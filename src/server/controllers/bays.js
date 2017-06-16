@@ -195,7 +195,9 @@ var startReady = (bayId) => {
     var data = {
         state: 'ready'
     }
-    sockets.sendToButton(bayId, 'setState', data);
+    sockets.sendToButton(bayId, 'setState', data,(res)=>{
+        console.log(res);
+    });
 }
 var startGameplay = (bayId) => {
     console.log('start Gameplay on bay ' + bayId);

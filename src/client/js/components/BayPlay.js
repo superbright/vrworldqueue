@@ -20,16 +20,20 @@ class BayPlay extends Component {
         query: `clientType=button&clientId=${bayid}`,
       }),
     });
-
-    this.connectSocket();
+      /*hack since client wasn't connecting*/
+      setTimeout(()=>{
+            this.connectSocket();
+  
+      }, 1000);
   }
 
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
+        console.log("Socket connected");
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
-
+        
         // this.setState({ userAttempt: res, showModal: true });
       });
     }
