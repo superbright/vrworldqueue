@@ -9,7 +9,7 @@ class Bay extends Component {
       socket: null,
       queue: [],
       showModal: false,
-      isErrorModal: false,
+      error: null,
       userAttempt: null,
       play: null,
     };
@@ -18,6 +18,7 @@ class Bay extends Component {
     this.fetchQueue = this.fetchQueue.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.confirmUser = this.confirmUser.bind(this);
+    this.countDown = this.countDown.bind(this);
   }
 
   componentWillMount() {
@@ -62,15 +63,27 @@ class Bay extends Component {
       });
       socket.on('userattempt', (res) => {
         console.log('userAttempt', res);
-
-        this.setState({ userAttempt: res, showModal: true });
+        if (res.error) {
+          console.log('res error', res.error);
+          setTimeout(this.closeModal, 2000);
+          return this.setState({ showModal: true, error: res.error });
+        }
+        return this.setState({ userAttempt: res, showModal: true });
       });
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
 
         this.setState({ play: res });
+
+        if (this.state.play.endTime) {
+          this.countDown();
+        }
       });
     }
+  }
+
+  countDown() {
+    const { endTime } = this.state.play;
   }
 
   closeModal() {
@@ -98,7 +111,7 @@ class Bay extends Component {
   }
 
   render() {
-    const { bay, queue, showModal, isErrorModal } = this.state;
+    const { bay, queue, showModal, error } = this.state;
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
 
@@ -145,13 +158,23 @@ class Bay extends Component {
               {
                 showModal
                 && (
-                  <div className={`modal flex justify-center align-center ${isErrorModal ? 'modal-error' : ''}`}>
+                  <div className={`modal flex justify-center align-center ${error ? 'modal-error' : ''}`}>
                     <div className="modal-container">
-                      <h2>Are you sure?</h2>
-                      <div>
-                        <button className="button-white" onClick={this.confirmUser}>YES</button>
-                        <button className="button-white" onClick={this.closeModal}>NO</button>
-                      </div>
+                      {
+                        error
+                        ? (<div>
+                          <h2>{error}</h2>
+                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+                        </div>)
+                        : (<div>
+                          <h2>Are you sure?</h2>
+                          <div>
+                            <button className="button-white" onClick={this.confirmUser}>YES</button>
+                            <button className="button-white" onClick={this.closeModal}>NO</button>
+                          </div>
+                        </div>)
+                      }
+
                     </div>
                   </div>
                 )
