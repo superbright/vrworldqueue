@@ -161,6 +161,12 @@ var startGameplay = (bayId) => {
         timers.gameplay.bayId = scheduler.scheduleJob(endTime, () => {
             endGameplay(bayId);
         });
+        var data = {
+            state: 'gameplay'
+        };
+        sockets.sendToGame(bayId, 'endGame', data);
+        sockets.sendToButton(bayId, 'setState', data);
+        sockets.sendToQueue(bayId, 'setState', data);
     }
 };
 var endGameplay = (bayId) => {
