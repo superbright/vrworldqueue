@@ -24,8 +24,9 @@
     "react-select-country": "0.0.15",
     "react-spin": "^0.6.2",
     "socket.io": "^1.4.6",
-    "socket.io-client": "^1.7.4",
-    "style-loader": "^0.18.2"
+    "socket.io-client": "^1.4.6",
+    "style-loader": "^0.18.2",
+    "validate.js": "^0.11.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

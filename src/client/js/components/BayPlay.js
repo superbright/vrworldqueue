@@ -20,8 +20,8 @@ class BayPlay extends Component {
       socket: io(window.location.origin, {
         query: `clientType=button&clientId=${bayid}`,
       }),
-    }, ()=>{
-        this.connectSocket();
+    }, () => {
+      this.connectSocket();
     });
   }
 

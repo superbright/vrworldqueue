@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
+import validate from 'validate.js';
 import UserForm from './UserForm';
+import formConstraints from '../utils/formConstraints';
 
-class AdminList extends Component {
+class AdminUser extends Component {
   constructor() {
     super();
 
@@ -11,6 +13,7 @@ class AdminList extends Component {
       user: null,
       socket: null,
       tempRFID: '',
+      errors: null,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -28,9 +31,9 @@ class AdminList extends Component {
       this.setState({
         user,
         socket: io(window.location.origin, { query: `clientType=admin&clientId=${adminid}` }),
-      }, ()=>{
+      }, () => {
         this.connectSocket();
-        });
+      });
     }).catch((err) => {
       console.log('error', err);
     });
@@ -53,28 +56,36 @@ class AdminList extends Component {
   handleSubmit(event) {
     event.preventDefault();
     const { user, tempRFID } = this.state;
-    let data;
-    if (tempRFID) {
-      data = { ...user, rfid: tempRFID };
-    } else {
-      const { rfid, ...restOfUser } = user;
-      data = restOfUser;
-    }
 
-    fetch('/api/users', {
-      method: 'post',
-      body: JSON.stringify(data),
-      headers: new Headers({
-        'Content-Type': 'application/json',
-      }),
-    }).then(res => res.json()).then((res) => {
-      this.setState({
-        user: res,
+    const errors = validate(user, formConstraints);
+
+    if (errors) {
+      this.setState({ errors });
+    } else {
+      this.setState({ errors: null });
+      let data;
+      if (tempRFID) {
+        data = { ...user, rfid: tempRFID };
+      } else {
+        const { rfid, ...restOfUser } = user;
+        data = restOfUser;
+      }
+
+      fetch('/api/users', {
+        method: 'post',
+        body: JSON.stringify(data),
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+      }).then(res => res.json()).then((res) => {
+        this.setState({
+          user: res,
+        });
+        this.clearTempRFID();
+      }).catch((err) => {
+        console.log('error', err);
       });
-      this.clearTempRFID();
-    }).catch((err) => {
-      console.log('error', err);
-    });
+    }
   }
 
   handleChange(event) {
@@ -109,7 +120,7 @@ class AdminList extends Component {
   }
 
   render() {
-    const { user, tempRFID } = this.state;
+    const { user, tempRFID, errors } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
     const activated = user
       ? (new Date(user.rfid.expiresAt).getTime() - new Date().getTime()) > 0
@@ -142,7 +153,13 @@ class AdminList extends Component {
                 )
               }
 
-              <UserForm form={user} submitText={'update'} handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
+              <UserForm
+                form={user}
+                submitText={'update'}
+                handleChange={this.handleChange}
+                handleSubmit={this.handleSubmit}
+                errors={errors}
+              />
             </div>
           )
         }
@@ -151,4 +168,4 @@ class AdminList extends Component {
   }
 }
 
-export default AdminList;
+export default AdminUser;
