@@ -11,6 +11,7 @@ const UserForm = ({
     screenname,
   },
   submitText,
+  errors,
 }) => (
   <div>
     <form className="signup-form" onSubmit={handleSubmit}>
@@ -26,7 +27,7 @@ const UserForm = ({
             required
             onChange={handleChange}
           />
-          <div className="error-message"></div>
+          {errors && errors.firstname && <div className="error-message">{errors.firstname}</div>}
         </div>
       }
 
@@ -42,6 +43,7 @@ const UserForm = ({
             required
             onChange={handleChange}
           />
+          {errors && errors.lastname && <div className="error-message">{errors.lastname}</div>}
         </div>
       }
 
@@ -57,6 +59,7 @@ const UserForm = ({
             required
             onChange={handleChange}
           />
+          {errors && errors.email && <div className="error-message">{errors.email}</div>}
         </div>
       }
 
@@ -71,6 +74,7 @@ const UserForm = ({
             value={phone}
             onChange={handleChange}
           />
+          {errors && errors.phone && <div className="error-message">{errors.phone}</div>}
         </div>
       }
 
@@ -86,6 +90,7 @@ const UserForm = ({
             required
             onChange={handleChange}
           />
+          {errors && errors.screenname && <div className="error-message">{errors.screenname}</div>}
         </div>
       }
 

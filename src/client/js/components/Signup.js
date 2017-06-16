@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import validate from 'validate.js';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
+import formConstraints from '../utils/formConstraints';
 
 const formInit = {
   firstname: '',
@@ -10,25 +11,6 @@ const formInit = {
   email: '',
   phone: '',
   screenname: '',
-};
-
-const constraints = {
-  firstname: {
-    presence: true,
-  },
-  lastname: {
-    presence: true,
-  },
-  email: {
-    presence: true,
-    email: true,
-  },
-  phone: {
-    presence: true,
-    length: {
-      minimum: 10,
-    },
-  }
 };
 
 class Signup extends Component {
@@ -40,6 +22,7 @@ class Signup extends Component {
       showWaiver: false,
       waiverAccepted: false,
       waiverFetching: false,
+      errors: null,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -64,7 +47,12 @@ class Signup extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    this.setState({ showWaiver: true });
+    const errors = validate(this.state.form, formConstraints);
+
+    if (errors) {
+      return this.setState({ errors });
+    }
+    return this.setState({ showWaiver: true });
   }
 
   handleWaiver(accept) {
@@ -84,12 +72,12 @@ class Signup extends Component {
       });
     } else {
       this.clearForm();
-      this.setState({ showWaiver: false });
+      this.setState({ showWaiver: false, errors: null });
     }
   }
 
   clearForm() {
-    this.setState({ form: formInit });
+    this.setState({ form: formInit, errors: null });
   }
 
   render() {
@@ -98,6 +86,7 @@ class Signup extends Component {
       waiverAccepted,
       form,
       waiverFetching,
+      errors,
     } = this.state;
 
     if (waiverAccepted) {
@@ -106,7 +95,14 @@ class Signup extends Component {
 
     return showWaiver
       ? <Waiver handleWaiver={this.handleWaiver} waiverFetching={waiverFetching} />
-      : <div className="simple-container"><UserForm form={form} handleSubmit={this.handleSubmit} handleChange={this.handleChange} /></div>;
+      : <div className="simple-container">
+        <UserForm
+          form={form}
+          handleSubmit={this.handleSubmit}
+          handleChange={this.handleChange}
+          errors={errors}
+        />
+      </div>;
   }
 }
 
