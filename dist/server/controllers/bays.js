@@ -124,7 +124,7 @@ var userOnDeck = function userOnDeck(bayId, callback) {
     }).sort({
         timeAdded: 1
     }).populate('user').exec(function (err, queue) {
-        if (err) callback(err);else callback(queue.user);
+        if (err) callback(err);else if (queue) callback(queue.user);else callback({});
     });
 };
 var getQueue = function getQueue(bayId, callback) {

@@ -87,7 +87,7 @@ exports.getQueue = (req, res) => {
     Bay.findOne({
         _id: req.params.bayId
     }, (err, bay) => {
-        if(err) res.status(500).send(err);
+        if (err) res.status(500).send(err);
         if (bay) {
             Queue.find({
                 bay: bay._id
@@ -98,7 +98,6 @@ exports.getQueue = (req, res) => {
             });
         }
         else res.status(404).send("Bay not found");
-        
     });
 };
 exports.deleteBay = (req, res) => {
@@ -139,7 +138,8 @@ var userOnDeck = (bayId, callback) => {
         timeAdded: 1
     }).populate('user').exec((err, queue) => {
         if (err) callback(err);
-        else callback(queue.user);
+        else if (queue) callback(queue.user);
+        else callback({});
     });
 }
 var getQueue = (bayId, callback) => {
@@ -316,7 +316,7 @@ var isCurrentUser = (bayId, tag, callback) => {
         console.log(user);
         console.log(currentUser[bayId]);
         console.log('-------------------');
-        callback(user._id.equals( currentUser[bayId]._id))
+        callback(user._id.equals(currentUser[bayId]._id))
     });
 }
 module.exports.socketHandler = (socket) => {
