@@ -24,16 +24,12 @@ module.exports.setupSockets = (server) => {
             , bayNumber: clientId
             , clientType: clientType
         };
-                console.log('Incoming WS Connection from ' +clientType + ' # ' + clientId);
-
-        if(sockets[currentBay.clientType] == null)
-            {
-                console.log("unknown client type. Disconnecting...");
-                socket.disconnect();
-                return;
-            }
-        
-        
+        console.log('Incoming WS Connection from ' + clientType + ' # ' + clientId);
+        if (sockets[currentBay.clientType] == null) {
+            console.log("unknown client type. Disconnecting...");
+            socket.disconnect();
+            return;
+        }
         sockets[currentBay.clientType][currentBay.bayNumber] = socket;
         console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.bayNumber + ' connected!');
         // }
@@ -74,10 +70,13 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         }
     }
     var socket = sockets[clientType][clientId];
+    console.log('[INFO]: ' + request);
     if (!socket) {
+        console.log('[WARN]: Socket not found');
         returnValue.error = "Socket not found";
     }
     else if (!socket.connected) {
+        console.log('[WARN] Socket not connected');
         returnValue.error = "Socket Not Connected";
     }
     else {
