@@ -132,7 +132,7 @@ var startOnboarding = (bayId) => {
     var data = {
         state: 'onboarding'
         , data: {
-            nextUser: nextUp
+            nextUser: currentUser[bayId]
         }
     }
     sockets.sendToButton(bayId, 'setState', data);

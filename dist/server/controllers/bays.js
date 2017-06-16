@@ -10,6 +10,7 @@ var timers = {
     gameplay: {}
 };
 var bayState = {};
+var currentUser = {};
 exports.getBays = function (req, res) {
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, function (err, bay) {
@@ -107,7 +108,7 @@ exports.getState = function (req, res) {
 var startOnboarding = function startOnboarding(bayId) {
     console.log('Onboarding, waiting for user...');
     bayState[bayId] = 'Onboarding';
-    var nextUp = exports.popUser();
+    currentUser[bayId] = exports.popUser();
     var endTime = new Date();
     endTime.setSeconds(endTime.getSeconds() + 10);
     if (timers.onboarding.bayId != null) {
@@ -120,7 +121,7 @@ var startOnboarding = function startOnboarding(bayId) {
     var data = {
         state: 'onboarding',
         data: {
-            nextUser: nextUp
+            nextUser: currentUser[bayId]
         }
     };
     sockets.sendToButton(bayId, 'setState', data);
@@ -148,6 +149,12 @@ var startGameplay = function startGameplay(bayId) {
         timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
             endGameplay(bayId);
         });
+        var data = {
+            state: 'gameplay'
+        };
+        sockets.sendToGame(bayId, 'endGame', data);
+        sockets.sendToButton(bayId, 'setState', data);
+        sockets.sendToQueue(bayId, 'setState', data);
     }
 };
 var endGameplay = function endGameplay(bayId) {
@@ -215,6 +222,13 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
         }
     });
 };
+var isCurrentUser = function isCurrentUser(bayId, tag) {
+    User.findOne({
+        'rfid.id': tag
+    }, function (err, user) {
+        return user == currentUser[bayId];
+    });
+};
 module.exports.socketHandler = function (socket) {
     /* Add Socket Handling Logic Here */
     socket.on('startButtonPressed', function (data) {});
@@ -234,7 +248,7 @@ module.exports.socketHandler = function (socket) {
                 console.log('Bay ' + bay._id + 'in state: ' + bayState[bay._id]);
                 if (bayState[bay._id] == 'Onboarding') {
                     console.log('Check if correct user');
-                    startReady(bay._id);
+                    if (isCurrentUser(bay._id, req.tag)) startReady(bay._id);else addUserToQueue(req.clientId, req.tag);
                 } else {
                     console.log('attempting to add user to queue');
                     addUserToQueue(req.clientId, req.tag);
