@@ -65,7 +65,7 @@ class Bay extends Component {
         console.log('userAttempt', res);
         if (res.error) {
           console.log('res error', res.error);
-          setTimeout(this.closeModal, 2000);
+          setTimeout(this.closeModal, 3000);
           return this.setState({ showModal: true, error: res.error });
         }
         return this.setState({ userAttempt: res, showModal: true });
