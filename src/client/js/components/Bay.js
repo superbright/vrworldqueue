@@ -62,13 +62,14 @@ class Bay extends Component {
         this.setState({ queue: res });
       });
       socket.on('userattempt', (res) => {
+        
         console.log('userAttempt', res);
         if (res.error) {
           console.log('res error', res.error);
           setTimeout(this.closeModal, 3000);
           return this.setState({ showModal: true, error: res.error });
         }
-        return this.setState({ userAttempt: res, showModal: true });
+        return this.setState({ error:null, userAttempt: res, showModal: true });
       });
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
