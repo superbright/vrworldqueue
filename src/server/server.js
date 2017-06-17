@@ -5,6 +5,8 @@ import compression from 'compression';
 import path from 'path';
 import webpack from 'webpack';
 import config from '../../webpack.config';
+require("babel-core/register");
+require("babel-polyfill");
 const app = express();
 const server = http.Server(app);
 var socketController = require('./services/sockets');

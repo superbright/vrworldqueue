@@ -73,8 +73,8 @@ class Bay extends Component {
       });
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
-
-        this.setState({ play: res });
+        this.setState({ play: res});
+        
 
         if (this.state.play.endTime) {
           this.countDown();
@@ -89,7 +89,7 @@ class Bay extends Component {
 
   closeModal() {
     const { showModal, userAttempt } = this.state;
-    this.setState({ showModal: !showModal, userAttempt: showModal ? null : userAttempt });
+    this.setState({ showModal: false, userAttempt: showModal ? null : userAttempt });
   }
 
   confirmUser() {

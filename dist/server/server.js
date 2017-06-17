@@ -26,6 +26,8 @@ var _webpack4 = _interopRequireDefault(_webpack3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+require("babel-core/register");
+require("babel-polyfill");
 var app = (0, _express2.default)();
 var server = _http2.default.Server(app);
 var socketController = require('./services/sockets');
