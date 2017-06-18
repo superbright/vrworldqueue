@@ -225,9 +225,9 @@ var startGameplay = function startGameplay(bayId) {
                 state: 'gameplay',
                 endTime: endTime
             };
+            sockets.sendToButton(bayId, 'setState', data);
+            sockets.sendToQueue(bayId, 'setState', data);
         });
-        sockets.sendToButton(bayId, 'setState', data);
-        sockets.sendToQueue(bayId, 'setState', data);
     }
 };
 var endGameplay = function endGameplay(bayId) {
