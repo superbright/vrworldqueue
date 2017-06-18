@@ -9,6 +9,13 @@ let sockets = {
     , admin: {}
     , registration: {}
 };
+let socketState = {
+    game: {}
+    , button: {}
+    , queue: {}
+    , admin: {}
+    , registration: {}
+}
 import SocketIO from 'socket.io';
 import {
     findIndex, sanitizeString
@@ -35,10 +42,13 @@ var registerSocket = (socket, currentBay) => {
         return;
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
+    socketState[currentBay.clientType][currentBay.clientId] = true;
+    
     console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.clientId + ' connected!');
     socket.on('disconnect', () => {
         console.log('[INFO] ' + currentBay.clientType + " " + currentBay.clientId + ' disconnected!');
         sockets[currentBay.clientType][currentBay.clientId] = null;
+        socketState[currentBay.clientType][currentBay.clientId] = false;
         socket.broadcast.emit('bayDisconnect', {
             clientId: currentBay.bayNumber
         });
@@ -91,3 +101,4 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     callback && callback(returnValue);
 }
 exports.sockets = sockets;
+exports.socketState = socketState;

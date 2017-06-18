@@ -27,7 +27,8 @@ router.post('/', (req, res) => {
         res.send(result);
     });
 });
-router.get('/', (req, res)=>{
-   return socketService.sockets; 
+router.get('/', (req, res) => {
+    console.log(socketService.socketState);
+    res.status(200).send(socketService.socketState);
 });
 module.exports = router;

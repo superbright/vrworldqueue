@@ -216,6 +216,7 @@ var startGameplay = function startGameplay(bayId) {
             endTime.setMinutes(endTime.getMinutes() + bay.playTime);
             if (timers.onboarding.bayId != null) {
                 timers.onboarding.bayId.cancel();
+                timers.onboarding.bayId = null;
             }
             timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
                 endGameplay(bayId);
@@ -230,6 +231,10 @@ var startGameplay = function startGameplay(bayId) {
     }
 };
 var endGameplay = function endGameplay(bayId) {
+    if (timers.gameplay.bayId != null) {
+        timers.gameplay.bayId.cancel();
+        timers.gameplay.bayId = null;
+    }
     console.log('Gameplay over!');
     var data = {
         state: 'onboarding'
@@ -310,6 +315,10 @@ module.exports.socketHandler = function (socket) {
     socket.on('startButton', function (req) {
         var bayId = req.clientId;
         startGameplay(bayId);
+    });
+    socket.on('endButton', function (req) {
+        var bayId = req.clientId;
+        endGameplay(bayId);
     });
     socket.on('rfid', function (data) {
         var req = JSON.parse(data
