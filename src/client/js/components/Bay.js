@@ -5,7 +5,7 @@ import showRemaining from '../utils/showRemaining';
 
 const numToString = (num) => {
   const result = num.toString();
-  if (result) {
+  if (result && !isNaN(result)) {
     return result.length === 1 ? `0${result}` : result;
   }
   return '--'
@@ -20,6 +20,7 @@ class Bay extends Component {
       queue: [],
       showModal: false,
       error: null,
+      success: null,
       userAttempt: null,
       play: null,
       connected: false,
@@ -61,7 +62,6 @@ class Bay extends Component {
     return fetch(`/api/bays/${bayid}/queue`, {
       method: 'get',
     }).then(res => res.json()).then((queue) => {
-      console.log('fetching queue', queue);
       this.setState({ queue });
     }).catch((err) => {
       console.log('error', err);
@@ -91,6 +91,13 @@ class Bay extends Component {
         console.log('setstate socket', res);
         this.setState({ play: res});
 
+        if (res.state === 'ready') {
+          // show a temporary modal that tells them to go to the play button
+          this.setState({ showModal: true, success: `You're up ${res.user.screenname}, Go to the next screen!`});
+          setTimeout(() => {
+            this.setState({ showModal: false, success: null });
+          }, 5000);
+        }
 
         if (this.state.play.endTime) {
           const interval = setInterval(() => {
@@ -107,6 +114,10 @@ class Bay extends Component {
     const { endTime } = this.state.play;
     const minSecs = showRemaining(new Date(endTime));
 
+    if (isNaN(minSecs[0])) {
+      clearInterval(this.state.interval);
+      this.setState({ interval: null });
+    }
     this.setState({
       minsLeft: minSecs[0],
       secondsLeft: minSecs[1],
@@ -149,6 +160,7 @@ class Bay extends Component {
       queue,
       showModal,
       error,
+      success,
       connected,
       minsLeft,
       secondsLeft
@@ -199,21 +211,36 @@ class Bay extends Component {
               {
                 showModal
                 && (
-                  <div className={`modal flex justify-center align-center ${error ? 'modal-error' : ''}`}>
+                  <div className={`modal flex justify-center align-center ${error ? 'modal-error' : ''} ${success ? 'modal-success' : ''}`}>
                     <div className="modal-container">
                       {
                         error
-                        ? (<div>
+                        &&
+                        <div>
                           <h2>{error}</h2>
                           <button className="button-white" onClick={this.closeModal}>CLOSE</button>
-                        </div>)
-                        : (<div>
+                        </div>
+                      }
+
+                      {
+                        success
+                        &&
+                        <div>
+                          <h2>{success}</h2>
+                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+                        </div>
+                      }
+
+                      {
+                        (!error && !success)
+                        &&
+                        <div>
                           <h2>Are you sure?</h2>
                           <div>
                             <button className="button-white" onClick={this.confirmUser}>YES</button>
                             <button className="button-white" onClick={this.closeModal}>NO</button>
                           </div>
-                        </div>)
+                        </div>
                       }
 
                     </div>

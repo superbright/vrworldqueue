@@ -5,10 +5,10 @@ import showRemaining from '../utils/showRemaining';
 
 const numToString = (num) => {
   const result = num.toString();
-  if (result) {
+  if (result && !isNaN(result)) {
     return result.length === 1 ? `0${result}` : result;
   }
-  return '--';
+  return '--'
 };
 
 class BayPlay extends Component {
@@ -81,6 +81,10 @@ class BayPlay extends Component {
     const { endTime } = this.state.play;
     const minSecs = showRemaining(new Date(endTime));
 
+    if (isNaN(minSecs[0])) {
+      clearInterval(this.state.interval);
+      this.setState({ interval: null });
+    }
     this.setState({
       minsLeft: minSecs[0],
       secondsLeft: minSecs[1],
@@ -122,7 +126,7 @@ class BayPlay extends Component {
         playDom = (
           <div>
             <h1>VRWORLD</h1>
-<h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
+            <h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
             <button onClick={this.onCancelButtonPressed}>end game</button>
           </div>
         );

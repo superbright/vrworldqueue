@@ -185,6 +185,13 @@ header {
   color: #F44336;
 }
 
+.modal.modal-success {
+  background-color: #4CAF50;
+}
+.modal.modal-success button {
+  color: #4CAF50;
+}
+
 .modal button {
   margin: 0px 20px;
 }
