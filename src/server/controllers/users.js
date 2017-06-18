@@ -1,5 +1,6 @@
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
+import {twoAMTomorrow, midnightThisMorning} from '../../shared/util.js';
 exports.getUsers = (req, res) => {
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
@@ -19,7 +20,7 @@ exports.activateUser = (req, res) => {
                 res.status(404).send("User does not have RFID");
             }
             else {
-                user.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+                user.rfid.expiresAt = twoAMTomorrow();
                 user.save((err, doc) => {
                     if (err) res.status(500).send(err);
                     else res.status(200).send(doc);
@@ -39,7 +40,7 @@ exports.deactivateUser = (req, res) => {
                 res.status(404).send("User does not have RFID");
             }
             else {
-                user.rfid.expiresAt = new Date().setHours(0, 0, 0, 0);
+                user.rfid.expiresAt = midnightThisMorning();
                 user.save((err, doc) => {
                     if (err) res.status(500).send(err);
                     else res.status(200).send(doc);
@@ -83,7 +84,7 @@ exports.postUser = (req, res) => {
         console.log('Adding RFID');
         userData.rfid = {};
         userData.rfid.id = req.body.rfid;
-        userData.rfid.expiresAt = new Date().setHours(24, 0, 0, 0);
+        userData.rfid.expiresAt = twoAMTomorrow();
     }
     var query = {
         'email': req.body.email
