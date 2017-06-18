@@ -165,9 +165,7 @@ var startOnboarding = (bayId) => {
             });
             var data = {
                 state: 'onboarding'
-                , data: {
-                    timeout: endTime
-                }
+                , endTime: endTime
             }
             sockets.sendToButton(bayId, 'setState', data);
             sockets.sendToQueue(bayId, 'setState', data);
