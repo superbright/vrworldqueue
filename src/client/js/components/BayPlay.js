@@ -16,7 +16,7 @@ class BayPlay extends Component {
     super();
     this.state = {
       socket: null,
-      play: 'idle', // idle, ready, gameplay, onboarding
+      play: { state: 'idle' }, // idle, ready, gameplay, onboarding
       connected: false,
       minsLeft: '--',
       secondsLeft: '--',
@@ -126,8 +126,15 @@ class BayPlay extends Component {
         playDom = (
           <div>
             <h1>VRWORLD</h1>
-            <h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
-            <button onClick={this.onCancelButtonPressed}>end game</button>
+            {
+              play.state !== 'idle'
+              &&
+              <div>
+                <h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
+                <button onClick={this.onCancelButtonPressed}>end game</button>
+              </div>
+            }
+
           </div>
         );
         break;
