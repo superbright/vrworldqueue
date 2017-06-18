@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+import SocketConnectionStatus from './SocketConnectionStatus';
 
 class BayPlay extends Component {
   constructor() {
@@ -7,6 +8,7 @@ class BayPlay extends Component {
     this.state = {
       socket: null,
       play: 'idle', // idle, ready, gameplay, onboarding
+      connected: false,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -28,6 +30,12 @@ class BayPlay extends Component {
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
+      socket.on('connect', () => {
+        this.setState({ connected: true });
+      });
+      socket.on('disconnect', () => {
+        this.setState({ connected: false });
+      });
       socket.on('setState', (res) => {
         console.log('setstate', res);
         this.setState({ play: res });
@@ -38,11 +46,11 @@ class BayPlay extends Component {
   onPlayButtonPressed(){
     const { match: { params: { bayid } } } = this.props;
 
-    this.state.socket.emit('startButton', { 'clientId': bayid });
+    this.state.socket.emit('startButton', { clientId: bayid });
   }
 
   render() {
-    const { play } = this.state;
+    const { play, connected } = this.state;
 
     let playDom;
 
@@ -85,6 +93,7 @@ class BayPlay extends Component {
     return (
       <div className="bay-play flex justify-center align-center">
         {playDom}
+        <SocketConnectionStatus connected={connected} />
       </div>
     );
   }
