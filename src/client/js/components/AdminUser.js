@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
 import validate from 'validate.js';
 import UserForm from './UserForm';
+import SocketConnectionStatus from './SocketConnectionStatus';
 import formConstraints from '../utils/formConstraints';
 
 class AdminUser extends Component {
@@ -14,6 +15,7 @@ class AdminUser extends Component {
       socket: null,
       tempRFID: '',
       errors: null,
+      connected: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -42,6 +44,12 @@ class AdminUser extends Component {
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
+      socket.on('connect', () => {
+        this.setState({ connected: true });
+      });
+      socket.on('disconnect', () => {
+        this.setState({ connected: false });
+      });
       socket.on('rfid', (res) => {
         console.log('rfid', res);
         this.setState({ tempRFID: res });
@@ -120,7 +128,7 @@ class AdminUser extends Component {
   }
 
   render() {
-    const { user, tempRFID, errors } = this.state;
+    const { user, tempRFID, errors, connected } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
     const activated = user
       ? (new Date(user.rfid.expiresAt).getTime() - new Date().getTime()) > 0
@@ -163,6 +171,8 @@ class AdminUser extends Component {
             </div>
           )
         }
+
+        <SocketConnectionStatus connected={connected} />
       </div>
     );
   }

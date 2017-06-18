@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+import SocketConnectionStatus from './SocketConnectionStatus';
 
 class Bay extends Component {
   constructor() {
@@ -12,6 +13,7 @@ class Bay extends Component {
       error: null,
       userAttempt: null,
       play: null,
+      connected: false,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -57,6 +59,12 @@ class Bay extends Component {
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
+      socket.on('connect', () => {
+        this.setState({ connected: true });
+      });
+      socket.on('disconnect', () => {
+        this.setState({ connected: false });
+      });
       socket.on('queue', (res) => {
         console.log('HELLO');
         this.setState({ queue: res });
@@ -65,7 +73,6 @@ class Bay extends Component {
         
         console.log('userAttempt', res);
         if (res.error) {
-          console.log('res error', res.error);
           setTimeout(this.closeModal, 3000);
           return this.setState({ showModal: true, error: res.error });
         }
@@ -112,7 +119,7 @@ class Bay extends Component {
   }
 
   render() {
-    const { bay, queue, showModal, error } = this.state;
+    const { bay, queue, showModal, error, connected } = this.state;
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
 
@@ -183,6 +190,7 @@ class Bay extends Component {
             </div>
           )
         }
+        <SocketConnectionStatus connected={connected} />
       </div>
     );
   }
