@@ -25,7 +25,6 @@ var schema = new mongoose.Schema({
     },
     playTime: {
         type: Number,
-        default: 10
     }
 });
 var Bay = mongoose.model('Bay', schema);

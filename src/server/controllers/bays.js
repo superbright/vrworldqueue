@@ -48,7 +48,7 @@ exports.enqueueUser = (req, res) => {
         if (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle') {
             User.findById(req.body.userId, (err, doc) => {
                 currentUser[req.params.bayId] = doc;
-                startReady(req.params.bayId);
+                startReady(req.params.bayId, doc);
             });
             res.status(200).send([]);
         }
@@ -152,7 +152,7 @@ var startOnboarding = (bayId) => {
         if (!user) startIdle(bayId);
         else {
             var endTime = new Date();
-            endTime.setSeconds(endTime.getSeconds() + 10);
+            endTime.setMinutes(endTime.getMinutes() + 1);
             if (timers.onboarding.bayId != null) {
                 timers.onboarding.bayId.cancel();
             }
@@ -180,7 +180,7 @@ var sendQueue = (bayId) => {
         else sockets.sendToQueue(bayId, 'queue', []);
     });
 };
-var startReady = (bayId) => {
+var startReady = (bayId, user) => {
     popUser(bayId).then((queue) => {
         sendQueue(bayId);
         bayState[bayId] = 'Ready';
@@ -190,7 +190,9 @@ var startReady = (bayId) => {
         console.log('Bay ' + bayId + ' is Ready');
         var data = {
             state: 'ready'
+            , user: user
         }
+        sockets.sendToQueue(bayId, 'setState', data);
         sockets.sendToButton(bayId, 'setState', data);
     });
 }
@@ -198,21 +200,21 @@ var startGameplay = (bayId) => {
     console.log('start Gameplay on bay ' + bayId);
     if (bayState[bayId] == 'Playing') console.log('Already playing game...');
     else {
-        bayState[bayId] = 'Playing';
-        var endTime = new Date();
-        endTime.setSeconds(endTime.getSeconds() + 10);
-        if (timers.onboarding.bayId != null) {
-            timers.onboarding.bayId.cancel();
-        }
-        timers.gameplay.bayId = scheduler.scheduleJob(endTime, () => {
-            endGameplay(bayId);
-        });
-        var data = {
-            state: 'gameplay'
-            , endTime: endTime
-        };
-        Bay.findById(bayId, (err, bay) => {
+        Bay.findById(bayId).then((bay) => {
             if (bay) sockets.sendToGame(bay.id, 'startGame', data);
+            bayState[bayId] = 'Playing';
+            var endTime = new Date();
+            endTime.setMinutes(endTime.getMinutes() + bay.playTime);
+            if (timers.onboarding.bayId != null) {
+                timers.onboarding.bayId.cancel();
+            }
+            timers.gameplay.bayId = scheduler.scheduleJob(endTime, () => {
+                endGameplay(bayId);
+            });
+            var data = {
+                state: 'gameplay'
+                , endTime: endTime
+            };
         });
         sockets.sendToButton(bayId, 'setState', data);
         sockets.sendToQueue(bayId, 'setState', data);
@@ -323,7 +325,7 @@ module.exports.socketHandler = (socket) => {
                         console.log(req.tag);
                         if (user.rfid.id == req.tag) {
                             console.log('Is current USer');
-                            startReady(bay._id);
+                            startReady(bay._id, user);
                         }
                         else addUserToQueue(req.clientId, req.tag);
                     });
