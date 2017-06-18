@@ -222,6 +222,7 @@ button.button-white {
   -o-background-size: cover;
   background-size: cover;
   color: white;
+  text-align: center;
 }
 
 .play-button {

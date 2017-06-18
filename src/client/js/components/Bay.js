@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import SocketConnectionStatus from './SocketConnectionStatus';
+import showRemaining from '../utils/showRemaining';
+
+const numToString = (num) => {
+  const result = num.toString();
+  if (result) {
+    return result.length === 1 ? `0${result}` : result;
+  }
+  return '--'
+}
 
 class Bay extends Component {
   constructor() {
@@ -14,6 +23,9 @@ class Bay extends Component {
       userAttempt: null,
       play: null,
       connected: false,
+      minsLeft: '--',
+      secondsLeft: '--',
+      interval: null,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -66,25 +78,26 @@ class Bay extends Component {
         this.setState({ connected: false });
       });
       socket.on('queue', (res) => {
-        console.log('HELLO');
         this.setState({ queue: res });
       });
       socket.on('userattempt', (res) => {
-        
-        console.log('userAttempt', res);
         if (res.error) {
           setTimeout(this.closeModal, 3000);
           return this.setState({ showModal: true, error: res.error });
         }
-        return this.setState({ error:null, userAttempt: res, showModal: true });
+        return this.setState({ error: null, userAttempt: res, showModal: true });
       });
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
         this.setState({ play: res});
-        
+
 
         if (this.state.play.endTime) {
+          const interval = setInterval(() => {
+            this.countDown();
+          }, 1000);
           this.countDown();
+          this.setState({ interval });
         }
       });
     }
@@ -92,6 +105,12 @@ class Bay extends Component {
 
   countDown() {
     const { endTime } = this.state.play;
+    const minSecs = showRemaining(new Date(endTime));
+
+    this.setState({
+      minsLeft: minSecs[0],
+      secondsLeft: minSecs[1],
+    });
   }
 
   closeModal() {
@@ -111,6 +130,11 @@ class Bay extends Component {
       }),
     }).then(res => res.json()).then((res) => {
       console.log('user confirmed', res);
+      if (res[0] && res[0].timeAdded) {
+        console.log('userAttempt-', res[0].timeAdded);
+        console.log('userAttempt-', showRemaining(new Date(res[0].timeAdded)));
+        // this.countDown({ end });
+      }
       this.setState({ queue: res });
       this.closeModal();
     }).catch((err) => {
@@ -118,8 +142,17 @@ class Bay extends Component {
     });
   }
 
+
   render() {
-    const { bay, queue, showModal, error, connected } = this.state;
+    const {
+      bay,
+      queue,
+      showModal,
+      error,
+      connected,
+      minsLeft,
+      secondsLeft
+    } = this.state;
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
 
@@ -145,7 +178,7 @@ class Bay extends Component {
                         <p>On Deck</p>
                         <div className="flex space-between align-center">
                           <h1>{onDeck.user.screenname}</h1>
-                          <h1>00:00</h1>
+                          <h1>{numToString(minsLeft)}:{numToString(secondsLeft)}</h1>
                         </div>
                       </div>
                     </div>

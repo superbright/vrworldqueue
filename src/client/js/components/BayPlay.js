@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import SocketConnectionStatus from './SocketConnectionStatus';
+import showRemaining from '../utils/showRemaining';
+
+const numToString = (num) => {
+  const result = num.toString();
+  if (result) {
+    return result.length === 1 ? `0${result}` : result;
+  }
+  return '--';
+};
 
 class BayPlay extends Component {
   constructor() {
@@ -9,10 +18,15 @@ class BayPlay extends Component {
       socket: null,
       play: 'idle', // idle, ready, gameplay, onboarding
       connected: false,
+      minsLeft: '--',
+      secondsLeft: '--',
+      interval: null,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
     this.onPlayButtonPressed = this.onPlayButtonPressed.bind(this);
+    this.onCancelButtonPressed = this.onCancelButtonPressed.bind(this);
+    this.countDown = this.countDown.bind(this);
   }
 
   componentWillMount() {
@@ -39,18 +53,42 @@ class BayPlay extends Component {
       socket.on('setState', (res) => {
         console.log('setstate', res);
         this.setState({ play: res });
+
+        if (this.state.play.endTime) {
+          const interval = setInterval(() => {
+            this.countDown();
+          }, 1000);
+          this.countDown();
+          this.setState({ interval });
+        }
       });
     }
   }
 
-  onPlayButtonPressed(){
+  onPlayButtonPressed() {
     const { match: { params: { bayid } } } = this.props;
 
     this.state.socket.emit('startButton', { clientId: bayid });
   }
 
+  onCancelButtonPressed() {
+    const { match: { params: { bayid } } } = this.props;
+
+    this.state.socket.emit('endButton', { clientId: bayid });
+  }
+
+  countDown() {
+    const { endTime } = this.state.play;
+    const minSecs = showRemaining(new Date(endTime));
+
+    this.setState({
+      minsLeft: minSecs[0],
+      secondsLeft: minSecs[1],
+    });
+  }
+
   render() {
-    const { play, connected } = this.state;
+    const { play, connected, minsLeft, secondsLeft } = this.state;
 
     let playDom;
 
@@ -84,6 +122,8 @@ class BayPlay extends Component {
         playDom = (
           <div>
             <h1>VRWORLD</h1>
+<h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
+            <button onClick={this.onCancelButtonPressed}>end game</button>
           </div>
         );
         break;

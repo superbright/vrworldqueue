@@ -8,13 +8,6 @@ function showRemaining(end) {
   var now = new Date();
   var distance = end - now;
 
-  if (distance < 0) {
-    clearInterval(timer);
-    document.getElementById('countdown').innerHTML = 'EXPIRED!';
-
-    return;
-  }
-
   var minutes = Math.floor((distance % _hour) / _minute);
   var seconds = Math.floor((distance % _minute) / _second);
 
