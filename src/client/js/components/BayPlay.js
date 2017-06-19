@@ -8,7 +8,7 @@ const numToString = (num) => {
   if (result && !isNaN(result)) {
     return result.length === 1 ? `0${result}` : result;
   }
-  return '--'
+  return '--';
 };
 
 class BayPlay extends Component {
