@@ -28,7 +28,7 @@ class FormGroup extends Component {
               value={value}
               onChange={handleChange}
               onFocus={this.handleFocus}
-              ref={(ref) => { this.inputRef = ref }}
+              ref={(ref) => { this.inputRef = ref; }}
             />
             {errors && errors[valueID] && <div className="error-message">{errors[valueID]}</div>}
           </div>

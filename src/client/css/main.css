@@ -262,6 +262,10 @@ button.button-white {
   padding: 25px 0px;
 }
 
+.bay-on-deck.waiting {
+  background-color: #F44336;
+}
+
 .socket-connection {
   position: fixed;
   bottom: 25px;

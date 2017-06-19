@@ -8,8 +8,8 @@ const numToString = (num) => {
   if (result && !isNaN(result)) {
     return result.length === 1 ? `0${result}` : result;
   }
-  return '--'
-}
+  return '--';
+};
 
 class Bay extends Component {
   constructor() {
@@ -22,7 +22,7 @@ class Bay extends Component {
       error: null,
       success: null,
       userAttempt: null,
-      play: null,
+      play: { state: 'idle' },
       connected: false,
       minsLeft: '--',
       secondsLeft: '--',
@@ -44,6 +44,7 @@ class Bay extends Component {
     }).then(res => res.json()).then((bay) => {
       this.setState({
         bay,
+        play: bay.state,
         socket: io(window.location.origin, {
           query: `clientType=queue&clientId=${bayid}`,
         }),
@@ -153,10 +154,10 @@ class Bay extends Component {
     });
   }
 
-
   render() {
     const {
       bay,
+      play,
       queue,
       showModal,
       error,
@@ -187,9 +188,9 @@ class Bay extends Component {
                 )
                 : (
                   <div>
-                    <div className="bay-on-deck">
+                    <div className={`bay-on-deck ${bay.play.state === 'onboarding' ? 'waiting' : ''}`}>
                       <div className="simple-container">
-                        <p>On Deck</p>
+                        <p>{bay.play.state === 'onboarding' ? 'Waiting for you to swipe in' : 'Up next'}</p>
                         <div className="flex space-between align-center">
                           <h1>{onDeck.user.screenname}</h1>
                           <h1>{numToString(minsLeft)}:{numToString(secondsLeft)}</h1>
