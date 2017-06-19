@@ -45,30 +45,34 @@ exports.enqueueUser = (req, res) => {
             delete queue._id;
             console.log('deleted user from queue');
         }
-        if (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle') {
-            User.findById(req.body.userId, (err, doc) => {
-                currentUser[req.params.bayId] = doc;
-                startReady(req.params.bayId, doc);
-            });
-            res.status(200).send([]);
-        }
-        else {
-            var q = new Queue({
-                user: req.body.userId
-                , bay: req.params.bayId
-            });
-            q.save((err, doc) => {
-                Queue.find({
-                    bay: req.params.bayId
-                }).populate('bay user').exec((err, fullQueue) => {
-                    if (err) res.status(500).send(err);
-                    else if (fullQueue) {
-                        res.status(200).send(fullQueue);
-                    }
-                    else res.status(404).send(fullQueue);
+        getBay(req.params.bayId).then((bay) => {
+            console.log(bay.currentState);
+            if (!bay.currentState || bay.currentState.state == 'idle') {
+                User.findById(req.body.userId, (err, doc) => {
+                    console.log('starting ready');
+                    currentUser[req.params.bayId] = doc;
+                    startReady(req.params.bayId, doc);
                 });
-            });
-        }
+                res.status(200).send([]);
+            }
+            else {
+                var q = new Queue({
+                    user: req.body.userId
+                    , bay: req.params.bayId
+                });
+                q.save((err, doc) => {
+                    Queue.find({
+                        bay: req.params.bayId
+                    }).populate('bay user').exec((err, fullQueue) => {
+                        if (err) res.status(500).send(err);
+                        else if (fullQueue) {
+                            res.status(200).send(fullQueue);
+                        }
+                        else res.status(404).send(fullQueue);
+                    });
+                });
+            }
+        });
     });
 };
 exports.dequeueUser = (req, res) => {
@@ -84,7 +88,9 @@ exports.dequeueUser = (req, res) => {
 };
 exports.getQueue = (req, res) => {
     getQueue(req.params.bayId).then((queue) => {
-//        if ((queue.length > 0) && (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle')) startOnboarding(req.params.bayId);
+        getBay(req.params.bayId).then((bay) => {
+            if ((queue.length > 0) && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId);
+        });
         res.status(200).send(queue);
     });
 };
@@ -145,7 +151,6 @@ var getQueue = (bayId) => {
 }
 var startIdle = (bayId) => {
     console.log('Going to Idle State')
-    bayState[bayId] = "Idle";
     var data = {
         state: 'idle'
     };
@@ -340,15 +345,13 @@ module.exports.socketHandler = (socket) => {
         }, {}, (err, bay) => {
             console.log(req.tag + 'tapped in');
             if (req.clientType == 'game') {
-                console.log('Bay ' + bay._id + 'in state: ' + bayState[bay._id]);
-                if (bayState[bay._id] == 'Onboarding') {
+                console.log('Bay ' + bay._id + 'in state: ' + bay.currentState.state);
+                if (bay.currentState.state == 'onboarding') {
                     console.log('Check if correct user');
                     getUserOnDeck(bay._id).then((queue) => {
                         var user = queue.user;
-                        console.log(user);
-                        console.log(req.tag);
                         if (user.rfid.id == req.tag) {
-                            console.log('Is current USer');
+                            console.log('Is current User');
                             startReady(bay._id, user);
                         }
                         else addUserToQueue(req.clientId, req.tag);

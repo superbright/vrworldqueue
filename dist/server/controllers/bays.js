@@ -32,7 +32,6 @@ var timers = {
     onboarding: {},
     gameplay: {}
 };
-var bayState = {};
 var currentUser = {};
 exports.getBays = function (req, res) {
     if (req.params.bayId) {
@@ -65,27 +64,31 @@ exports.enqueueUser = function (req, res) {
             delete queue._id;
             console.log('deleted user from queue');
         }
-        if (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle') {
-            User.findById(req.body.userId, function (err, doc) {
-                currentUser[req.params.bayId] = doc;
-                startReady(req.params.bayId, doc);
-            });
-            res.status(200).send([]);
-        } else {
-            var q = new Queue({
-                user: req.body.userId,
-                bay: req.params.bayId
-            });
-            q.save(function (err, doc) {
-                Queue.find({
-                    bay: req.params.bayId
-                }).populate('bay user').exec(function (err, fullQueue) {
-                    if (err) res.status(500).send(err);else if (fullQueue) {
-                        res.status(200).send(fullQueue);
-                    } else res.status(404).send(fullQueue);
+        getBay(req.params.bayId).then(function (bay) {
+            console.log(bay.currentState);
+            if (!bay.currentState || bay.currentState.state == 'idle') {
+                User.findById(req.body.userId, function (err, doc) {
+                    console.log('starting ready');
+                    currentUser[req.params.bayId] = doc;
+                    startReady(req.params.bayId, doc);
                 });
-            });
-        }
+                res.status(200).send([]);
+            } else {
+                var q = new Queue({
+                    user: req.body.userId,
+                    bay: req.params.bayId
+                });
+                q.save(function (err, doc) {
+                    Queue.find({
+                        bay: req.params.bayId
+                    }).populate('bay user').exec(function (err, fullQueue) {
+                        if (err) res.status(500).send(err);else if (fullQueue) {
+                            res.status(200).send(fullQueue);
+                        } else res.status(404).send(fullQueue);
+                    });
+                });
+            }
+        });
     });
 };
 exports.dequeueUser = function (req, res) {
@@ -99,7 +102,9 @@ exports.dequeueUser = function (req, res) {
 };
 exports.getQueue = function (req, res) {
     getQueue(req.params.bayId).then(function (queue) {
-        if (queue.length > 0 && (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle')) startOnboarding(req.params.bayId);
+        getBay(req.params.bayId).then(function (bay) {
+            if (queue.length > 0 && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId);
+        });
         res.status(200).send(queue);
     });
 };
@@ -157,7 +162,6 @@ var getQueue = function getQueue(bayId) {
 };
 var startIdle = function startIdle(bayId) {
     console.log('Going to Idle State');
-    bayState[bayId] = "Idle";
     var data = {
         state: 'idle'
     };
@@ -344,15 +348,13 @@ module.exports.socketHandler = function (socket) {
         }, {}, function (err, bay) {
             console.log(req.tag + 'tapped in');
             if (req.clientType == 'game') {
-                console.log('Bay ' + bay._id + 'in state: ' + bayState[bay._id]);
-                if (bayState[bay._id] == 'Onboarding') {
+                console.log('Bay ' + bay._id + 'in state: ' + bay.currentState.state);
+                if (bay.currentState.state == 'onboarding') {
                     console.log('Check if correct user');
                     getUserOnDeck(bay._id).then(function (queue) {
                         var user = queue.user;
-                        console.log(user);
-                        console.log(req.tag);
                         if (user.rfid.id == req.tag) {
-                            console.log('Is current USer');
+                            console.log('Is current User');
                             startReady(bay._id, user);
                         } else addUserToQueue(req.clientId, req.tag);
                     });

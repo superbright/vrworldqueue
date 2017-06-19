@@ -35,6 +35,7 @@ socketController.setupSockets(server);
 var port = process.env.PORT || 3000;
 var mongoose = require('mongoose');
 var compiler = (0, _webpack2.default)(_webpack4.default);
+
 // webpack hot reload
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: _webpack4.default.output.publicPath

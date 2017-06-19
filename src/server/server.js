@@ -14,6 +14,7 @@ socketController.setupSockets(server);
 let port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const compiler = webpack(config);
+
 // webpack hot reload
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath

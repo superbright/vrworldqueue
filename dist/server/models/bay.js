@@ -26,8 +26,7 @@ var schema = new mongoose.Schema({
     currentState: {
         state: {
             type: String,
-            enum: ['Idle', 'Waiting', 'Playing'],
-            default: 'Idle'
+            default: 'idle'
         },
         endTime: {
             type: Date
