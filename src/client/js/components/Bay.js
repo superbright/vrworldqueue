@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
+import Spinner from 'react-spin';
+import config from '../utils/spinnerConfig';
 
 const numToString = (num) => {
   const result = num.toString();
@@ -27,6 +29,7 @@ class Bay extends Component {
       minsLeft: '--',
       secondsLeft: '--',
       interval: null,
+      fetching: false,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -134,6 +137,8 @@ class Bay extends Component {
     const { userAttempt: { data: { user } } } = this.state;
     const { match: { params: { bayid } } } = this.props;
 
+    this.setState({ fetching: true });
+
     fetch(`/api/bays/${bayid}/enqueue`, {
       method: 'post',
       body: JSON.stringify({ userId: user._id }),
@@ -147,9 +152,10 @@ class Bay extends Component {
         console.log('userAttempt-', showRemaining(new Date(res[0].timeAdded)));
         // this.countDown({ end });
       }
-      this.setState({ queue: res });
+      this.setState({ queue: res, false: false });
       this.closeModal();
     }).catch((err) => {
+      this.setState({ queue: res, false: false });
       console.log('error', err);
     });
   }
@@ -165,6 +171,7 @@ class Bay extends Component {
       connected,
       minsLeft,
       secondsLeft,
+      fetching,
     } = this.state;
 
     const { match: { params: { bayid } } } = this.props;
@@ -239,10 +246,16 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>Are you sure?</h2>
-                          <div>
-                            <button className="button-white" onClick={this.confirmUser}>YES</button>
-                            <button className="button-white" onClick={this.closeModal}>NO</button>
-                          </div>
+                          {
+                            fetching
+                            ? <Spinner config={config} />
+                            : (
+                              <div>
+                                <button className="button-white" onClick={this.confirmUser}>YES</button>
+                                <button className="button-white" onClick={this.closeModal}>NO</button>
+                              </div>
+                            )
+                          }
                         </div>
                       }
 
