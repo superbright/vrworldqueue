@@ -4,7 +4,7 @@ import validate from 'validate.js';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 import formConstraints from '../utils/formConstraints';
-import vrworld from '../../images/vrworld.png';
+//import vrworld from '../../images/vrworld.png';
 
 const formInit = {
   firstname: '',
@@ -98,7 +98,7 @@ class Signup extends Component {
       ? <Waiver handleWaiver={this.handleWaiver} waiverFetching={waiverFetching} />
       : <div className="simple-container">
         <header className="flex space-between align-center">
-          <img className="logo" src={vrworld} />
+          <img className="logo" src="/images/vrworld.png" />
         </header>
 
         <UserForm

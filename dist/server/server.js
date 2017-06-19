@@ -43,6 +43,7 @@ app.use(require('webpack-hot-middleware')(compiler));
 mongoose.connect('mongodb://localhost/vrworld');
 app.use((0, _compression2.default)({}));
 app.use('/api', require('./routes/routes.js'));
+app.use(_express2.default.static('public'));
 app.get('*', function (req, res) {
     res.sendFile(_path2.default.join(__dirname, '../../index.html'));
 });
