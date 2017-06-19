@@ -127,14 +127,16 @@ class BayPlay extends Component {
       case 'ready':
         // next player has swiped in, display the play button
         playDom = (
-          <div className="play-button">
-            <svg viewBox="0 0 200 200" alt="Play video" onClick={this.onPlayButtonPressed}>
-              <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
-              <polygon
-                points="70, 55 70, 145 145, 100"
-                fill="#fff"
-              />
-            </svg>
+          <div className="play-button-container flex justify-center" onClick={this.onPlayButtonPressed}>
+            <div className="play-button">
+              <svg viewBox="0 0 200 200" alt="Play video">
+                <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
+                <polygon
+                  points="70, 55 70, 145 145, 100"
+                  fill="#fff"
+                />
+              </svg>
+            </div>
           </div>
         );
         break;
