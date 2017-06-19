@@ -39,7 +39,10 @@ class BayPlay extends Component {
     fetch(`/api/bays/${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
-      this.setState({ bay });
+      this.setState({
+        bay,
+        play: bay.currentState,
+      });
     }).catch((err) => {
       console.log('error', err);
     });
