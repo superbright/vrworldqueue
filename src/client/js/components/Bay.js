@@ -160,7 +160,7 @@ class Bay extends Component {
         console.log('userAttempt-', showRemaining(new Date(res[0].timeAdded)));
         // this.countDown({ end });
       }
-      this.setState({ queue: res, false: false });
+      this.setState({ queue: res, fetching: false });
       this.closeModal();
     }).catch((err) => {
       this.setState({ queue: res, false: false });
@@ -256,7 +256,7 @@ class Bay extends Component {
                           <h2>Are you sure?</h2>
                           {
                             fetching
-                            ? <Spinner config={config} />
+                            ? <Spinner config={{ ...config, color: '#ffffff'}} />
                             : (
                               <div>
                                 <button className="button-white" onClick={this.confirmUser}>YES</button>
