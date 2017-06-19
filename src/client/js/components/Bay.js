@@ -175,6 +175,7 @@ class Bay extends Component {
             <div>
               <header className="flex space-between align-center">
                 <h5>{bay.name}</h5>
+                <h5>{bay.game}</h5>
               </header>
               {
                 queue.length === 0
