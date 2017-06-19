@@ -3,7 +3,7 @@ const bays = [
         bayid: 0
         , name: 'A-1'
         , game: 'Play Things'
-        , playTime: 10
+        , playTime: 1
         , instructionFile: '/images/instructions/a_1.png'
     , }
     , {
