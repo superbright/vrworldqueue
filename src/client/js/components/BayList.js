@@ -31,7 +31,7 @@ class BayList extends Component {
             bays.map(bay => (
               <li key={bay._id} className="user-list-item flex space-between align-center">
                 <div>
-                  <h5><Link to={`/bay/${bay._id}`}>{bay.name} - queue</Link></h5>
+                  <h5><Link to={`/bay/${bay._id}`}>{bay.name} - {bay.game}</Link></h5>
                 </div>
                 <div><h5><Link to={`/bay/${bay._id}/play`}>play button page</Link></h5></div>
               </li>
