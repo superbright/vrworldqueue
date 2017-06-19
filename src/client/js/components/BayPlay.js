@@ -3,6 +3,9 @@ import io from 'socket.io-client';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
 
+const backgroundConfig = 'no-repeat center center fixed'
+const backgroundGif = 'https://media4.giphy.com/media/3o85gd3noLuSkE4Lkc/giphy.gif';
+
 const numToString = (num) => {
   const result = num.toString();
   if (result && !isNaN(result)) {
@@ -101,7 +104,7 @@ class BayPlay extends Component {
   }
 
   render() {
-    const { play, connected, minsLeft, secondsLeft, bay } = this.state;
+    const { play, connected, minsLeft, secondsLeft, bay, background } = this.state;
 
     let playDom;
 
@@ -116,12 +119,11 @@ class BayPlay extends Component {
         // next player has swiped in, display the play button
         playDom = (
           <div className="play-button">
-            <svg viewBox="0 0 200 200" alt="Play video">
+            <svg viewBox="0 0 200 200" alt="Play video" onClick={this.onPlayButtonPressed}>
               <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
               <polygon
                 points="70, 55 70, 145 145, 100"
                 fill="#fff"
-                onClick={this.onPlayButtonPressed}
               />
             </svg>
           </div>
@@ -143,15 +145,23 @@ class BayPlay extends Component {
                 <button onClick={this.onCancelButtonPressed}>end game</button>
               </div>
             }
-
           </div>
         );
         break;
     }
 
-    console.log(bay);
+    const backgroundURL = (play.state !== 'ready' || !bay)
+      ? backgroundGif
+      : bay.instructionFile;
+
     return (
-      <div className="bay-play flex justify-center align-center">
+      <div
+        className={`bay-play flex justify-center ${play.state !== 'ready' ? 'align-center' : '' }`}
+        style={{
+          background: `url(${backgroundURL}) ${backgroundConfig}`,
+          backgroundSize: 'cover',
+        }}
+      >
         {
           bay &&
           <header className="bay-header flex space-between align-center">

@@ -16,6 +16,7 @@ Bay.remove({}).then(function (err, result) {
             , name: bay.name
             , game: bay.game
             , playTime: bay.playTime
+            , instructionFile: bay.instructionFile
         });
         newBay.save().then(function (err, savedBay) {
             if (err) console.log(err);

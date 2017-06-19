@@ -10,6 +10,9 @@ var schema = new mongoose.Schema({
     , game: {
         type: String
     }
+    , instructionFile: {
+        type: String
+    }
     , timeouts: {
         user: {
             type: Date

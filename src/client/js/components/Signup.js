@@ -4,7 +4,6 @@ import validate from 'validate.js';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 import formConstraints from '../utils/formConstraints';
-//import vrworld from '../../images/vrworld.png';
 
 const formInit = {
   firstname: '',

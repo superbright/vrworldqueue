@@ -4,6 +4,7 @@ const bays = [
         , name: 'A-1'
         , game: 'Play Things'
         , playTime: 10
+        , instructionFile: '/images/instructions/googleearth.png'
     , }
     , {
         bayid: 1
