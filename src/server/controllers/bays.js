@@ -43,6 +43,7 @@ exports.enqueueUser = (req, res) => {
         }
         else if (queue) {
             delete queue._id;
+            sendQueue(queue.bay);
             console.log('deleted user from queue');
         }
         getBay(req.params.bayId).then((bay) => {
