@@ -83,10 +83,7 @@ exports.dequeueUser = (req, res) => {
     });
 };
 exports.getQueue = (req, res) => {
-    console.log("Getting Queue");
     getQueue(req.params.bayId).then((queue) => {
-        console.log(queue);
-        console.log(queue.length)
         if ((queue.length > 0) && (!bayState[req.params.bayId] || bayState[req.params.bayId] == 'Idle')) startOnboarding(req.params.bayId);
         res.status(200).send(queue);
     });

@@ -35,11 +35,16 @@ module.exports.setupSockets = (server) => {
     });
 };
 var registerSocket = (socket, currentBay) => {
-    console.log('Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
+    console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
     if (sockets[currentBay.clientType] == null) {
-        console.log("unknown client type. Disconnecting...");
+        console.error("unknown client type. Disconnecting...");
         socket.disconnect();
         return;
+    }
+    if(sockets[currentBay.clientType][currentBay.clientId]){
+        console.warn("Client already connected. Disconnecting");
+        sockets[currentBay.clientType][currentBay.clientId].disconnect();
+        sockets[currentBay.clientType][currentBay.clientId] = null;
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
     socketState[currentBay.clientType][currentBay.clientId] = true;
