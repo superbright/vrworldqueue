@@ -120,6 +120,16 @@ module.exports.clearQueue = function (req, res) {
         res.status(200).send([]);
     });
 };
+var updateBayState = function updateBayState(bayId, data) {
+    return Bay.findByIdAndUpdate(bayId, {
+        $set: {
+            currentState: data
+        }
+    }).exec();
+};
+var getBay = function getBay(bayId) {
+    return Bay.findById(bayId).exec();
+};
 var popUser = function popUser(bayId) {
     return Queue.findOneAndRemove({
         bay: bayId
@@ -151,8 +161,10 @@ var startIdle = function startIdle(bayId) {
     var data = {
         state: 'idle'
     };
-    sockets.sendToButton(bayId, 'setState', data);
-    sockets.sendToQueue(bayId, 'setState', data);
+    updateBayState(bayId, data).then(function (bay) {
+        sockets.sendToButton(bayId, 'setState', data);
+        sockets.sendToQueue(bayId, 'setState', data);
+    });
 };
 var startOnboarding = function startOnboarding(bayId) {
     console.log('Onboarding, waiting for user...');
@@ -175,8 +187,10 @@ var startOnboarding = function startOnboarding(bayId) {
                 state: 'onboarding',
                 endTime: endTime
             };
-            sockets.sendToButton(bayId, 'setState', data);
-            sockets.sendToQueue(bayId, 'setState', data);
+            updateBayState(bayId, data).then(function (bay) {
+                sockets.sendToButton(bayId, 'setState', data);
+                sockets.sendToQueue(bayId, 'setState', data);
+            });
         }
     });
 };
@@ -197,8 +211,10 @@ var startReady = function startReady(bayId, user) {
             state: 'ready',
             user: user
         };
-        sockets.sendToQueue(bayId, 'setState', data);
-        sockets.sendToButton(bayId, 'setState', data);
+        updateBayState(bayId, data).then(function (bay) {
+            sockets.sendToQueue(bayId, 'setState', data);
+            sockets.sendToButton(bayId, 'setState', data);
+        });
     });
 };
 var startGameplay = function startGameplay(bayId) {
@@ -220,8 +236,10 @@ var startGameplay = function startGameplay(bayId) {
                 state: 'gameplay',
                 endTime: endTime
             };
-            sockets.sendToButton(bayId, 'setState', data);
-            sockets.sendToQueue(bayId, 'setState', data);
+            updateBayState(bayId, data).then(function (bay) {
+                sockets.sendToButton(bayId, 'setState', data);
+                sockets.sendToQueue(bayId, 'setState', data);
+            });
         });
     }
 };
@@ -237,8 +255,10 @@ var endGameplay = function endGameplay(bayId) {
     Bay.findById(bayId, function (err, bay) {
         if (bay) sockets.sendToGame(bay.id, 'endGame', data);
     });
-    sockets.sendToButton(bayId, 'setState', data);
-    sockets.sendToQueue(bayId, 'setState', data);
+    updateBayState(bayId, data).then(function (bay) {
+        sockets.sendToButton(bayId, 'setState', data);
+        sockets.sendToQueue(bayId, 'setState', data);
+    });
     startOnboarding(bayId);
 };
 var addUserToQueue = function addUserToQueue(bayId, tag) {

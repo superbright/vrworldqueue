@@ -21,14 +21,18 @@ var schema = new mongoose.Schema({
             type: Date
         }
     }
-    , state: {
-        type: String
-        , enum: ['Idle', 'Waiting', 'Playing']
-        , default: 'Idle'
-    },
-    playTime: {
-        type: Number,
+    , currentState: {
+        state: {
+            type: String
+            , default: 'idle'
+        }
+        , endTime: {
+            type: Date
+        }
     }
+    , playTime: {
+        type: Number
+    , }
 });
 var Bay = mongoose.model('Bay', schema);
 module.exports = {

@@ -152,6 +152,7 @@ class BayPlay extends Component {
         );
         break;
     }
+    console.log(this.state);
 
     const backgroundURL = (play.state !== 'ready' || !bay)
       ? backgroundGif

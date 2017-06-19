@@ -12,6 +12,9 @@ var schema = new mongoose.Schema({
     game: {
         type: String
     },
+    instructionFile: {
+        type: String
+    },
     timeouts: {
         user: {
             type: Date
@@ -20,10 +23,15 @@ var schema = new mongoose.Schema({
             type: Date
         }
     },
-    state: {
-        type: String,
-        enum: ['Idle', 'Waiting', 'Playing'],
-        default: 'Idle'
+    currentState: {
+        state: {
+            type: String,
+            enum: ['Idle', 'Waiting', 'Playing'],
+            default: 'Idle'
+        },
+        endTime: {
+            type: Date
+        }
     },
     playTime: {
         type: Number
