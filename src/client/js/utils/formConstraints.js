@@ -17,14 +17,6 @@ export default {
     presence: true,
     email: true,
   },
-  phone: {
-    presence: true,
-    length: {
-      minimum: 10,
-      message: 'must be at least 10 numbers',
-    },
-    numericality: true,
-  },
   screenname: {
     presence: true,
     length: {
