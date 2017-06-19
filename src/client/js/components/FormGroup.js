@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
+import scrollIntoView from 'scroll-into-view';
 
 class FormGroup extends Component {
   constructor() {
     super();
+
+    this.handleFocus = this.handleFocus.bind(this);
+  }
+
+  handleFocus() {
+    scrollIntoView(this.inputRef, { time: 500 });
   }
 
   render() {
@@ -20,6 +27,7 @@ class FormGroup extends Component {
               id={valueID}
               value={value}
               onChange={handleChange}
+              onFocus={this.handleFocus}
               ref={(ref) => { this.inputRef = ref }}
             />
             {errors && errors[valueID] && <div className="error-message">{errors[valueID]}</div>}
