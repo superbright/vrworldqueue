@@ -188,7 +188,7 @@ class Bay extends Component {
                 )
                 : (
                   <div>
-                    <div className={`bay-on-deck ${bay.play.state === 'onboarding' ? 'waiting' : ''}`}>
+                    <div className={`bay-on-deck ${(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'waiting' : ''}`}>
                       <div className="simple-container">
                         <p>{bay.play.state === 'onboarding' ? 'Waiting for you to swipe in' : 'Up next'}</p>
                         <div className="flex space-between align-center">
