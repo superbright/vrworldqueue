@@ -54,7 +54,7 @@ const UserForm = ({
 
       <FormGroup
         value={phone}
-        valuID="phone"
+        valueID="phone"
         valueName="Phone"
         errors={errors}
         handleChange={handleChange}
