@@ -23,7 +23,14 @@ module.exports = {
         test: /\.js$/,
         loaders: ['babel-loader'],
         include: path.join(__dirname, 'src')
-      }
+      },
+      {
+        test: /\.(jpg|png|svg)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 25000,
+        },
+      },
     ]
   },
   resolve: {

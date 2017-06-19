@@ -163,8 +163,9 @@ class Bay extends Component {
       success,
       connected,
       minsLeft,
-      secondsLeft
+      secondsLeft,
     } = this.state;
+
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
 

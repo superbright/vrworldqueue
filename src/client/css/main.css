@@ -275,3 +275,8 @@ button.button-white {
 .socket-connection.disconnected {
   background-color: #F44336;
 }
+
+.logo {
+  margin-left: 25px;
+  width: 175px;
+}
