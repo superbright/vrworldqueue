@@ -32,7 +32,6 @@ class BayList extends Component {
               <li key={bay._id} className="user-list-item flex space-between align-center">
                 <div>
                   <h5><Link to={`/bay/${bay._id}`}>{bay.name} - queue</Link></h5>
-                  <div>BAY ID: {bay.id}</div>
                 </div>
                 <div><h5><Link to={`/bay/${bay._id}/play`}>play button page</Link></h5></div>
               </li>
