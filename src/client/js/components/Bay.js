@@ -208,6 +208,7 @@ class Bay extends Component {
                 )
                 : (
                   <div>
+                    {JSON.stringify(bay)}
                     <div className={`bay-on-deck ${(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'waiting' : ''}`}>
                       <div className="simple-container">
                         <p>{(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'Waiting for you to swipe in' : 'Up next'}</p>
