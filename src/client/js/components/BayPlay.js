@@ -15,6 +15,7 @@ class BayPlay extends Component {
   constructor() {
     super();
     this.state = {
+      bay: null,
       socket: null,
       play: { state: 'idle' }, // idle, ready, gameplay, onboarding
       connected: false,
@@ -31,6 +32,14 @@ class BayPlay extends Component {
 
   componentWillMount() {
     const { match: { params: { bayid } } } = this.props;
+
+    fetch(`/api/bays/${bayid}`, {
+      method: 'get',
+    }).then(res => res.json()).then((bay) => {
+      this.setState({ bay });
+    }).catch((err) => {
+      console.log('error', err);
+    });
 
     this.setState({
       socket: io(window.location.origin, {
@@ -92,7 +101,7 @@ class BayPlay extends Component {
   }
 
   render() {
-    const { play, connected, minsLeft, secondsLeft } = this.state;
+    const { play, connected, minsLeft, secondsLeft, bay } = this.state;
 
     let playDom;
 
@@ -140,9 +149,17 @@ class BayPlay extends Component {
         break;
     }
 
-
+    console.log(bay);
     return (
       <div className="bay-play flex justify-center align-center">
+        {
+          bay &&
+          <header className="bay-header flex space-between align-center">
+            <h5>{bay.name}</h5>
+            <h5>{bay.game}</h5>
+          </header>
+        }
+
         {playDom}
         <SocketConnectionStatus connected={connected} />
       </div>
