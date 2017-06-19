@@ -53,6 +53,14 @@ class Bay extends Component {
         }),
       });
 
+      if (bay.currentState.endTime) {
+        const interval = setInterval(() => {
+          this.countDown();
+        }, 1000);
+        this.countDown();
+        this.setState({ interval });
+      }
+
       this.connectSocket();
       this.fetchQueue();
     }).catch((err) => {
