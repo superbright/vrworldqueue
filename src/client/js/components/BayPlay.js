@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
 
-const backgroundConfig = 'no-repeat center center fixed'
+const backgroundConfig = 'no-repeat center center fixed';
 const backgroundGif = 'https://media4.giphy.com/media/3o85gd3noLuSkE4Lkc/giphy.gif';
 
 const numToString = (num) => {
@@ -73,7 +73,6 @@ class BayPlay extends Component {
         this.setState({ connected: false });
       });
       socket.on('setState', (res) => {
-        console.log('setstate', res);
         this.setState({ play: res });
 
         if (this.state.play.endTime) {
@@ -114,7 +113,7 @@ class BayPlay extends Component {
   }
 
   render() {
-    const { play, connected, minsLeft, secondsLeft, bay, background } = this.state;
+    const { play, connected, minsLeft, secondsLeft, bay } = this.state;
 
     let playDom;
 
@@ -165,13 +164,12 @@ class BayPlay extends Component {
       ? backgroundGif
       : bay.instructionFile;
 
+    const style = { background: `url(${backgroundURL}) ${backgroundConfig}` };
+
     return (
       <div
         className={`bay-play flex justify-center ${play.state !== 'ready' ? 'align-center' : '' }`}
-        style={{
-          background: `url(${backgroundURL}) ${backgroundConfig}`,
-          backgroundSize: 'cover',
-        }}
+        style={style}
       >
         {
           bay &&
