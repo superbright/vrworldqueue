@@ -36,10 +36,14 @@ class Admin extends Component {
     };
 
     this.updateUser = this.updateUser.bind(this);
-
+    this.getUsers = this.getUsers.bind(this);
   }
 
   componentWillMount() {
+    this.getUsers();
+  }
+
+  getUsers() {
     return fetch('/api/users', {
       method: 'get',
     }).then(res => res.json()).then((users) => {
@@ -59,7 +63,7 @@ class Admin extends Component {
     const { users, tempRFID } = this.state;
     const { match } = this.props;
     const { adminid } = match.params;
-    console.log(match);
+
     return (
       <div>
         <header className="flex space-between align-center">
@@ -74,7 +78,7 @@ class Admin extends Component {
         <Route
           exact
           path={`${match.url}/:adminid`}
-          component={props => <AdminList {...props} users={users} />}
+          component={props => <AdminList {...props} users={users} getUsers={this.getUsers} />}
         />
         <Route exact path={match.url} component={NoId} />
       </div>

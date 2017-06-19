@@ -37,7 +37,7 @@ class AdminList extends Component {
 
   render() {
     const { searchValue } = this.state;
-    const { match: { params: { adminid } } } = this.props;
+    const { getUsers, match: { params: { adminid } } } = this.props;
 
     const filteredUsers = this.filterUsers();
 
@@ -46,8 +46,13 @@ class AdminList extends Component {
         <header className="flex space-between align-center">
           <h5>vrworld admin {adminid}</h5>
         </header>
+
         <div className="user-search simple-container">
           <input type="text" placeholder="Search Users" onChange={this.updateSearch} value={searchValue} />
+        </div>
+
+        <div className="simple-container">
+          <button onClick={getUsers}>RefreshList</button>
         </div>
 
         <ul>
