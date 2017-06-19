@@ -32,6 +32,10 @@ header h2, header h5 {
   margin: 0px 25px;
 }
 
+header.bay-header {
+  background-color: transparent;
+}
+
 button {
   background-color: #283593;
   border-radius: 5px;
