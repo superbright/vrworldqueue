@@ -43,6 +43,9 @@ class AdminList extends Component {
 
     return (
       <div>
+        <header className="flex space-between align-center">
+          <h5>vrworld admin {adminid}</h5>
+        </header>
         <div className="user-search simple-container">
           <input type="text" placeholder="Search Users" onChange={this.updateSearch} value={searchValue} />
         </div>
@@ -68,7 +71,7 @@ class AdminList extends Component {
           }
         </ul>
       </div>
-    )
+    );
   }
 }
 

@@ -136,6 +136,10 @@ class AdminUser extends Component {
 
     return (
       <div className="admin-user-page simple-container" key={userid}>
+        <header className="flex space-between align-center">
+          <h5>vrworld admin {adminid}</h5>
+        </header>
+
         <Link to={`/admin/${adminid}`}>{'< Return to Users List'}</Link>
 
         {

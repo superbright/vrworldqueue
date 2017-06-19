@@ -1,10 +1,29 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 import update from 'immutability-helper';
 import AdminList from './AdminList';
 import AdminUser from './AdminUser';
 
-const NoId = () => <div>No Admin ID in route, try: /admin/*ADMIN_ID*</div>;
+const adminList = [
+  {
+    name: '',
+    id: 1,
+  },
+  {
+    name: '',
+    id: 2,
+  }
+];
+
+const NoId = () => <ul>
+  {
+    adminList.map((a) => (
+      <li key={`admin-${a.id}`} className="user-list-item flex space-between align-center">
+        <Link to={`/admin/${a.id}`}>Admin Location: {a.id}</Link>
+      </li>
+    ))
+  }
+</ul>;
 
 class Admin extends Component {
   constructor() {
@@ -39,11 +58,12 @@ class Admin extends Component {
   render() {
     const { users, tempRFID } = this.state;
     const { match } = this.props;
-
+    const { adminid } = match.params;
+    console.log(match);
     return (
       <div>
         <header className="flex space-between align-center">
-          <h5>vrworld admin</h5>
+          <h5>vrworld admin {adminid}</h5>
         </header>
 
         <Route
