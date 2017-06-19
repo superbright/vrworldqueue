@@ -20,6 +20,7 @@ class FormGroup extends Component {
               id={valueID}
               value={value}
               onChange={handleChange}
+              ref={(ref) => { this.inputRef = ref }}
             />
             {errors && errors[valueID] && <div className="error-message">{errors[valueID]}</div>}
           </div>
