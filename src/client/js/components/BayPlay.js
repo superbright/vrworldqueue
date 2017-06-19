@@ -43,6 +43,13 @@ class BayPlay extends Component {
         bay,
         play: bay.currentState,
       });
+      if (bay.currentState.endTime) {
+        const interval = setInterval(() => {
+          this.countDown();
+        }, 1000);
+        this.countDown();
+        this.setState({ interval });
+      }
     }).catch((err) => {
       console.log('error', err);
     });
