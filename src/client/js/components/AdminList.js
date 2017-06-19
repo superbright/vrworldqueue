@@ -52,7 +52,7 @@ class AdminList extends Component {
         </div>
 
         <div className="simple-container">
-          <button onClick={getUsers}>RefreshList</button>
+          <button onClick={getUsers}>Refresh List</button>
         </div>
 
         <ul>
