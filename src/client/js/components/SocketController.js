@@ -19,7 +19,7 @@ class SocketController extends Component {
   componentWillMount() {
     this.setState({
       socket: io(window.location.origin, {
-        query: `clientType=global`,
+        query: `clientType=global&clientId=1`,
       }),
     }, () => {
       this.connectSocket();
