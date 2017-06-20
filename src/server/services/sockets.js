@@ -8,6 +8,7 @@ let sockets = {
     , queue: {}
     , admin: {}
     , registration: {}
+    , global: {}
 };
 let socketState = {
     game: {}
@@ -15,13 +16,14 @@ let socketState = {
     , queue: {}
     , admin: {}
     , registration: {}
+    , global: {}
 }
 import SocketIO from 'socket.io';
 import {
     findIndex, sanitizeString
 }
 from '../../shared/util';
-module.exports.setupSockets = (server) => {
+module.exports.setupSockets = (server, app) => {
     let io = new SocketIO(server);
     io.on('connection', (socket) => {
         let clientId = socket.handshake.query.clientId;
@@ -31,24 +33,23 @@ module.exports.setupSockets = (server) => {
             , clientId: clientId
             , clientType: clientType
         };
-        registerSocket(socket, currentBay);
+        registerSocket(socket, currentBay, app);
     });
 };
-var registerSocket = (socket, currentBay) => {
+var registerSocket = (socket, currentBay, app) => {
     console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
     if (sockets[currentBay.clientType] == null) {
         console.error("unknown client type. Disconnecting...");
         socket.disconnect();
         return;
     }
-    if(sockets[currentBay.clientType][currentBay.clientId]){
+    if (sockets[currentBay.clientType][currentBay.clientId]) {
         console.warn("Client already connected. Disconnecting");
         sockets[currentBay.clientType][currentBay.clientId].disconnect();
         sockets[currentBay.clientType][currentBay.clientId] = null;
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
     socketState[currentBay.clientType][currentBay.clientId] = true;
-    
     console.log('[INFO] ' + currentBay.clientType + " #" + currentBay.clientId + ' connected!');
     socket.on('disconnect', () => {
         console.log('[INFO] ' + currentBay.clientType + " " + currentBay.clientId + ' disconnected!');
@@ -59,9 +60,13 @@ var registerSocket = (socket, currentBay) => {
         });
     });
     socket.emit('hello', currentBay);
-    userController.socketHandler(socket);
-    rfidController.socketHandler(socket);
-    bayController.socketHandler(socket);
+    socket.on('refresh', () => {
+        console.log('[INFO] Refresh triggered');
+        socket.broadcast.emit('refresh');
+    })
+    userController.socketHandler(socket, app);
+    rfidController.socketHandler(socket, app);
+    bayController.socketHandler(socket, app);
 }
 exports.sendToGame = (gameId, endpoint, message, callback) => {
     exports.sendToClient('game', gameId, endpoint, message, callback);

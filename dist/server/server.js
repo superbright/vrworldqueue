@@ -31,22 +31,19 @@ require("babel-polyfill");
 var app = (0, _express2.default)();
 var server = _http2.default.Server(app);
 var socketController = require('./services/sockets');
-socketController.setupSockets(server);
 var port = process.env.PORT || 3000;
 var mongoose = require('mongoose');
 var compiler = (0, _webpack2.default)(_webpack4.default);
-
 // webpack hot reload
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: _webpack4.default.output.publicPath
 }));
 app.use(require('webpack-hot-middleware')(compiler));
 mongoose.connect('mongodb://localhost/vrworld');
-
 // verify data on start
 // setup timers
 require("./verifydata")(app);
-
+socketController.setupSockets(server, app);
 app.use((0, _compression2.default)({}));
 app.use('/api', require('./routes/routes.js'));
 app.use(_express2.default.static('public'));

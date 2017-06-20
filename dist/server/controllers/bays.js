@@ -30,23 +30,13 @@ var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
-
 //var timerconfig = require('../../shared/timerconfig');
 
-
-console.log(_timerconfig.timerparams);
-//todo
 //move these to app.locals
-var timers = {
-    onboarding: {},
-    gameplay: {}
-};
 var bayState = {};
 var currentUser = {};
 exports.getBays = function (req, res) {
-
     console.log(req.app.locals);
-
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, function (err, bay) {
             if (err) res.status(500).send(err);else if (bay) res.status(200).send(bay);else res.status(404).send("No Bay found with that ID");
@@ -84,7 +74,7 @@ exports.enqueueUser = function (req, res) {
                 User.findById(req.body.userId, function (err, doc) {
                     console.log('starting ready');
                     currentUser[req.params.bayId] = doc;
-                    startReady(req.params.bayId, doc);
+                    startReady(req.params.bayId, doc, req.app);
                 });
                 res.status(200).send([]);
             } else {
@@ -117,7 +107,7 @@ exports.dequeueUser = function (req, res) {
 exports.getQueue = function (req, res) {
     getQueue(req.params.bayId).then(function (queue) {
         getBay(req.params.bayId).then(function (bay) {
-            if (queue.length > 0 && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId);
+            if (queue.length > 0 && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId, req.app);
         });
         res.status(200).send(queue);
     });
@@ -184,17 +174,17 @@ var startIdle = function startIdle(bayId) {
         sockets.sendToQueue(bayId, 'setState', data);
     });
 };
-var startOnboarding = function startOnboarding(bayId) {
+var startOnboarding = function startOnboarding(bayId, app) {
     console.log('Onboarding, waiting for user...');
     bayState[bayId] = 'Onboarding';
     getUserOnDeck(bayId).then(function (user) {
         if (!user) startIdle(bayId);else {
             var endTime = new Date();
             endTime.setMinutes(endTime.getMinutes() + 1);
-            if (timers.onboarding.bayId != null) {
-                timers.onboarding.bayId.cancel();
+            if (app.locals.timers.onboarding.bayId != null) {
+                app.locals.timers.onboarding.bayId.cancel();
             }
-            timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
+            app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
                 console.log('Onboarding timeout, moving to next person...');
                 popUser(bayId).then(function (queue) {
                     sendQueue(bayId);
@@ -217,12 +207,12 @@ var sendQueue = function sendQueue(bayId) {
         if (queue) sockets.sendToQueue(bayId, 'queue', queue);else sockets.sendToQueue(bayId, 'queue', []);
     });
 };
-var startReady = function startReady(bayId, user) {
+var startReady = function startReady(bayId, user, app) {
     popUser(bayId).then(function (queue) {
         sendQueue(bayId);
         bayState[bayId] = 'Ready';
-        if (timers.onboarding.bayId != null) {
-            timers.onboarding.bayId.cancel();
+        if (app.locals.timers.onboarding.bayId != null) {
+            app.locals.timers.onboarding.bayId.cancel();
         }
         console.log('Bay ' + bayId + ' is Ready');
         var data = {
@@ -235,36 +225,41 @@ var startReady = function startReady(bayId, user) {
         });
     });
 };
-var startGameplay = function startGameplay(bayId) {
+var startGameplay = function startGameplay(bayId, app) {
     console.log('start Gameplay on bay ' + bayId);
     if (bayState[bayId] == 'Playing') console.log('Already playing game...');else {
         Bay.findById(bayId).then(function (bay) {
-            if (bay) sockets.sendToGame(bay.id, 'startGame', data);
-            bayState[bayId] = 'Playing';
-            var endTime = new Date();
-            endTime.setMinutes(endTime.getMinutes() + bay.playTime);
-            if (timers.onboarding.bayId != null) {
-                timers.onboarding.bayId.cancel();
-                timers.onboarding.bayId = null;
-            }
-            timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
-                endGameplay(bayId);
-            });
-            var data = {
-                state: 'gameplay',
-                endTime: endTime
-            };
-            updateBayState(bayId, data).then(function (bay) {
-                sockets.sendToButton(bayId, 'setState', data);
-                sockets.sendToQueue(bayId, 'setState', data);
-            });
+            console.log(bay);
+            console.log(app.locals);
+            if (bay) {
+                sockets.sendToGame(bay.id, 'startGame', data);
+                bayState[bayId] = 'Playing';
+                var endTime = new Date();
+                endTime.setMinutes(endTime.getMinutes() + bay.playTime);
+                if (app.locals.timers.onboarding.bayId != null) {
+                    app.locals.timers.onboarding.bayId.cancel();
+                    app.locals.timers.onboarding.bayId = null;
+                }
+                app.locals.timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
+                    endGameplay(bayId, app);
+                });
+                console.log(app.locals.timers);
+                var data = {
+                    state: 'gameplay',
+                    endTime: endTime
+                };
+                updateBayState(bayId, data).then(function (bay) {
+                    sockets.sendToButton(bayId, 'setState', data);
+                    sockets.sendToQueue(bayId, 'setState', data);
+                });
+            } else console.log('bay not found');
         });
     }
 };
-var endGameplay = function endGameplay(bayId) {
-    if (timers.gameplay.bayId != null) {
-        timers.gameplay.bayId.cancel();
-        timers.gameplay.bayId = null;
+var endGameplay = function endGameplay(bayId, app) {
+    if (app.locals.timers.gameplay.bayId != null) {
+        app.locals.timers.gameplay.bayId.cancel();
+        app.locals.timers.gameplay.bayId = null;
     }
     console.log('Gameplay over!');
     var data = {
@@ -349,16 +344,16 @@ var isCurrentUser = function isCurrentUser(bayId, tag, callback) {
         callback(user._id.equals(currentUser[bayId]._id));
     });
 };
-module.exports.socketHandler = function (socket) {
+module.exports.socketHandler = function (socket, app) {
     /* Add Socket Handling Logic Here */
     socket.on('startButtonPressed', function (data) {});
     socket.on('startButton', function (req) {
         var bayId = req.clientId;
-        startGameplay(bayId);
+        startGameplay(bayId, app);
     });
     socket.on('endButton', function (req) {
         var bayId = req.clientId;
-        endGameplay(bayId);
+        endGameplay(bayId, app);
     });
     socket.on('rfid', function (data) {
         var req = JSON.parse(data
@@ -376,7 +371,7 @@ module.exports.socketHandler = function (socket) {
                         var user = queue.user;
                         if (user.rfid.id == req.tag) {
                             console.log('Is current User');
-                            startReady(bay._id, user);
+                            startReady(bay._id, user, app);
                         } else addUserToQueue(req.clientId, req.tag);
                     });
                 } else {

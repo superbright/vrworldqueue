@@ -10,22 +10,19 @@ require("babel-polyfill");
 const app = express();
 const server = http.Server(app);
 var socketController = require('./services/sockets');
-socketController.setupSockets(server);
 let port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const compiler = webpack(config);
-
 // webpack hot reload
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath
 }));
 app.use(require('webpack-hot-middleware')(compiler));
 mongoose.connect('mongodb://localhost/vrworld');
-
 // verify data on start
 // setup timers
 require("./verifydata")(app);
-
+socketController.setupSockets(server, app);
 app.use(compression({}));
 app.use('/api', require('./routes/routes.js'));
 app.use(express.static('public'));
