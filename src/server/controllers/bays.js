@@ -277,14 +277,16 @@ var addUserToQueue = (bayId, tag) => {
                             sockets.sendToQueue(bay._id, 'userattempt', res);
                         }
                         else if (queue) {
-                            if (bay._id.equals(queue.bay._id))        res.error = "You are already in this queue";
-                            else
-                                bay.info = "Would you like to join this queue? You'll lose your place in your other queue.";
+                            if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
+                            else bay.info = "Would you like to join this queue? You'll lose your place in your other queue.";
                             res.data = queue;
                             sockets.sendToQueue(bay._id, 'userattempt', res);
                         }
                         else {
-                            res.info("Would you like to join this queue?")
+                            res.info = "Would you like to join this queue?"
+                            getQueue(bay._id).then((queue) => {
+                                if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = "There's no one in front of you. Would you like to play?"
+                            })
                             var q = new Queue({
                                 user: user._id
                                 , bay: bay._id
