@@ -111,5 +111,7 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     }
     callback && callback(returnValue);
 }
+
+console.log('This is definitely latest code');
 exports.sockets = sockets;
 exports.socketState = socketState;
