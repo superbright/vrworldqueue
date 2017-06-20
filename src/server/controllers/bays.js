@@ -11,7 +11,6 @@ from '../../shared/timerconfig.js';
 //move these to app.locals
 var currentUser = {}
 exports.getBays = (req, res) => {
-    console.log(req.app.locals);
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, (err, bay) => {
             if (err) res.status(500).send(err);
