@@ -79,6 +79,7 @@ exports.postUser = (req, res) => {
     if (req.body.email != null) userData.email = req.body.email;
     if (req.body.phone != null) userData.phone = req.body.phone;
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
+    if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
     userData.signature = signature._id
     if (req.body.rfid) {
         console.log('Adding RFID');

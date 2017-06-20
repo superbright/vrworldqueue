@@ -4,7 +4,7 @@ import { timerparams } from '../../../shared/timerconfig';
 class Thanks extends Component {
   componentWillMount() {
     setTimeout(() => {
-      window.location.href = `${window.location.origin}/signup`;
+      window.location.replace(`${window.location.origin}/signup`);
     }, timerparams.modalTimeout);
   }
 
