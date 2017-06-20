@@ -65,6 +65,19 @@ exports.getUserSignature = (req, res) => {
         else res.json("No User found with that ID");
     });
 };
+exports.checkScreenName = (req, res) => {
+  if (req.params.screenname != null) {
+    User.findOne({ screenname: req.params.screenname }, (err, user) => {
+        if (err) res.status(500).send(err);
+        else if (user) {
+            res.json({ status: true, error: 'Screenname already taken'});
+        }
+        else res.json({ status: true });
+    });
+  } else {
+    res.json({ status: false, error: 'must send screenname'})
+  }
+}
 exports.postUser = (req, res) => {
     var signature = new Signature({
         image: {

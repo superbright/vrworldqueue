@@ -9,7 +9,6 @@ import {
 }
 from '../../shared/timerconfig.js';
 //move these to app.locals
-var bayState = {}
 var currentUser = {}
 exports.getBays = (req, res) => {
     console.log(req.app.locals);
@@ -92,9 +91,6 @@ exports.dequeueUser = (req, res) => {
 };
 exports.getQueue = (req, res) => {
     getQueue(req.params.bayId).then((queue) => {
-        getBay(req.params.bayId).then((bay) => {
-            if ((queue.length > 0) && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId, req.app);
-        });
         res.status(200).send(queue);
     });
 };
@@ -133,9 +129,6 @@ var popUser = (bayId) => {
         timeAdded: 1
     }).exec();
 }
-exports.getState = (req, res) => {
-    res.status(200).send(bayState);
-}
 async function asyncFun(req) {
     return req;
 }
@@ -165,22 +158,24 @@ var startIdle = (bayId) => {
 }
 var startOnboarding = (bayId, app) => {
     console.log('Onboarding, waiting for user...');
-    bayState[bayId] = 'Onboarding';
     getUserOnDeck(bayId).then((user) => {
         if (!user) startIdle(bayId);
         else {
             var endTime = new Date();
+//            console.log('----------' + user);
             endTime.setMinutes(endTime.getMinutes() + 1);
             if (app.locals.timers.onboarding.bayId != null) {
                 app.locals.timers.onboarding.bayId.cancel();
             }
+//            console.log('--------send onboard message');
             app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, () => {
                 console.log('Onboarding timeout, moving to next person...');
                 popUser(bayId).then((queue) => {
                     sendQueue(bayId);
-                    startOnboarding(bayId);
+                    startOnboarding(bayId,app);
                 });
             });
+            //  console.log(app.locals.timers);
             var data = {
                 state: 'onboarding'
                 , endTime: endTime
@@ -201,7 +196,6 @@ var sendQueue = (bayId) => {
 var startReady = (bayId, user, app) => {
     popUser(bayId).then((queue) => {
         sendQueue(bayId);
-        bayState[bayId] = 'Ready';
         if (app.locals.timers.onboarding.bayId != null) {
             app.locals.timers.onboarding.bayId.cancel();
         }
@@ -218,36 +212,31 @@ var startReady = (bayId, user, app) => {
 }
 var startGameplay = (bayId, app) => {
     console.log('start Gameplay on bay ' + bayId);
-    if (bayState[bayId] == 'Playing') console.log('Already playing game...');
-    else {
-        Bay.findById(bayId).then((bay) => {
-            console.log(bay);
-            console.log(app.locals);
-            if (bay) {
-                sockets.sendToGame(bay.id, 'startGame', data);
-                bayState[bayId] = 'Playing';
-                var endTime = new Date();
-                endTime.setMinutes(endTime.getMinutes() + bay.playTime);
-                if (app.locals.timers.onboarding.bayId != null) {
-                    app.locals.timers.onboarding.bayId.cancel();
-                    app.locals.timers.onboarding.bayId = null;
-                }
+    getBay(bayId).then((bay) => {
+        if (bay.currentState == 'gameplay') console.log('Already playing game on game ' + bayId);
+        else {
+            var endTime = new Date();
+            endTime.setMinutes(endTime.getMinutes() + bay.playTime);
+            if (app.locals.timers.onboarding.bayId != null) {
+                app.locals.timers.onboarding.bayId.cancel();
+                app.locals.timers.onboarding.bayId = null;
+            }
+            var data = {
+                state: 'gameplay'
+                , endTime: endTime
+            };
+            updateBayState(bayId, data).then((bay) => {
+                console.log('update bay state');
                 app.locals.timers.gameplay.bayId = scheduler.scheduleJob(endTime, () => {
+                    console.log('gameplay timer expired');
                     endGameplay(bayId, app);
                 });
-                console.log(app.locals.timers);
-                var data = {
-                    state: 'gameplay'
-                    , endTime: endTime
-                };
-                updateBayState(bayId, data).then((bay) => {
-                    sockets.sendToButton(bayId, 'setState', data);
-                    sockets.sendToQueue(bayId, 'setState', data);
-                })
-            }
-            else console.log('bay not found');
-        });
-    }
+                sockets.sendToGame(bay.id, 'startGame', data);
+                sockets.sendToButton(bayId, 'setState', data);
+                sockets.sendToQueue(bayId, 'setState', data);
+            });
+        }
+    });
 };
 var endGameplay = (bayId, app) => {
     if (app.locals.timers.gameplay.bayId != null) {
@@ -265,7 +254,7 @@ var endGameplay = (bayId, app) => {
         sockets.sendToButton(bayId, 'setState', data);
         sockets.sendToQueue(bayId, 'setState', data);
     });
-    startOnboarding(bayId);
+    startOnboarding(bayId, app);
 };
 var addUserToQueue = (bayId, tag) => {
     var res = {}
@@ -288,7 +277,6 @@ var addUserToQueue = (bayId, tag) => {
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
                             }
                             else if (queue) {
-                                console.log(queue);
                                 if (!queue.bay || !queue.user) delete queue._id;
                                 else
                                 if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";

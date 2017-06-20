@@ -33,7 +33,6 @@ var sockets = require('../services/sockets');
 //var timerconfig = require('../../shared/timerconfig');
 
 //move these to app.locals
-var bayState = {};
 var currentUser = {};
 exports.getBays = function (req, res) {
     console.log(req.app.locals);
@@ -106,9 +105,6 @@ exports.dequeueUser = function (req, res) {
 };
 exports.getQueue = function (req, res) {
     getQueue(req.params.bayId).then(function (queue) {
-        getBay(req.params.bayId).then(function (bay) {
-            if (queue.length > 0 && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId, req.app);
-        });
         res.status(200).send(queue);
     });
 };
@@ -146,9 +142,6 @@ var popUser = function popUser(bayId) {
         timeAdded: 1
     }).exec();
 };
-exports.getState = function (req, res) {
-    res.status(200).send(bayState);
-};
 
 var getUserOnDeck = function getUserOnDeck(bayId) {
     return Queue.findOne({
@@ -176,21 +169,23 @@ var startIdle = function startIdle(bayId) {
 };
 var startOnboarding = function startOnboarding(bayId, app) {
     console.log('Onboarding, waiting for user...');
-    bayState[bayId] = 'Onboarding';
     getUserOnDeck(bayId).then(function (user) {
         if (!user) startIdle(bayId);else {
             var endTime = new Date();
+            //            console.log('----------' + user);
             endTime.setMinutes(endTime.getMinutes() + 1);
             if (app.locals.timers.onboarding.bayId != null) {
                 app.locals.timers.onboarding.bayId.cancel();
             }
+            //            console.log('--------send onboard message');
             app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
                 console.log('Onboarding timeout, moving to next person...');
                 popUser(bayId).then(function (queue) {
                     sendQueue(bayId);
-                    startOnboarding(bayId);
+                    startOnboarding(bayId, app);
                 });
             });
+            //  console.log(app.locals.timers);
             var data = {
                 state: 'onboarding',
                 endTime: endTime
@@ -210,7 +205,6 @@ var sendQueue = function sendQueue(bayId) {
 var startReady = function startReady(bayId, user, app) {
     popUser(bayId).then(function (queue) {
         sendQueue(bayId);
-        bayState[bayId] = 'Ready';
         if (app.locals.timers.onboarding.bayId != null) {
             app.locals.timers.onboarding.bayId.cancel();
         }
@@ -227,34 +221,30 @@ var startReady = function startReady(bayId, user, app) {
 };
 var startGameplay = function startGameplay(bayId, app) {
     console.log('start Gameplay on bay ' + bayId);
-    if (bayState[bayId] == 'Playing') console.log('Already playing game...');else {
-        Bay.findById(bayId).then(function (bay) {
-            console.log(bay);
-            console.log(app.locals);
-            if (bay) {
-                sockets.sendToGame(bay.id, 'startGame', data);
-                bayState[bayId] = 'Playing';
-                var endTime = new Date();
-                endTime.setMinutes(endTime.getMinutes() + bay.playTime);
-                if (app.locals.timers.onboarding.bayId != null) {
-                    app.locals.timers.onboarding.bayId.cancel();
-                    app.locals.timers.onboarding.bayId = null;
-                }
+    getBay(bayId).then(function (bay) {
+        if (bay.currentState == 'gameplay') console.log('Already playing game on game ' + bayId);else {
+            var endTime = new Date();
+            endTime.setMinutes(endTime.getMinutes() + bay.playTime);
+            if (app.locals.timers.onboarding.bayId != null) {
+                app.locals.timers.onboarding.bayId.cancel();
+                app.locals.timers.onboarding.bayId = null;
+            }
+            var data = {
+                state: 'gameplay',
+                endTime: endTime
+            };
+            updateBayState(bayId, data).then(function (bay) {
+                console.log('update bay state');
                 app.locals.timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
+                    console.log('gameplay timer expired');
                     endGameplay(bayId, app);
                 });
-                console.log(app.locals.timers);
-                var data = {
-                    state: 'gameplay',
-                    endTime: endTime
-                };
-                updateBayState(bayId, data).then(function (bay) {
-                    sockets.sendToButton(bayId, 'setState', data);
-                    sockets.sendToQueue(bayId, 'setState', data);
-                });
-            } else console.log('bay not found');
-        });
-    }
+                sockets.sendToGame(bay.id, 'startGame', data);
+                sockets.sendToButton(bayId, 'setState', data);
+                sockets.sendToQueue(bayId, 'setState', data);
+            });
+        }
+    });
 };
 var endGameplay = function endGameplay(bayId, app) {
     if (app.locals.timers.gameplay.bayId != null) {
@@ -272,7 +262,7 @@ var endGameplay = function endGameplay(bayId, app) {
         sockets.sendToButton(bayId, 'setState', data);
         sockets.sendToQueue(bayId, 'setState', data);
     });
-    startOnboarding(bayId);
+    startOnboarding(bayId, app);
 };
 var addUserToQueue = function addUserToQueue(bayId, tag) {
     var res = {};
@@ -292,7 +282,6 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
                                 res.err = err;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
                             } else if (queue) {
-                                console.log(queue);
                                 if (!queue.bay || !queue.user) delete queue._id;else if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
                                 res.data = queue;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);

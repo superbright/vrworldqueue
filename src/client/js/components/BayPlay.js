@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+import Spinner from 'react-spin';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
+import config from '../utils/spinnerConfig';
 
 const backgroundConfig = 'no-repeat center center fixed';
 const backgroundGif = 'https://media4.giphy.com/media/3o85gd3noLuSkE4Lkc/giphy.gif';
@@ -25,6 +27,7 @@ class BayPlay extends Component {
       minsLeft: '--',
       secondsLeft: '--',
       interval: null,
+      fetching: false,
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -73,7 +76,7 @@ class BayPlay extends Component {
         this.setState({ connected: false });
       });
       socket.on('setState', (res) => {
-        this.setState({ play: res });
+        this.setState({ play: res, fetching: false });
 
         if (this.state.play.endTime) {
           const interval = setInterval(() => {
@@ -92,13 +95,19 @@ class BayPlay extends Component {
   onPlayButtonPressed() {
     const { match: { params: { bayid } } } = this.props;
 
-    this.state.socket.emit('startButton', { clientId: bayid });
+    if (!this.state.fetching) {
+      this.setState({ fetching: true });
+      this.state.socket.emit('startButton', { clientId: bayid });
+    }
   }
 
   onCancelButtonPressed() {
     const { match: { params: { bayid } } } = this.props;
 
-    this.state.socket.emit('endButton', { clientId: bayid });
+    if (!this.state.fetching) {
+      this.setState({ fetching: true });
+      this.state.socket.emit('endButton', { clientId: bayid });
+    }
   }
 
   countDown() {
@@ -116,7 +125,7 @@ class BayPlay extends Component {
   }
 
   render() {
-    const { play, connected, minsLeft, secondsLeft, bay } = this.state;
+    const { play, connected, minsLeft, secondsLeft, bay, fetching } = this.state;
 
     let playDom;
 
@@ -130,16 +139,25 @@ class BayPlay extends Component {
       case 'ready':
         // next player has swiped in, display the play button
         playDom = (
-          <div className="play-button-container flex justify-center" onClick={this.onPlayButtonPressed}>
-            <div className="play-button">
-              <svg viewBox="0 0 200 200" alt="Play video">
-                <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
-                <polygon
-                  points="70, 55 70, 145 145, 100"
-                  fill="#fff"
-                />
-              </svg>
-            </div>
+          <div
+            className="play-button-container flex justify-center"
+            onClick={this.onPlayButtonPressed}
+          >
+            {
+              fetching
+              ? <Spinner config={{ ...config, color: '#ffffff' }} />
+              : (
+                <div className="play-button">
+                  <svg viewBox="0 0 200 200" alt="Play video">
+                    <circle cx="100" cy="100" r="90" fill="none" strokeWidth="15" stroke="#fff" />
+                    <polygon
+                      points="70, 55 70, 145 145, 100"
+                      fill="#fff"
+                    />
+                  </svg>
+                </div>
+              )
+            }
           </div>
         );
         break;
@@ -156,7 +174,11 @@ class BayPlay extends Component {
               &&
               <div>
                 <h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
-                <button onClick={this.onCancelButtonPressed}>end game</button>
+                {
+                  fetching
+                  ? <Spinner config={{ ...config, color: '#ffffff' }} />
+                  : <button onClick={this.onCancelButtonPressed}>end game</button>
+                }
               </div>
             }
           </div>
@@ -177,7 +199,7 @@ class BayPlay extends Component {
         style={style}
       >
         {
-          bay &&
+          (bay && play.state !== 'ready') &&
           <header className="bay-header flex space-between align-center">
             <h5>{bay.name}</h5>
             <h5>{bay.game}</h5>

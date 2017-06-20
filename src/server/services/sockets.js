@@ -69,6 +69,7 @@ var registerSocket = (socket, currentBay, app) => {
     bayController.socketHandler(socket, app);
 }
 exports.sendToGame = (gameId, endpoint, message, callback) => {
+    console.log('sending to game' + endpoint);
     exports.sendToClient('game', gameId, endpoint, message, callback);
 };
 exports.sendToButton = (buttonId, endpoint, message, callback) => {
