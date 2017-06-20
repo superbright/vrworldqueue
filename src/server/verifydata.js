@@ -1,4 +1,5 @@
 var Bay = require('./models/bay').Bay;
+var Queue = require('./models/queue').Queue;
 var verifyData = function (app) {
     Bay.find({}, (err, bays) => {
         if (err) {
@@ -9,9 +10,6 @@ var verifyData = function (app) {
                 onboarding: {}
                 , gameplay: {}
             }
-            app.locals.testVar = {
-                    msg: "Hello"
-                }
                 //TODO:
                 //go through bay states
                 //Look for dangling queues
@@ -22,8 +20,7 @@ var verifyData = function (app) {
                 console.log(bay.currentState);
                 if (bay.currentState.endTime && bay.currentState.endTime) {
                     console.log('endtime; ' + bay.currentState.endTime)
-                    if (bay, bay.currentState.endTime < new Date()) {
-                        console.log("delteing timer");
+                    if (bay.currentState.endTime < new Date()) {
                         if (bay.currentState.state == 'gameplay') {
                             bay.currentState.endTime = null;
                             bay.currentState.state = 'idle';
@@ -33,7 +30,6 @@ var verifyData = function (app) {
                         }
                     }
                 }
-                // console.log(bay.id + " " + bay.name + " "+ bay.currentState);
             });
         }
     });
