@@ -21,6 +21,10 @@ app.use(require('webpack-dev-middleware')(compiler, {
 }));
 app.use(require('webpack-hot-middleware')(compiler));
 mongoose.connect('mongodb://localhost/vrworld');
+
+// verify data on start
+require("./verifydata");
+
 app.use(compression({}));
 app.use('/api', require('./routes/routes.js'));
 app.use(express.static('public'));

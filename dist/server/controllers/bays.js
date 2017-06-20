@@ -32,6 +32,7 @@ var timers = {
     onboarding: {},
     gameplay: {}
 };
+var bayState = {};
 var currentUser = {};
 exports.getBays = function (req, res) {
     if (req.params.bayId) {
@@ -62,6 +63,7 @@ exports.enqueueUser = function (req, res) {
             return;
         } else if (queue) {
             delete queue._id;
+            sendQueue(queue.bay);
             console.log('deleted user from queue');
         }
         getBay(req.params.bayId).then(function (bay) {
@@ -275,27 +277,34 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
                 Bay.findOne({
                     id: bayId
                 }, function (err, bay) {
-                    Queue.findOne({
-                        user: user._id
-                    }).populate('user bay').exec(function (err, queue) {
-                        if (err) {
-                            res.err = err;
-                            sockets.sendToQueue(bay._id, 'userattempt', res);
-                        } else if (queue) {
-                            if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
-                            res.data = queue;
-                            sockets.sendToQueue(bay._id, 'userattempt', res);
-                        } else {
-                            var q = new Queue({
-                                user: user._id,
-                                bay: bay._id
-                            });
-                            q.populate('user bay', function (err) {
-                                res.data = q;
+                    if (err) sockets.sendToQueue(bay._id, 'userattempt', res);else if (bay) {
+                        Queue.findOne({
+                            user: user._id
+                        }).populate('user bay').exec(function (err, queue) {
+                            if (err) {
+                                res.err = err;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
-                            });
-                        }
-                    });
+                            } else if (queue) {
+                                console.log(queue);
+                                if (!queue.bay || !queue.user) delete queue._id;else if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
+                                res.data = queue;
+                                sockets.sendToQueue(bay._id, 'userattempt', res);
+                            } else {
+                                res.info = "Would you like to join this queue?";
+                                getQueue(bay._id).then(function (queue) {
+                                    if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = "There's no one in front of you. Would you like to play?";
+                                });
+                                var q = new Queue({
+                                    user: user._id,
+                                    bay: bay._id
+                                });
+                                q.populate('user bay', function (err) {
+                                    res.data = q;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res);
+                                });
+                            }
+                        });
+                    }
                 });
             } else {
                 console.log('[info] User badge is expired');
