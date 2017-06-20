@@ -19,6 +19,7 @@ const mongoose = require('mongoose');
 const compiler = webpack(config);
 
 app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
     publicPath: config.output.publicPath
 }));
 if (process.env.NODE_ENV === 'development') {
