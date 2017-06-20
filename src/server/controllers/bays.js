@@ -8,7 +8,6 @@ import {
     timerparams
 }
 from '../../shared/timerconfig.js';
-
 //move these to app.locals
 var currentUser = {}
 exports.getBays = (req, res) => {
@@ -92,9 +91,6 @@ exports.dequeueUser = (req, res) => {
 };
 exports.getQueue = (req, res) => {
     getQueue(req.params.bayId).then((queue) => {
-        getBay(req.params.bayId).then((bay) => {
-            if ((queue.length > 0) && !bay.currentState.state || bay.currentState.state == 'idle') //startOnboarding(req.params.bayId, req.app);
-        });
         res.status(200).send(queue);
     });
 };

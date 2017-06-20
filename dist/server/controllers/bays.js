@@ -32,7 +32,6 @@ var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 //var timerconfig = require('../../shared/timerconfig');
 
-
 //move these to app.locals
 var currentUser = {};
 exports.getBays = function (req, res) {
@@ -106,9 +105,6 @@ exports.dequeueUser = function (req, res) {
 };
 exports.getQueue = function (req, res) {
     getQueue(req.params.bayId).then(function (queue) {
-        getBay(req.params.bayId).then(function (bay) {
-            if (queue.length > 0 && !bay.currentState.state || bay.currentState.state == 'idle') startOnboarding(req.params.bayId, req.app);
-        });
         res.status(200).send(queue);
     });
 };
