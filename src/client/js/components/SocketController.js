@@ -30,7 +30,7 @@ class SocketController extends Component {
 
   connectSocket() {
     const { socket } = this.state;
-    console.log('socket connect', socket);
+
     if (socket) {
       socket.on('connect', () => {
         this.setState({ connected: true });
@@ -59,7 +59,7 @@ class SocketController extends Component {
 
       <div className="simple-container user-search">
         {
-          fetching
+          fetching || !connected
           ? <Spinner config={config} />
           : <button onClick={this.refreshPages}>Refresh Pages</button>
         }
