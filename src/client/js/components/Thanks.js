@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import { timerparams } from '../../../shared/timerconfig';
 
 class Thanks extends Component {
   componentWillMount() {
     setTimeout(() => {
       window.location.href = `${window.location.origin}/signup`;
-    }, 4000);
+    }, timerparams.modalTimeout);
   }
 
   render() {
