@@ -4,7 +4,11 @@ import http from 'http';
 import compression from 'compression';
 import path from 'path';
 import webpack from 'webpack';
-import config from '../../webpack.config';
+
+const config = process.env.NODE_ENV === 'development'
+  ? require('../../webpack.config')
+  : require('../../webpack-production.config');
+
 require("babel-core/register");
 require("babel-polyfill");
 const app = express();
@@ -13,11 +17,15 @@ var socketController = require('./services/sockets');
 let port = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const compiler = webpack(config);
-// webpack hot reload
+
 app.use(require('webpack-dev-middleware')(compiler, {
     publicPath: config.output.publicPath
 }));
-app.use(require('webpack-hot-middleware')(compiler));
+if (process.env.NODE_ENV === 'development') {
+  // app.use(require('webpack-hot-middleware')(compiler));
+}
+
+
 mongoose.connect('mongodb://localhost/vrworld');
 // verify data on start
 // setup timers
