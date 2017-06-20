@@ -1,9 +1,12 @@
 import React from 'react';
 
-const SocketConnectionStatus = ({ connected }) => (
-  <div className={`socket-connection ${connected ? 'connected': 'disconnected'}`}>
+const refresh = () => { location.reload(); };
 
-  </div>
+const SocketConnectionStatus = ({ connected }) => (
+  <div
+    className={`socket-connection ${connected ? 'connected': 'disconnected'}`}
+    onClick={refresh}
+  ></div>
 );
 
 export default SocketConnectionStatus;
