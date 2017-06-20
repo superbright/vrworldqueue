@@ -177,7 +177,7 @@ class BayPlay extends Component {
         style={style}
       >
         {
-          bay &&
+          (bay && play.state !== 'ready') &&
           <header className="bay-header flex space-between align-center">
             <h5>{bay.name}</h5>
             <h5>{bay.game}</h5>
