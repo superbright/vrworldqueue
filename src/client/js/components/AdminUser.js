@@ -54,6 +54,9 @@ class AdminUser extends Component {
         console.log('rfid', res);
         this.setState({ tempRFID: res });
       });
+      socket.on('refresh', () => {
+        location.reload();
+      });
     }
   }
 

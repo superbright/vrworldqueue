@@ -99,6 +99,9 @@ class Bay extends Component {
         }
         return this.setState({ error: null, userAttempt: res, showModal: true });
       });
+      socket.on('refresh', () => {
+        location.reload();
+      });
       socket.on('setState', (res) => {
         console.log('setstate socket', res);
         this.setState({ play: res});

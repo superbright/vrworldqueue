@@ -83,6 +83,9 @@ class BayPlay extends Component {
           this.setState({ interval });
         }
       });
+      socket.on('refresh', () => {
+        location.reload();
+      });
     }
   }
 
