@@ -41,6 +41,10 @@ var schema = new mongoose.Schema({
             , default: new Date(new Date().setHours(0, 0, 0, 0))
         }
     }
+    , createdAt: {
+        type: Date
+        , default: new Date()
+    }
 })
 var User = mongoose.model('User', schema);
 module.exports = {
