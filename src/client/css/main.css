@@ -196,6 +196,13 @@ header {
   color: #4CAF50;
 }
 
+.modal.modal-warning {
+  background-color: #FF9800;
+}
+.modal.modal-warning button {
+  color: #FF9800;
+}
+
 .modal button {
   margin: 0px 20px;
 }

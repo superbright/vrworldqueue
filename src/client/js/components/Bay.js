@@ -236,7 +236,11 @@ class Bay extends Component {
               {
                 showModal
                 && (
-                  <div className={`modal flex justify-center align-center ${error ? 'modal-error' : ''} ${success ? 'modal-success' : ''}`}>
+                  <div
+                    className={
+                      `modal flex justify-center align-center ${error ? 'modal-error' : ''} ${success ? 'modal-success' : ''} ${(userAttempt && userAttempt.warning) ? 'modal-warning' : '' }`
+                    }
+                  >
                     <div className="modal-container">
                       {
                         error
@@ -260,7 +264,7 @@ class Bay extends Component {
                         (!error && !success)
                         &&
                         <div>
-                          <h2>{userAttempt.info}</h2>
+                          <h2>{(userAttempt && userAttempt.info) ? userAttempt.info : userAttempt.warning}</h2>
                           {
                             fetching
                             ? <Spinner config={{ ...config, color: '#ffffff'}} />
