@@ -269,37 +269,39 @@ var addUserToQueue = (bayId, tag) => {
                 Bay.findOne({
                     id: bayId
                 }, (err, bay) => {
-                    Queue.findOne({
-                        user: user._id
-                    }).populate('user bay').exec((err, queue) => {
-                        if (err) {
-                            res.err = err;
-                            sockets.sendToQueue(bay._id, 'userattempt', res);
-                        }
-                        else if (queue) {
-                            console.log(queue);
-                            if(!queue.bay || !queue.user)
-                                delete queue._id;
-                            if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
-                            else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
-                            res.data = queue;
-                            sockets.sendToQueue(bay._id, 'userattempt', res);
-                        }
-                        else {
-                            res.info = "Would you like to join this queue?"
-                            getQueue(bay._id).then((queue) => {
-                                if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = "There's no one in front of you. Would you like to play?"
-                            })
-                            var q = new Queue({
-                                user: user._id
-                                , bay: bay._id
-                            });
-                            q.populate('user bay', (err) => {
-                                res.data = q;
+                    if (err) sockets.sendToQueue(bay._id, 'userattempt', res);
+                    else if (bay) {
+                        Queue.findOne({
+                            user: user._id
+                        }).populate('user bay').exec((err, queue) => {
+                            if (err) {
+                                res.err = err;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
-                            });
-                        }
-                    });
+                            }
+                            else if (queue) {
+                                console.log(queue);
+                                if (!queue.bay || !queue.user) delete queue._id;
+                                if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
+                                else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
+                                res.data = queue;
+                                sockets.sendToQueue(bay._id, 'userattempt', res);
+                            }
+                            else {
+                                res.info = "Would you like to join this queue?"
+                                getQueue(bay._id).then((queue) => {
+                                    if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = "There's no one in front of you. Would you like to play?"
+                                })
+                                var q = new Queue({
+                                    user: user._id
+                                    , bay: bay._id
+                                });
+                                q.populate('user bay', (err) => {
+                                    res.data = q;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res);
+                                });
+                            }
+                        });
+                    }
                 });
             }
             else {
