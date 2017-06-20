@@ -208,10 +208,9 @@ class Bay extends Component {
                 )
                 : (
                   <div>
-                    {JSON.stringify(bay)}
-                    <div className={`bay-on-deck ${(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'waiting' : ''}`}>
+                    <div className={`bay-on-deck ${(play && play.state  === 'onboarding') ? 'waiting' : ''}`}>
                       <div className="simple-container">
-                        <p>{(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'Waiting for you to swipe in' : 'Up next'}</p>
+                        <h5>{(play && play.state  === 'onboarding') ? 'Waiting for you to swipe in' : 'Up next'}</h5>
                         <div className="flex space-between align-center">
                           <h1>{onDeck.user.screenname}</h1>
                           <h1>{numToString(minsLeft)}:{numToString(secondsLeft)}</h1>
