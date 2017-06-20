@@ -277,6 +277,7 @@ var addUserToQueue = (bayId, tag) => {
                             sockets.sendToQueue(bay._id, 'userattempt', res);
                         }
                         else if (queue) {
+                            console.log(queue);
                             if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
                             else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
                             res.data = queue;
