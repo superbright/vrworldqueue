@@ -6,9 +6,13 @@
   </head>
   <body>
     <div id='root'>
-        
+
     </div>
-    <script src="/static/bundle.js">
+    <!-- <script src="/static/bundle.js">
+      </script> -->
+      <script type="text/javascript">
+      var cachebuster = Math.round(new Date().getTime() / 1000);
+      document.write('<scr'+'ipt type="text/javascript" src="/static/bundle.js?cb=' +cachebuster+'"></scr' + 'ipt>');
       </script>
   </body>
 </html>
