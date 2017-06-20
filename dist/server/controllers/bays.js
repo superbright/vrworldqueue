@@ -28,6 +28,9 @@ var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
+
+//todo
+//move these to app.locals
 var timers = {
     onboarding: {},
     gameplay: {}
@@ -35,6 +38,9 @@ var timers = {
 var bayState = {};
 var currentUser = {};
 exports.getBays = function (req, res) {
+
+    console.log(req.app.locals);
+
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, function (err, bay) {
             if (err) res.status(500).send(err);else if (bay) res.status(200).send(bay);else res.status(404).send("No Bay found with that ID");

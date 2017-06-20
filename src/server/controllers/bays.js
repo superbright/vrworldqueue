@@ -3,6 +3,9 @@ var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
+
+//todo
+//move these to app.locals
 var timers = {
     onboarding: {}
     , gameplay: {}
@@ -10,6 +13,9 @@ var timers = {
 var bayState = {}
 var currentUser = {}
 exports.getBays = (req, res) => {
+
+    console.log(req.app.locals);
+
     if (req.params.bayId) {
         Bay.findById(req.params.bayId, (err, bay) => {
             if (err) res.status(500).send(err);
