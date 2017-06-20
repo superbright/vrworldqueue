@@ -185,6 +185,7 @@ class Bay extends Component {
       minsLeft,
       secondsLeft,
       fetching,
+      userAttempt,
     } = this.state;
 
     const { match: { params: { bayid } } } = this.props;
@@ -258,7 +259,7 @@ class Bay extends Component {
                         (!error && !success)
                         &&
                         <div>
-                          <h2>Are you sure?</h2>
+                          <h2>{userAttempt.info}</h2>
                           {
                             fetching
                             ? <Spinner config={{ ...config, color: '#ffffff'}} />
