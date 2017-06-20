@@ -11,6 +11,7 @@ import Thanks from './components/Thanks';
 
 import Admin from './components/Admin';
 import Bays from './components/Bays';
+import SocketController from './components/SocketController';
 
 const AppRouter = () => (
   <Router>
@@ -20,6 +21,7 @@ const AppRouter = () => (
       <Route path="/signup/thanks" component={Thanks} />
       <Route path="/admin" component={Admin} />
       <Route path="/bay" component={Bays} />
+      <Route path="/sockets" component={SocketController} />
     </div>
   </Router>
 );
