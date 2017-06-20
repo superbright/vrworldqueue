@@ -185,6 +185,7 @@ class Bay extends Component {
       minsLeft,
       secondsLeft,
       fetching,
+      userAttempt,
     } = this.state;
 
     const { match: { params: { bayid } } } = this.props;
@@ -208,7 +209,6 @@ class Bay extends Component {
                 )
                 : (
                   <div>
-                    {JSON.stringify(bay)}
                     <div className={`bay-on-deck ${(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'waiting' : ''}`}>
                       <div className="simple-container">
                         <p>{(bay && bay.play && bay.play.state && bay.play.state === 'onboarding') ? 'Waiting for you to swipe in' : 'Up next'}</p>
@@ -259,7 +259,7 @@ class Bay extends Component {
                         (!error && !success)
                         &&
                         <div>
-                          <h2>Are you sure?</h2>
+                          <h2>{userAttempt.info}</h2>
                           {
                             fetching
                             ? <Spinner config={{ ...config, color: '#ffffff'}} />
