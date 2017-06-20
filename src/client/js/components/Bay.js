@@ -243,7 +243,7 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>{error}</h2>
-                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+
                         </div>
                       }
 
@@ -252,7 +252,7 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>{success}</h2>
-                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+
                         </div>
                       }
 
