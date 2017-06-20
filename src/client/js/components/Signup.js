@@ -4,6 +4,8 @@ import validate from 'validate.js';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 import formConstraints from '../utils/formConstraints';
+import Spinner from 'react-spin';
+import config from '../utils/spinnerConfig';
 
 const formInit = {
   firstname: '',
@@ -23,6 +25,7 @@ class Signup extends Component {
       waiverAccepted: false,
       waiverFetching: false,
       errors: null,
+      fetching: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -52,7 +55,20 @@ class Signup extends Component {
     if (errors) {
       return this.setState({ errors });
     }
-    return this.setState({ showWaiver: true });
+    this.setState({ fetching: true });
+    fetch(`/api/users/screenname/${this.state.form.screenname}`, {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    }).then(res => res.json()).then((res) => {
+      if (res.error) {
+        return this.setState({ errors: { screenname: res.error }, fetching: false});
+      }
+      return this.setState({ showWaiver: true, fetching: false });
+    }).catch((err) => {
+      console.log('error', err);
+    });
   }
 
   handleWaiver(accept) {
@@ -87,6 +103,7 @@ class Signup extends Component {
       form,
       waiverFetching,
       errors,
+      fetching,
     } = this.state;
 
     if (waiverAccepted) {
@@ -99,13 +116,17 @@ class Signup extends Component {
         <header className="flex space-between align-center">
           <img className="logo" src="/images/vrworld.png" />
         </header>
+        {
+          fetching
+          ? <Spinner config={config} />
+          : (<UserForm
+            form={form}
+            handleSubmit={this.handleSubmit}
+            handleChange={this.handleChange}
+            errors={errors}
+          />)
+        }
 
-        <UserForm
-          form={form}
-          handleSubmit={this.handleSubmit}
-          handleChange={this.handleChange}
-          errors={errors}
-        />
       </div>;
   }
 }
