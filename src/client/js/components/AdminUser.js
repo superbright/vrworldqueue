@@ -170,10 +170,11 @@ class AdminUser extends Component {
 
               <UserForm
                 form={user}
-                submitText={'update'}
+                submitText={'update user'}
                 handleChange={this.handleChange}
                 handleSubmit={this.handleSubmit}
                 errors={errors}
+                twoButtons
               />
             </div>
           )

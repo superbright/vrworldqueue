@@ -13,13 +13,22 @@ const UserForm = ({
   },
   submitText,
   errors,
+  twoButtons
 }) => (
   <div>
     <form className="signup-form" onSubmit={handleSubmit}>
+      {
+        twoButtons
+        &&
+        <div className="form-group">
+          <button>{submitText || 'Submit'}</button>
+        </div>
+      }
+
       <FormGroup
         value={firstname}
         valueID="firstname"
-        valueName="First Nam"
+        valueName="First Name"
         errors={errors}
         handleChange={handleChange}
         required
