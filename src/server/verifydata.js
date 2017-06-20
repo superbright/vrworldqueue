@@ -18,7 +18,7 @@ var verifyData = function(app) {
         // else create timer and push to app.locals
 
         bays.forEach(function(bay) {
-           console.log(bay.id + " " + bay.name + " "+ bay.currentState);
+          // console.log(bay.id + " " + bay.name + " "+ bay.currentState);
         });
       }
   });

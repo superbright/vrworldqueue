@@ -21,6 +21,8 @@ var asyncFun = function () {
     };
 }();
 
+var _timerconfig = require('../../shared/timerconfig.js');
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var Bay = require('../models/bay').Bay;
@@ -29,6 +31,10 @@ var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 
+//var timerconfig = require('../../shared/timerconfig');
+
+
+console.log(_timerconfig.timerparams);
 //todo
 //move these to app.locals
 var timers = {

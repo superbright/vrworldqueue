@@ -4,6 +4,10 @@ var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 
+//var timerconfig = require('../../shared/timerconfig');
+import {timerparams} from '../../shared/timerconfig.js';
+
+console.log(timerparams);
 //todo
 //move these to app.locals
 var timers = {
