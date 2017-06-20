@@ -104,14 +104,12 @@ class Bay extends Component {
         location.reload();
       });
       socket.on('setState', (res) => {
-        this.setState({ play: res});
+        this.setState({ play: res });
 
         if (res.state === 'ready') {
           // show a temporary modal that tells them to go to the play button
-          this.setState({ showModal: true, success: `You're up ${res.user.screenname}, Go to the next screen!`});
-          setTimeout(() => {
-            this.setState({ showModal: false, success: null });
-          }, timerparams.modalTimeout);
+          this.setState({ showModal: true, success: `You're up ${res.user.screenname}, Go to the next screen!` });
+          setTimeout(this.closeModal, timerparams.modalTimeout);
         }
 
         if (this.state.play.endTime) {
@@ -245,7 +243,7 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>{error}</h2>
-                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+
                         </div>
                       }
 
@@ -254,7 +252,7 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>{success}</h2>
-                          <button className="button-white" onClick={this.closeModal}>CLOSE</button>
+
                         </div>
                       }
 
