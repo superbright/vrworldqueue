@@ -162,18 +162,20 @@ var startOnboarding = (bayId, app) => {
         if (!user) startIdle(bayId);
         else {
             var endTime = new Date();
+//            console.log('----------' + user);
             endTime.setMinutes(endTime.getMinutes() + 1);
             if (app.locals.timers.onboarding.bayId != null) {
                 app.locals.timers.onboarding.bayId.cancel();
             }
+//            console.log('--------send onboard message');
             app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, () => {
                 console.log('Onboarding timeout, moving to next person...');
                 popUser(bayId).then((queue) => {
                     sendQueue(bayId);
-                    startOnboarding(bayId);
+                    startOnboarding(bayId,app);
                 });
             });
-            console.log(app.locals.timers);
+            //  console.log(app.locals.timers);
             var data = {
                 state: 'onboarding'
                 , endTime: endTime
@@ -252,7 +254,7 @@ var endGameplay = (bayId, app) => {
         sockets.sendToButton(bayId, 'setState', data);
         sockets.sendToQueue(bayId, 'setState', data);
     });
-    startOnboarding(bayId);
+    startOnboarding(bayId, app);
 };
 var addUserToQueue = (bayId, tag) => {
     var res = {}
