@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import scrollIntoView from 'scroll-into-view';
+// import scrollIntoView from 'scroll-into-view';
 
 class FormGroup extends Component {
   constructor() {
@@ -9,7 +9,7 @@ class FormGroup extends Component {
   }
 
   handleFocus() {
-    scrollIntoView(this.inputRef, { time: 500 });
+    // scrollIntoView(this.inputRef, { time: 500 });
   }
 
   render() {

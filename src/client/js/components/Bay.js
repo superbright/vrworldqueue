@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
+import Spinner from 'react-spin';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
-import Spinner from 'react-spin';
 import config from '../utils/spinnerConfig';
+import { timerparams } from '../../../shared/timerconfig';
 
 const numToString = (num) => {
   const result = num.toString();
@@ -94,7 +95,7 @@ class Bay extends Component {
       });
       socket.on('userattempt', (res) => {
         if (res.error) {
-          setTimeout(this.closeModal, 3000);
+          setTimeout(this.closeModal, timerparams.modalTimeout);
           return this.setState({ showModal: true, error: res.error });
         }
         return this.setState({ error: null, userAttempt: res, showModal: true });
@@ -103,7 +104,6 @@ class Bay extends Component {
         location.reload();
       });
       socket.on('setState', (res) => {
-        console.log('setstate socket', res);
         this.setState({ play: res});
 
         if (res.state === 'ready') {
@@ -111,7 +111,7 @@ class Bay extends Component {
           this.setState({ showModal: true, success: `You're up ${res.user.screenname}, Go to the next screen!`});
           setTimeout(() => {
             this.setState({ showModal: false, success: null });
-          }, 5000);
+          }, timerparams.modalTimeout);
         }
 
         if (this.state.play.endTime) {

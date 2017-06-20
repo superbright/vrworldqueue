@@ -19,7 +19,7 @@ const UserForm = ({
       <FormGroup
         value={firstname}
         valueID="firstname"
-        valueName="First Name"
+        valueName="First Nam"
         errors={errors}
         handleChange={handleChange}
         required
