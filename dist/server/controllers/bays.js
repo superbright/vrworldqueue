@@ -172,12 +172,12 @@ var startOnboarding = function startOnboarding(bayId, app) {
     getUserOnDeck(bayId).then(function (user) {
         if (!user) startIdle(bayId);else {
             var endTime = new Date();
-            console.log('----------' + user);
+            //            console.log('----------' + user);
             endTime.setMinutes(endTime.getMinutes() + 1);
             if (app.locals.timers.onboarding.bayId != null) {
                 app.locals.timers.onboarding.bayId.cancel();
             }
-            console.log('--------send onboard message');
+            //            console.log('--------send onboard message');
             app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
                 console.log('Onboarding timeout, moving to next person...');
                 popUser(bayId).then(function (queue) {

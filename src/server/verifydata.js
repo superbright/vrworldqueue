@@ -7,9 +7,9 @@ var verifyData = function (app) {
         }
         else {
             app.locals.timers = {
-                onboarding: {}
-                , gameplay: {}
-            }
+                    onboarding: {}
+                    , gameplay: {}
+                }
                 //TODO:
                 //go through bay states
                 //Look for dangling queues
@@ -18,18 +18,28 @@ var verifyData = function (app) {
                 // else create timer and push to app.locals
             bays.forEach(function (bay) {
                 console.log(bay.currentState);
-                if (bay.currentState.endTime && bay.currentState.endTime) {
-                    console.log('endtime; ' + bay.currentState.endTime)
-                    if (bay.currentState.endTime < new Date()) {
-                        if (bay.currentState.state == 'gameplay') {
-                            bay.currentState.endTime = null;
-                            bay.currentState.state = 'idle';
-                            bay.save().then((bay) => {
-                                console.log(bay);
-                            });
+                if (bay.currentState == 'idle') {}
+                else if (bay.currentState == '')
+                    if (bay.currentState.endTime && bay.currentState.endTime) {
+                        console.log('endtime; ' + bay.currentState.endTime)
+                        if (bay.currentState.endTime < new Date()) {
+                            if (bay.currentState.state == 'gameplay') {
+                                bay.currentState.endTime = null;
+                                bay.currentState.state = 'idle';
+                                bay.save().then((bay) => {
+                                    console.log(bay);
+                                });
+                            }
                         }
                     }
-                }
+                Queue.find({
+                    bay: bay._id
+                }).exec((queues) => {
+                    if (!queues) {
+                        bay.currentState.state = 'idle';
+                        bay.save();
+                    }
+                })
             });
         }
     });
