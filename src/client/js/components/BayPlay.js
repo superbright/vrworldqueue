@@ -185,13 +185,14 @@ class BayPlay extends Component {
         );
         break;
     }
-    console.log(this.state);
 
     const backgroundURL = (play.state !== 'ready' || !bay)
       ? backgroundGif
       : bay.instructionFile;
 
-    const style = { background: `url(${backgroundURL}) ${backgroundConfig}` };
+    const style = (play.state !== 'ready' || !bay)
+      ? {}
+      : { background: `url(${backgroundURL}) ${backgroundConfig}` };
 
     return (
       <div
