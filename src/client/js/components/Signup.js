@@ -52,7 +52,20 @@ class Signup extends Component {
     if (errors) {
       return this.setState({ errors });
     }
-    return this.setState({ showWaiver: true });
+
+    fetch(`/api/users/screenname/${this.state.form.screenname}`, {
+      method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    }).then(res => res.json()).then((res) => {
+      if (res.error) {
+        return this.setState({ errors: { screenname: res.error }});
+      }
+      return this.setState({ showWaiver: true });
+    }).catch((err) => {
+      console.log('error', err);
+    });
   }
 
   handleWaiver(accept) {
