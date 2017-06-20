@@ -23,20 +23,21 @@ class AdminList extends Component {
     const { searchValue } = this.state;
     const { users } = this.props;
     const value = searchValue.toLowerCase();
-    console.log(users);
-    // const sortedUsers = users.sort((a, b) => {
-    //   return new Date(b.date) - new Date(a.date);
-    // });
+
+    const sortedUsers = users.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
 
     return searchValue
-      ? users.filter(u => (
+      ? sortedUsers.filter(u => (
         `${u.firstname.toLowerCase()} ${u.lastname.toLowerCase()}`.indexOf(value) >= 0
         || (
           u.email &&
           u.email.toLowerCase().indexOf(value) >= 0
         )
       ))
-      : users;
+      : sortedUsers;
   }
 
   render() {

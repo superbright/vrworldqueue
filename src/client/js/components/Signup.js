@@ -77,7 +77,7 @@ class Signup extends Component {
 
       fetch('/api/users', {
         method: 'post',
-        body: JSON.stringify(this.state.form),
+        body: JSON.stringify({ ...this.state.form, createdAt: new Date() }),
         headers: new Headers({
           'Content-Type': 'application/json',
         }),
