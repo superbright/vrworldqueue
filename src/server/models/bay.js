@@ -29,6 +29,7 @@ var schema = new mongoose.Schema({
         , endTime: {
             type: Date
         }
+        , user: {}
     }
     , playTime: {
         type: Number

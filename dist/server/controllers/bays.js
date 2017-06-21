@@ -70,9 +70,11 @@ exports.enqueueUser = function (req, res) {
             console.log(bay.currentState);
             if (!bay.currentState || bay.currentState.state == 'idle') {
                 User.findById(req.body.userId, function (err, doc) {
-                    console.log('starting ready');
-                    currentUser[bay._id] = doc;
-                    startReady(bay._id, doc, req.app);
+                    if (doc) {
+                        console.log('starting ready');
+                        currentUser[bay._id] = doc;
+                        startReady(bay._id, doc, req.app);
+                    } else console.log('-----User not found');
                 });
                 res.status(200).send([]);
             } else {
@@ -210,7 +212,7 @@ var sendQueue = function sendQueue(bayId) {
 };
 var startReady = function startReady(bayId, user, app) {
     popUser(bayId).then(function (queue) {
-        sendQueue(bayId);
+        //        sendQueue(bayId);
         if (app.locals.timers.onboarding[bayId] != null) {
             app.locals.timers.onboarding[bayId].cancel();
         }

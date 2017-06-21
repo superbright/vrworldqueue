@@ -104,6 +104,8 @@ class Bay extends Component {
         location.reload();
       });
       socket.on('setState', (res) => {
+          console.log('got set state ');
+          console.log(res);
         this.setState({ play: res });
 
         if (res.state === 'ready') {
