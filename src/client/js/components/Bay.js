@@ -92,6 +92,7 @@ class Bay extends Component {
         this.setState({ connected: false });
       });
       socket.on('queue', (res) => {
+          console.log(res);
         this.setState({ queue: res });
       });
       socket.on('userattempt', (res) => {
@@ -173,7 +174,7 @@ class Bay extends Component {
         console.log('userAttempt-', showRemaining(new Date(res[0].timeAdded)));
         // this.countDown({ end });
       }
-      this.setState({ queue: res, fetching: false });
+      //this.setState({ queue: res, fetching: false });
       this.closeModal();
     }).catch((err) => {
       this.setState({ queue: res, false: false });

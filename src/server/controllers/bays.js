@@ -23,6 +23,15 @@ exports.getBays = (req, res) => {
         else res.status(200).send(bays);
     });
 };
+exports.getBayByLocalId = (req, res) => {
+    Bay.findOne({
+        id: req.params.bayId
+    }, (err, bay) => {
+        if (err) res.status(500).send(err);
+        else if (bay) res.status(200).send(bay);
+        else res.status(404).send("No Bay found with that ID");
+    });
+};
 exports.upsertBay = (req, res) => {
     var newBay = new Bay({
         id: req.body.id
@@ -69,6 +78,7 @@ exports.enqueueUser = (req, res) => {
                     Queue.find({
                         bay: bay._id
                     }).populate('bay user').exec((err, fullQueue) => {
+                        sendQueue(bay._id);
                         if (err) res.status(500).send(err);
                         else if (fullQueue) {
                             res.status(200).send(fullQueue);
@@ -197,14 +207,19 @@ var startOnboarding = (bayId, app) => {
 exports.startOnboarding = startOnboarding;
 exports.resumerOnboarding = (bayId, app) => {}
 var sendQueue = (bayId) => {
-    getQueue(bayId).then((queue) => {
-        if (queue) sockets.sendToQueue(bayId, 'queue', queue);
-        else sockets.sendToQueue(bayId, 'queue', []);
-    });
+    getBay(bayId).then((bay) => {
+        getQueue(bayId).then((queue) => {
+            if (queue) {
+                sockets.sendToQueue(bay._id, 'queue', queue);
+                sockets.sendToBigQueue(bay.id, 'queue', queue);
+            }
+            else sockets.sendToQueue(bayId, 'queue', []);
+        });
+    })
 };
 var startReady = (bayId, user, app) => {
     popUser(bayId).then((queue) => {
-//        sendQueue(bayId);
+        //        sendQueue(bayId);
         if (app.locals.timers.onboarding[bayId] != null) {
             app.locals.timers.onboarding[bayId].cancel();
         }

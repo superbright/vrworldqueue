@@ -9,6 +9,7 @@ let sockets = {
     , admin: {}
     , registration: {}
     , global: {}
+    , bigqueue: {}
 };
 let socketState = {
     game: {}
@@ -17,6 +18,7 @@ let socketState = {
     , admin: {}
     , registration: {}
     , global: {}
+    , bigqueue: {}
 }
 import SocketIO from 'socket.io';
 import {
@@ -77,6 +79,9 @@ exports.sendToButton = (buttonId, endpoint, message, callback) => {
 };
 exports.sendToQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('queue', queueId, endpoint, message, callback);
+};
+exports.sendToBigQueue = (queueId, endpoint, message, callback) => {
+    exports.sendToClient('bigqueue', queueId, endpoint, message, callback);
 };
 exports.sendToAdmin = (adminId, endpoint, message, callback) => {
     exports.sendToClient('admin', adminId, endpoint, message, callback);
