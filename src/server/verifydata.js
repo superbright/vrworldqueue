@@ -42,7 +42,7 @@ var verifyData = function (app) {
                                 });
                             }
                             else if (bay.currentState.state == 'onboarding') {
-                                bayController.startOnboarding(bayid, app, bay.currentState.endTime);
+                                bayController.startOnboarding(bayId, app, bay.currentState.endTime);
                                 console.log('bay is in onboarding starting timer...');
                             }
                         }
