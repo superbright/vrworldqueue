@@ -43,7 +43,7 @@ class Bay extends Component {
   componentWillMount() {
     const { match: { params: { bayid } }, isBigBay } = this.props;
 
-    return fetch(`/api/bays/${bayid}`, {
+    return fetch(`/api/bays/${isBigBay ? 'local/' : ''}${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
       this.setState({
