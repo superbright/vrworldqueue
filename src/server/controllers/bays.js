@@ -3,6 +3,7 @@ var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
+var twilioService = require("../services/twilio");
 //var timerconfig = require('../../shared/timerconfig');
 import {
     timerparams
@@ -187,6 +188,10 @@ var startOnboarding = (bayId, app) => {
                 state: 'onboarding'
                 , endTime: endTime
             }).then((bay) => {
+                twilioService.sendMessage({
+                    phone: user.user.phone
+                    , message: "You're up next for " + bay.game + " at bay " + bay.name + "!"
+                });
                 console.log(bay.currentState)
                 sockets.sendToButton(bay._id, 'setState', bay.currentState);
                 sockets.sendToQueue(bay._id, 'setState', bay.currentState);

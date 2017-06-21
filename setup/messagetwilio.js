@@ -1,15 +1,3 @@
 // Load the twilio module
-var client = require('twilio')('sid', 'authtoken');
-
-
-client.api.messages.create({
-  to:"+16466969286",
-  from:"+16466473067",
-  body:"stop all the downloading"
-   }).then(function(data) {
-     console.log(data);
-     console.log('Administrator notified');
-   }).catch(function(err) {
-     console.error('Could not notify administrator');
-     console.error(err);
-   });
+var twilioService = require("../src/server/services/twilio");
+twilioService.sendMessage({phone:'9702314197',message:'test one two'});
