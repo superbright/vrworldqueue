@@ -1,5 +1,6 @@
 var Bay = require('./models/bay').Bay;
 var Queue = require('./models/queue').Queue;
+var bayController = require('./controllers/bays');
 var verifyData = function (app) {
     Bay.find({}, (err, bays) => {
         if (err) {
@@ -17,9 +18,19 @@ var verifyData = function (app) {
                 //if time < date.now() delete
                 // else create timer and push to app.locals
             bays.forEach(function (bay) {
+                //if no queues, go to idle state
+                var bayId = bay._id;
+                Queue.find({
+                    bay: bay._id
+                }).exec((queues) => {
+                    if (!queues) {
+                        bay.currentState.state = 'idle';
+                        bay.save();
+                    }
+                });
                 console.log(bay.currentState);
                 if (bay.currentState == 'idle') {}
-                else if (bay.currentState == '')
+                else if (bay.currentState)
                     if (bay.currentState.endTime && bay.currentState.endTime) {
                         console.log('endtime; ' + bay.currentState.endTime)
                         if (bay.currentState.endTime < new Date()) {
@@ -30,16 +41,13 @@ var verifyData = function (app) {
                                     console.log(bay);
                                 });
                             }
+                            else if (bay.currentState.state == 'onboarding') {
+                                bayController.startOnboarding(bayid, app, bay.currentState.endTime);
+                                console.log('bay is in onboarding starting timer...');
+                            }
                         }
                     }
-                Queue.find({
-                    bay: bay._id
-                }).exec((queues) => {
-                    if (!queues) {
-                        bay.currentState.state = 'idle';
-                        bay.save();
-                    }
-                })
+                    else {}
             });
         }
     });

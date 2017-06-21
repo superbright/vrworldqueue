@@ -20,11 +20,9 @@ var _webpack = require('webpack');
 
 var _webpack2 = _interopRequireDefault(_webpack);
 
-var _webpack3 = require('../../webpack.config');
-
-var _webpack4 = _interopRequireDefault(_webpack3);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var config = process.env.NODE_ENV === 'development' ? require('../../webpack.config') : require('../../webpack-production.config');
 
 require("babel-core/register");
 require("babel-polyfill");
@@ -33,12 +31,16 @@ var server = _http2.default.Server(app);
 var socketController = require('./services/sockets');
 var port = process.env.PORT || 3000;
 var mongoose = require('mongoose');
-var compiler = (0, _webpack2.default)(_webpack4.default);
-// webpack hot reload
+var compiler = (0, _webpack2.default)(config);
+
 app.use(require('webpack-dev-middleware')(compiler, {
-    publicPath: _webpack4.default.output.publicPath
+    noInfo: true,
+    publicPath: config.output.publicPath
 }));
-app.use(require('webpack-hot-middleware')(compiler));
+if (process.env.NODE_ENV === 'development') {
+    // app.use(require('webpack-hot-middleware')(compiler));
+}
+
 mongoose.connect('mongodb://localhost/vrworld');
 // verify data on start
 // setup timers

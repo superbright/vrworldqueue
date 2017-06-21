@@ -55,6 +55,17 @@ exports.getUserSignature = function (req, res) {
         } else res.json("No User found with that ID");
     });
 };
+exports.checkScreenName = function (req, res) {
+    if (req.params.screenname != null) {
+        User.findOne({ screenname: req.params.screenname }, function (err, user) {
+            if (err) res.status(500).send(err);else if (user) {
+                res.json({ status: true, error: 'Screenname already taken' });
+            } else res.json({ status: true });
+        });
+    } else {
+        res.json({ status: false, error: 'must send screenname' });
+    }
+};
 exports.postUser = function (req, res) {
     var signature = new Signature({
         image: {
@@ -69,6 +80,7 @@ exports.postUser = function (req, res) {
     if (req.body.email != null) userData.email = req.body.email;
     if (req.body.phone != null) userData.phone = req.body.phone;
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
+    if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
     userData.signature = signature._id;
     if (req.body.rfid) {
         console.log('Adding RFID');

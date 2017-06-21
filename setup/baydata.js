@@ -10,7 +10,7 @@ const bays = [
         bayid: 1
         , name: 'A-2'
         , game: 'Fruit Ninja'
-        , playTime: 10
+        , playTime: 1
         , instructionFile: '/images/instructions/a_2.png'
     , }
     , {

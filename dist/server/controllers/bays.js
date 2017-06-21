@@ -125,10 +125,13 @@ module.exports.clearQueue = function (req, res) {
     });
 };
 var updateBayState = function updateBayState(bayId, data) {
+    console.log(data);
     return Bay.findByIdAndUpdate(bayId, {
         $set: {
             currentState: data
         }
+    }, {
+        new: true
     }).exec();
 };
 var getBay = function getBay(bayId) {
@@ -162,40 +165,44 @@ var startIdle = function startIdle(bayId) {
         state: 'idle'
     };
     updateBayState(bayId, data).then(function (bay) {
-        sockets.sendToButton(bayId, 'setState', data);
-        sockets.sendToQueue(bayId, 'setState', data);
+        sockets.sendToButton(bayId, 'setState', bay.currentState);
+        sockets.sendToQueue(bayId, 'setState', bay.currentState);
     });
 };
-var startOnboarding = function startOnboarding(bayId, app) {
+exports.startIdle = startIdle;
+var startOnboarding = function startOnboarding(bayId, app, oldEndTime) {
     console.log('Onboarding, waiting for user...');
     getUserOnDeck(bayId).then(function (user) {
         if (!user) startIdle(bayId);else {
             var endTime = new Date();
-            //            console.log('----------' + user);
             endTime.setMinutes(endTime.getMinutes() + 1);
-            if (app.locals.timers.onboarding.bayId != null) {
-                app.locals.timers.onboarding.bayId.cancel();
+            if (app.locals.timers.onboarding[bayId] != null) {
+                console.log('Canceling onboarding timer for bay ' + bayId);
+                app.locals.timers.onboarding[bayId].cancel();
+                app.locals.timers.onboarding[bayId] = null;
             }
-            //            console.log('--------send onboard message');
-            app.locals.timers.onboarding.bayId = scheduler.scheduleJob(endTime, function () {
-                console.log('Onboarding timeout, moving to next person...');
-                popUser(bayId).then(function (queue) {
-                    sendQueue(bayId);
-                    startOnboarding(bayId, app);
-                });
-            });
-            //  console.log(app.locals.timers);
             var data = {
                 state: 'onboarding',
                 endTime: endTime
             };
             updateBayState(bayId, data).then(function (bay) {
-                sockets.sendToButton(bayId, 'setState', data);
-                sockets.sendToQueue(bayId, 'setState', data);
+                sockets.sendToButton(bayId, 'setState', bay.currentState);
+                sockets.sendToQueue(bayId, 'setState', bay.currentState);
+                console.log('current time is ' + new Date());
+                console.log('onboarding will end at... ' + bay.currentState.endTime);
+                app.locals.timers.onboarding[bayId] = scheduler.scheduleJob(bay.currentState.endTime, function () {
+                    console.log('Onboarding timeout, moving to next person...');
+                    popUser(bayId).then(function (queue) {
+                        sendQueue(bayId);
+                        startOnboarding(bayId, app);
+                    });
+                });
             });
         }
     });
 };
+exports.startOnboarding = startOnboarding;
+exports.resumerOnboarding = function (bayId, app) {};
 var sendQueue = function sendQueue(bayId) {
     getQueue(bayId).then(function (queue) {
         if (queue) sockets.sendToQueue(bayId, 'queue', queue);else sockets.sendToQueue(bayId, 'queue', []);
@@ -204,8 +211,8 @@ var sendQueue = function sendQueue(bayId) {
 var startReady = function startReady(bayId, user, app) {
     popUser(bayId).then(function (queue) {
         sendQueue(bayId);
-        if (app.locals.timers.onboarding.bayId != null) {
-            app.locals.timers.onboarding.bayId.cancel();
+        if (app.locals.timers.onboarding[bayId] != null) {
+            app.locals.timers.onboarding[bayId].cancel();
         }
         console.log('Bay ' + bayId + ' is Ready');
         var data = {
@@ -213,8 +220,8 @@ var startReady = function startReady(bayId, user, app) {
             user: user
         };
         updateBayState(bayId, data).then(function (bay) {
-            sockets.sendToQueue(bayId, 'setState', data);
-            sockets.sendToButton(bayId, 'setState', data);
+            sockets.sendToQueue(bayId, 'setState', bay.currentState);
+            sockets.sendToButton(bayId, 'setState', bay.currentState);
         });
     });
 };
@@ -224,31 +231,38 @@ var startGameplay = function startGameplay(bayId, app) {
         if (bay.currentState == 'gameplay') console.log('Already playing game on game ' + bayId);else {
             var endTime = new Date();
             endTime.setMinutes(endTime.getMinutes() + bay.playTime);
-            if (app.locals.timers.onboarding.bayId != null) {
-                app.locals.timers.onboarding.bayId.cancel();
-                app.locals.timers.onboarding.bayId = null;
+            if (app.locals.timers.onboarding[bayId] != null) {
+                console.log('Deleting onboarding timer bay ' + bayId);
+                app.locals.timers.onboarding[bayId].cancel();
+                app.locals.timers.onboarding[bayId] = null;
             }
             var data = {
                 state: 'gameplay',
                 endTime: endTime
             };
+            console.log('Update bay state');
             updateBayState(bayId, data).then(function (bay) {
-                console.log('update bay state');
-                app.locals.timers.gameplay.bayId = scheduler.scheduleJob(endTime, function () {
-                    console.log('gameplay timer expired');
-                    endGameplay(bayId, app);
-                });
-                sockets.sendToGame(bay.id, 'startGame', data);
-                sockets.sendToButton(bayId, 'setState', data);
-                sockets.sendToQueue(bayId, 'setState', data);
+                if (bay) {
+                    console.log(bay);
+                    console.log('current time is ' + new Date());
+                    console.log('gameplay will end at... ' + bay.currentState.endTime);
+                    app.locals.timers.gameplay[bayId] = scheduler.scheduleJob(bay.currentState.endTime, function () {
+                        console.log('gameplay timer expired');
+                        endGameplay(bayId, app);
+                    });
+                    sockets.sendToGame(bay.id, 'startGame', bay.currentState);
+                    sockets.sendToButton(bayId, 'setState', bay.currentState);
+                    sockets.sendToQueue(bayId, 'setState', bay.currentState);
+                } else console.log('Cant find bay to start gameplay ' + bayId);
             });
         }
     });
 };
 var endGameplay = function endGameplay(bayId, app) {
-    if (app.locals.timers.gameplay.bayId != null) {
-        app.locals.timers.gameplay.bayId.cancel();
-        app.locals.timers.gameplay.bayId = null;
+    if (app.locals.timers.gameplay[bayId] != null) {
+        app.locals.timers.gameplay[bayId].cancel();
+        app.locals.timers.gameplay[bayId] = null;
+        console.log('canceling gameplay timer in endgameplay');
     }
     console.log('Gameplay over!');
     var data = {
@@ -258,8 +272,8 @@ var endGameplay = function endGameplay(bayId, app) {
         if (bay) sockets.sendToGame(bay.id, 'endGame', data);
     });
     updateBayState(bayId, data).then(function (bay) {
-        sockets.sendToButton(bayId, 'setState', data);
-        sockets.sendToQueue(bayId, 'setState', data);
+        sockets.sendToButton(bayId, 'setState', bay.currentState);
+        sockets.sendToQueue(bayId, 'setState', bay.currentState);
     });
     startOnboarding(bayId, app);
 };
@@ -281,7 +295,7 @@ var addUserToQueue = function addUserToQueue(bayId, tag) {
                                 res.err = err;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
                             } else if (queue) {
-                                if (!queue.bay || !queue.user) delete queue._id;else if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";else res.info = "Would you like to join this queue? You'll lose your place in your other queue.";
+                                if (!queue.bay || !queue.user) delete queue._id;else if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";else res.warning = "Would you like to join this queue? You'll lose your place in your other queue.";
                                 res.data = queue;
                                 sockets.sendToQueue(bay._id, 'userattempt', res);
                             } else {
@@ -325,10 +339,6 @@ var isCurrentUser = function isCurrentUser(bayId, tag, callback) {
     User.findOne({
         'rfid.id': tag
     }, function (err, user) {
-        console.log('-------------------');
-        console.log(user);
-        console.log(currentUser[bayId]);
-        console.log('-------------------');
         callback(user._id.equals(currentUser[bayId]._id));
     });
 };
