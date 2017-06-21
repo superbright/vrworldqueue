@@ -177,7 +177,7 @@ class Bay extends Component {
       //this.setState({ queue: res, fetching: false });
       this.closeModal();
     }).catch((err) => {
-      this.setState({ queue: res, false: false });
+      this.setState({ queue: res, fetching: false });
       console.log('error', err);
     });
   }
