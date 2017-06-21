@@ -43,17 +43,15 @@ exports.upsertBay = (req, res) => {
         res.status(200).send(doc);
     });
 };
+var removeUserFromQueue = (user) => {
+    return Queue.findOneAndRemove({
+        user: user
+    }).exec();
+}
 exports.enqueueUser = (req, res) => {
-    Queue.findOneAndRemove({
-        user: req.body.userId
-    }, (err, queue) => {
-        if (err) {
-            res.status(500).send(err)
-            return;
-        }
-        else if (queue) {
-            delete queue._id;
-            sendQueue(queue.bay);
+    removeUserFromQueue(req.body.userId).then((removedQueue) => {
+        if (removedQueue) {
+            sendQueue(removedQueue.bay);
             console.log('deleted user from queue');
         }
         getBay(req.params.bayId).then((bay) => {
@@ -69,12 +67,23 @@ exports.enqueueUser = (req, res) => {
                 });
                 res.status(200).send([]);
             }
+            else if (bay.currentState.state == 'onboarding') {
+                var q = new Queue({
+                    user: req.body.userId
+                    , bay: bay._id
+                });
+                q.save().then((doc) => {
+                    getQueue(doc.bay).then((fullqueue) => {
+                        if (fullqueue) res.status(200).send(fullqueue);
+                    });
+                });
+            }
             else {
                 var q = new Queue({
                     user: req.body.userId
                     , bay: bay._id
                 });
-                q.save((err, doc) => {
+                q.save().then((doc) => {
                     Queue.find({
                         bay: bay._id
                     }).populate('bay user').exec((err, fullQueue) => {
@@ -85,11 +94,17 @@ exports.enqueueUser = (req, res) => {
                         }
                         else res.status(404).send(fullQueue);
                     });
+                }).catch((err) => {
+                    console.log(err);
+                    res.status(500).send(err);
                 });
             }
         });
+    }).catch((err) => {
+        console.log(err);
+        res.status(500).send(err);
     });
-};
+}
 exports.dequeueUser = (req, res) => {
     Queue.findOneAndRemove({
         bay: req.params.bayId
@@ -143,9 +158,6 @@ var popUser = (bayId) => {
         timeAdded: 1
     }).exec();
 }
-async function asyncFun(req) {
-    return req;
-}
 var getUserOnDeck = (bayId) => {
     return Queue.findOne({
         bay: bayId
@@ -160,12 +172,25 @@ var getQueue = (bayId) => {
         timeAdded: 1
     }).populate('user bay').exec();
 }
-var startIdle = (bayId) => {
+var cancelOnboardingTimer = (bayId, app) => {
+    if (app.locals.timers.onboarding[bayId] != null) {
+        app.locals.timers.onboarding[bayId].cancel();
+        app.locals.timers.onboarding[bayId] = null;
+    }
+}
+var cancelGameplayTimer = (bayId, app) => {
+    if (app.locals.timers.gameplay[bayId] != null) {
+        app.locals.timers.gameplay[bayId].cancel();
+        app.locals.timers.gameplay[bayId] = null;
+    }
+}
+var startIdle = (bayId, app) => {
     console.log('Going to Idle State')
-    var data = {
+    updateBayState(bayId, {
         state: 'idle'
-    };
-    updateBayState(bayId, data).then((bay) => {
+    }).then((bay) => {
+        cancelGameplayTiemr(bay._id, app);
+        cancelOnboardingTimer(bay._id, app);
         sockets.sendToButton(bay._id, 'setState', bay.currentState);
         sockets.sendToQueue(bay._id, 'setState', bay.currentState);
     });
@@ -174,15 +199,11 @@ exports.startIdle = startIdle;
 var startOnboarding = (bayId, app) => {
     console.log('Onboarding, waiting for user...');
     getUserOnDeck(bayId).then((user) => {
-        if (!user) startIdle(bayId);
+        if (!user) startIdle(bayId, app);
         else {
             var endTime = new Date();
             endTime.setMinutes(endTime.getMinutes() + 1);
-            if (app.locals.timers.onboarding[bayId] != null) {
-                console.log('Canceling onboarding timer for bay ' + bayId);
-                app.locals.timers.onboarding[bayId].cancel();
-                app.locals.timers.onboarding[bayId] = null;
-            }
+            cancelOnboardingTimer(bayId, app)
             updateBayState(bayId, {
                 state: 'onboarding'
                 , endTime: endTime
@@ -201,7 +222,9 @@ var startOnboarding = (bayId, app) => {
                 });
             });
         }
-    })
+    }).catch((err) => {
+        console.log(err);
+    });
 };
 exports.startOnboarding = startOnboarding;
 exports.resumerOnboarding = (bayId, app) => {}
