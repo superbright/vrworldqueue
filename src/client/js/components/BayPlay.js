@@ -141,6 +141,7 @@ class BayPlay extends Component {
         playDom = (
           <div
             className="play-button-container flex justify-center"
+            onTouchStart={this.onPlayButtonPressed}
             onClick={this.onPlayButtonPressed}
           >
             {
