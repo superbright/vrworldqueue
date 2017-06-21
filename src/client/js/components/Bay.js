@@ -8,10 +8,10 @@ import { timerparams } from '../../../shared/timerconfig';
 
 const numToString = (num) => {
   const result = num.toString();
-  if (result && !isNaN(result)) {
+  if (result && result > 0 && !isNaN(result)) {
     return result.length === 1 ? `0${result}` : result;
   }
-  return '--';
+  return '00';
 };
 
 class Bay extends Component {
