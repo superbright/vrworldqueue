@@ -28,14 +28,12 @@ class BayPlay extends Component {
       secondsLeft: '--',
       interval: null,
       fetching: false,
-      queue: [],
     };
 
     this.connectSocket = this.connectSocket.bind(this);
     this.onPlayButtonPressed = this.onPlayButtonPressed.bind(this);
     this.onCancelButtonPressed = this.onCancelButtonPressed.bind(this);
     this.countDown = this.countDown.bind(this);
-    this.fetchQueue = this.fetchQueue.bind(this);
   }
 
   componentWillMount() {
@@ -68,18 +66,6 @@ class BayPlay extends Component {
     });
   }
 
-  fetchQueue() {
-    const { match: { params: { bayid } } } = this.props;
-
-    return fetch(`/api/bays/${bayid}/queue`, {
-      method: 'get',
-    }).then(res => res.json()).then((queue) => {
-      this.setState({ queue });
-    }).catch((err) => {
-      console.log('error', err);
-    });
-  }
-
   connectSocket() {
     const { socket } = this.state;
     if (socket) {
@@ -88,9 +74,6 @@ class BayPlay extends Component {
       });
       socket.on('disconnect', () => {
         this.setState({ connected: false });
-      });
-      socket.on('queue', (res) => {
-        this.setState({ queue: res });
       });
       socket.on('setState', (res) => {
         this.setState({ play: res, fetching: false });
@@ -150,7 +133,7 @@ class BayPlay extends Component {
       case 'onboarding':
         // last person is done playing but next person hasn't swiped in yet
         playDom = (
-          <div className="big-font"><h3>Waiting for {queue[0].user.screenname} to swipe in</h3></div>
+          <div className="big-font"><h3>Waiting for {this.state.user.screenname} to swipe in</h3></div>
         );
         break;
       case 'ready':
