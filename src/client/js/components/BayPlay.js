@@ -133,7 +133,7 @@ class BayPlay extends Component {
       case 'onboarding':
         // last person is done playing but next person hasn't swiped in yet
         playDom = (
-          <div className="big-font"><h3>Waiting for next player to swipe in</h3></div>
+          <div className="big-font"><h3>Waiting for {bay.queue[0].user.screenname} to swipe in</h3></div>
         );
         break;
       case 'ready':
