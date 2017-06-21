@@ -125,7 +125,6 @@ module.exports.clearQueue = (req, res) => {
     });
 }
 var updateBayState = (bayId, data) => {
-    console.log(data);
     return Bay.findByIdAndUpdate(bayId, {
         $set: {
             currentState: data
@@ -184,11 +183,11 @@ var startOnboarding = (bayId, app) => {
                 app.locals.timers.onboarding[bayId].cancel();
                 app.locals.timers.onboarding[bayId] = null;
             }
-            var data = {
+            updateBayState(bayId, {
                 state: 'onboarding'
                 , endTime: endTime
-            }
-            updateBayState(bayId, data).then((bay) => {
+            }).then((bay) => {
+                console.log(bay.currentState)
                 sockets.sendToButton(bay._id, 'setState', bay.currentState);
                 sockets.sendToQueue(bay._id, 'setState', bay.currentState);
                 console.log('current time is ' + new Date());
@@ -210,10 +209,15 @@ var sendQueue = (bayId) => {
     getBay(bayId).then((bay) => {
         getQueue(bayId).then((queue) => {
             if (queue) {
+                sockets.sendToButton(bay._id, 'queue', queue);
                 sockets.sendToQueue(bay._id, 'queue', queue);
                 sockets.sendToBigQueue(bay.id, 'queue', queue);
             }
-            else sockets.sendToQueue(bayId, 'queue', []);
+            else {
+                sockets.sendToButton(bay._id, 'queue', []);
+                sockets.sendToQueue(bayId, 'queue', []);
+                sockets.sendToBigQueue(bay.id, 'queue', []);
+            }
         });
     })
 };
@@ -281,8 +285,8 @@ var endGameplay = (bayId, app) => {
     };
     updateBayState(bayId, data).then((bay) => {
         if (bay) sockets.sendToGame(bay.id, 'endGame', bay.currentState);
-        sockets.sendToButton(bay._id, 'setState', bay.currentState);
-        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+        //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
+        //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
         startOnboarding(bay._id, app);
     });
 };

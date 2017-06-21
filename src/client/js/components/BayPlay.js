@@ -149,9 +149,11 @@ class BayPlay extends Component {
 
     let playDom;
 
+      
     switch (play.state) {
       case 'onboarding':
         // last person is done playing but next person hasn't swiped in yet
+            console.log(queue);
         playDom = (
           <div className="big-font"><h3>Waiting for {queue[0].user.screenname} to swipe in</h3></div>
         );

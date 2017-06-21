@@ -135,7 +135,6 @@ module.exports.clearQueue = function (req, res) {
     });
 };
 var updateBayState = function updateBayState(bayId, data) {
-    console.log(data);
     return Bay.findByIdAndUpdate(bayId, {
         $set: {
             currentState: data
@@ -191,11 +190,11 @@ var startOnboarding = function startOnboarding(bayId, app) {
                 app.locals.timers.onboarding[bayId].cancel();
                 app.locals.timers.onboarding[bayId] = null;
             }
-            var data = {
+            updateBayState(bayId, {
                 state: 'onboarding',
                 endTime: endTime
-            };
-            updateBayState(bayId, data).then(function (bay) {
+            }).then(function (bay) {
+                console.log(bay.currentState);
                 sockets.sendToButton(bay._id, 'setState', bay.currentState);
                 sockets.sendToQueue(bay._id, 'setState', bay.currentState);
                 console.log('current time is ' + new Date());
@@ -217,9 +216,14 @@ var sendQueue = function sendQueue(bayId) {
     getBay(bayId).then(function (bay) {
         getQueue(bayId).then(function (queue) {
             if (queue) {
+                sockets.sendToButton(bay._id, 'queue', queue);
                 sockets.sendToQueue(bay._id, 'queue', queue);
                 sockets.sendToBigQueue(bay.id, 'queue', queue);
-            } else sockets.sendToQueue(bayId, 'queue', []);
+            } else {
+                sockets.sendToButton(bay._id, 'queue', []);
+                sockets.sendToQueue(bayId, 'queue', []);
+                sockets.sendToBigQueue(bay.id, 'queue', []);
+            }
         });
     });
 };
@@ -285,8 +289,8 @@ var endGameplay = function endGameplay(bayId, app) {
     };
     updateBayState(bayId, data).then(function (bay) {
         if (bay) sockets.sendToGame(bay.id, 'endGame', bay.currentState);
-        sockets.sendToButton(bay._id, 'setState', bay.currentState);
-        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+        //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
+        //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
         startOnboarding(bay._id, app);
     });
 };
