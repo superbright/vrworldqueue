@@ -300,3 +300,19 @@ button.button-white {
   margin-left: 25px;
   width: 175px;
 }
+
+.bay-page {
+
+}
+
+.bay-page.big-bay h1 {
+  font-size: 7rem;
+}
+
+.bay-page.big-bay h3 {
+  font-size: 5rem;
+}
+
+.bay-page.big-bay h4, .bay-page.big-bay h5 {
+  font-size: 3rem;
+}

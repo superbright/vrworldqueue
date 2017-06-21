@@ -41,7 +41,7 @@ class Bay extends Component {
   }
 
   componentWillMount() {
-    const { match: { params: { bayid } } } = this.props;
+    const { match: { params: { bayid } }, isBigBay } = this.props;
 
     return fetch(`/api/bays/${bayid}`, {
       method: 'get',
@@ -50,7 +50,7 @@ class Bay extends Component {
         bay,
         play: bay.currentState,
         socket: io(window.location.origin, {
-          query: `clientType=queue&clientId=${bayid}`,
+          query: `clientType=${isBigBay ? 'bigqueue' : 'queue'}&clientId=${bayid}`,
         }),
       });
 
@@ -83,6 +83,7 @@ class Bay extends Component {
 
   connectSocket() {
     const { socket } = this.state;
+
     if (socket) {
       socket.on('connect', () => {
         this.setState({ connected: true });
@@ -194,12 +195,13 @@ class Bay extends Component {
       fetching,
       userAttempt,
     } = this.state;
+    const { isBigBay } = this.props;
 
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
 
     return (
-      <div key={bayid}>
+      <div key={bayid} className={`bay-page ${isBigBay ? 'big-bay' : ''}`}>
         {
           bay && (
             <div>

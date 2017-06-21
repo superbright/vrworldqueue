@@ -21,6 +21,11 @@ class Bays extends Component {
         />
         <Route
           exact
+          path={`${match.url}/:bayid/bigbay`}
+          component={props => <Bay {...props} isBigBay />}
+        />
+        <Route
+          exact
           path={`${match.url}/:bayid/play`}
           component={BayPlay}
         />
