@@ -74,10 +74,11 @@ class Signup extends Component {
   handleWaiver(accept) {
     if (accept) {
       this.setState({ waiverFetching: true });
+      const { form } = this.state;
 
       fetch('/api/users', {
         method: 'post',
-        body: JSON.stringify({ ...this.state.form, createdAt: new Date() }),
+        body: JSON.stringify({ ...form, phone: form.phone.replace(/\D/g,''), createdAt: new Date() }),
         headers: new Headers({
           'Content-Type': 'application/json',
         }),
