@@ -221,24 +221,20 @@ var startOnboarding = function startOnboarding(bayId, app) {
                 state: 'onboarding',
                 endTime: endTime
             }).then(function (bay) {
-                twilioService.sendMessage({
-                    phone: user.user.phone,
-                    message: "You're up next for " + bay.game + " at bay " + bay.name + "!"
-                });
                 //                console.log(bay.currentState)
                 //                sockets.sendToButton(bay._id, 'setState', bay.currentState);
                 //                sockets.sendToQueue(bay._id, 'setState', bay.currentState);
                 sendStateToClients(bay._id);
-
                 console.log('current time is ' + new Date());
                 console.log('onboarding will end at... ' + bay.currentState.endTime);
                 app.locals.timers.onboarding[bay._id] = scheduler.scheduleJob(bay.currentState.endTime, function () {
                     console.log('Onboarding timeout, moving to next person...');
                     popUser(bay._id).then(function (queue) {
                         sendQueue(bay._id);
-                        startOnboarding(bay._id, app);
+                        return startOnboarding(bay._id, app);
                     });
                 });
+                notifyUserOnDeck(bay._id);
             });
         }
     }).catch(function (err) {
@@ -265,7 +261,6 @@ var sendQueue = function sendQueue(bayId) {
 var startReady = function startReady(bayId, user, app) {
     console.log('-------Start Ready-------');
     popUser(bayId).then(function (queue) {
-        //        sendQueue(bayId);
         if (app.locals.timers.onboarding[bayId] != null) {
             app.locals.timers.onboarding[bayId].cancel();
         }
@@ -276,6 +271,21 @@ var startReady = function startReady(bayId, user, app) {
             return sendStateToClients(bay._id).then(function () {
                 return sendQueue(bay._id);
             });
+        });
+    });
+};
+var notifyUserOnDeck = function notifyUserOnDeck(bayId) {
+    console.log('--------notify user on deck-------');
+    return getBay(bayId).then(function (bay) {
+        return getQueue(bayId).then(function (queue) {
+            if (queue.length > 1) {
+                console.log('--------sending twilio-------');
+                console.log(queue[1].user.phone);
+                twilioService.sendMessage({
+                    phone: queue[1].user.phone,
+                    message: "You're up next for " + bay.game + " at bay " + bay.name + "!"
+                });
+            } else console.log("No one else in queue to notify");
         });
     });
 };
@@ -302,12 +312,12 @@ var startGameplay = function startGameplay(bayId, app) {
                     app.locals.timers.gameplay[bay._id] = scheduler.scheduleJob(bay.currentState.endTime, function () {
                         console.log('gameplay timer expired');
                         return endGameplay(bay._id, app).then(function () {
-                            return sendStateToClients(bay._id);
+                            return sendStateToClients(bay._id).then(function () {});
                         });
                     });
-                    sockets.sendToGame(bay.id, 'startGame', bay.currentState);
-                    sockets.sendToButton(bay._id, 'setState', bay.currentState);
-                    sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+                    return sendStateToClients(bay._id, app).then(function () {
+                        sockets.sendToGame(bay.id, 'startGame', bay.currentState);
+                    });
                 } else console.log('Cant find bay to start gameplay ' + bay._id);
             });
         }
@@ -325,8 +335,6 @@ var endGameplay = function endGameplay(bayId, app) {
     };
     updateBayState(bayId, data).then(function (bay) {
         if (bay) sockets.sendToGame(bay.id, 'endGame', bay.currentState);
-        //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
-        //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
         startOnboarding(bay._id, app);
     });
 };
@@ -341,8 +349,6 @@ var endGameplay = function endGameplay(bayId, app) {
         state: 'onboarding'
     }).then(function (bay) {
         if (bay) sockets.sendToGame(bay.id, 'endGame', bay.currentState);
-        //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
-        //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
         return startOnboarding(bay._id, app);
     });
 };

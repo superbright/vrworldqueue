@@ -28,7 +28,7 @@ var verifyData = function (app) {
                         bay.save();
                     }
                 });
-                console.log(bay.currentState);
+//                console.log(bay.currentState);
                 if (bay.currentState == 'idle') {}
                 else if (bay.currentState)
                     if (bay.currentState.endTime && bay.currentState.endTime) {

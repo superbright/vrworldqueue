@@ -5,8 +5,7 @@ exports.sendMessage = (data) => {
         , to: '+1' + data.phone.replace(/[^\d]/g, '')
         , body: data.message
     }).then(function (data) {
-        console.log(data);
-        console.log('user notified on deck');
+//        console.log('twilio successfully sent!');
     }).catch(function (err) {
         console.error(err);
     });
