@@ -240,9 +240,11 @@ var startOnboarding = (bayId, app) => {
                     phone: user.user.phone
                     , message: "You're up next for " + bay.game + " at bay " + bay.name + "!"
                 });
-                console.log(bay.currentState)
-                sockets.sendToButton(bay._id, 'setState', bay.currentState);
-                sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+//                console.log(bay.currentState)
+//                sockets.sendToButton(bay._id, 'setState', bay.currentState);
+//                sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+                sendStateToClients(bay._id);
+                
                 console.log('current time is ' + new Date());
                 console.log('onboarding will end at... ' + bay.currentState.endTime);
                 app.locals.timers.onboarding[bay._id] = scheduler.scheduleJob(bay.currentState.endTime, () => {
