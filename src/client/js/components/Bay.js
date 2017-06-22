@@ -112,12 +112,12 @@ class Bay extends Component {
 
         if (res.state === 'ready') {
           // show a temporary modal that tells them to go to the play button
-            setTimeout(()=>{
-                          this.setState({ showModal: true, success: `You're up ${res.user.screenname}!  Go to the next screen!` });
+//            setTimeout(()=>{
+                this.setState({ showModal: true, success: `You're up ${res.user.screenname}!  Go to the next screen!` });
                  setTimeout(this.closeModal, timerparams.modalTimeout);
 
 
-            }, 1000)
+//            }, 1000)
         }
 
         if (this.state.play.endTime) {

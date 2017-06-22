@@ -53,7 +53,7 @@ var sendStateToClients = (bayId) => {
     return getBay(bayId).then((bay) => {
         sockets.sendToButton(bay._id, 'setState', bay.currentState);
         sockets.sendToQueue(bay._id, 'setState', bay.currentState);
-        sockets.sendToBigQueue(bay._id, 'setState', bay.currentState);
+        sockets.sendToBigQueue(bay.id, 'setState', bay.currentState);
     });
 }
 var checkState = (bayId, app) => {
@@ -75,7 +75,6 @@ var checkState = (bayId, app) => {
 }
 exports.enqueueUser = (req, res) => {
     removeUserFromQueue(req.body.userId).then((removedQueue) => {
-        console.log('----removing user----');
         if (removedQueue) {
             console.log('deleted user from queue');
             return checkState(removedQueue.bay, req.app).then(() => {
@@ -84,7 +83,6 @@ exports.enqueueUser = (req, res) => {
             });
         }
     }).then(() => {
-        console.log('-----then-----')
         getBay(req.params.bayId).then((bay) => {
             if (!bay.currentState || bay.currentState.state == 'idle') {
                 User.findById(req.body.userId, (err, doc) => {
@@ -285,7 +283,6 @@ var startReady = (bayId, user, app) => {
         if (app.locals.timers.onboarding[bayId] != null) {
             app.locals.timers.onboarding[bayId].cancel();
         }
-        console.log('Bay ' + bayId + ' is Ready for ' + user);
         return updateBayState(bayId, {
             state: 'ready'
             , user: user

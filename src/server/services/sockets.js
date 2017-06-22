@@ -102,8 +102,7 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     //    console.log('[INFO]: ');
     //    console.log(request);
     if (!socket) {
-        console.log('[WARN]: Socket not found');
-        console.log(returnValue.request);
+        console.log('[WARN]: Socket not found: ' + returnValue.request.clientType + " " + returnValue.request.clientId);
         returnValue.error = "Socket not found";
     }
     else if (!socket.connected) {
@@ -116,7 +115,6 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     }
     callback && callback(returnValue);
 }
-
 console.log('This is definitely latest code');
 exports.sockets = sockets;
 exports.socketState = socketState;
