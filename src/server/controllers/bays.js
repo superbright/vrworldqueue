@@ -48,14 +48,43 @@ var removeUserFromQueue = (user) => {
         user: user
     }).exec();
 }
+var sendStateToClients = (bayId) => {
+    return getBay(bayId).then((bay) => {
+        sockets.sendToButton(bay._id, 'setState', bay.currentState);
+        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+        sockets.sendToBigQueue(bay._id, 'setState', bay.currentState);
+    });
+}
+var checkState = (bayId, app) => {
+    return getQueue(bayId).then((queue) => {
+        if (!queue.length) {
+            console.log('No one left in queue ' + bayId);
+            return getBay(bayId).then((bay) => {
+                if (bay.currentState.state == 'onboarding') {
+                    console.log('was in onboarding, going to idle...');
+                    return startIdle(bayId, app);
+                };
+            });
+        }
+        else {
+            console.log('Still people in queue. Restarting Onboarding...');
+            return startOnboarding(bayId, app);
+        }
+    });
+}
 exports.enqueueUser = (req, res) => {
     removeUserFromQueue(req.body.userId).then((removedQueue) => {
+        console.log('----removing user----');
         if (removedQueue) {
-            sendQueue(removedQueue.bay);
             console.log('deleted user from queue');
+            return checkState(removedQueue.bay, req.app).then(() => {
+                console.log('sending queue');
+                return sendQueue(removedQueue.bay);
+            });
         }
+    }).then(() => {
+        console.log('-----then-----')
         getBay(req.params.bayId).then((bay) => {
-            console.log(bay.currentState);
             if (!bay.currentState || bay.currentState.state == 'idle') {
                 User.findById(req.body.userId, (err, doc) => {
                     if (doc) {
@@ -149,21 +178,22 @@ var updateBayState = (bayId, data) => {
     }).exec();
 };
 var getBay = (bayId) => {
-    return Bay.findById(bayId).exec();
+    return Bay.findById(bayId).populate('currentState.user').exec();
 }
 var popUser = (bayId) => {
+    console.log('-----------Pop User--------');
     return Queue.findOneAndRemove({
         bay: bayId
     }).sort({
         timeAdded: 1
-    }).exec();
+    }).populate('user bay').exec();
 }
 var getUserOnDeck = (bayId) => {
     return Queue.findOne({
         bay: bayId
     }).sort({
         timeAdded: 1
-    }).populate('user').exec();
+    }).populate('user bay').exec();
 }
 var getQueue = (bayId) => {
     return Queue.find({
@@ -186,25 +216,24 @@ var cancelGameplayTimer = (bayId, app) => {
 }
 var startIdle = (bayId, app) => {
     console.log('Going to Idle State')
-    updateBayState(bayId, {
+    return updateBayState(bayId, {
         state: 'idle'
     }).then((bay) => {
-        cancelGameplayTiemr(bay._id, app);
+        cancelGameplayTimer(bay._id, app);
         cancelOnboardingTimer(bay._id, app);
-        sockets.sendToButton(bay._id, 'setState', bay.currentState);
-        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+        return sendStateToClients(bay._id);
     });
 }
 exports.startIdle = startIdle;
 var startOnboarding = (bayId, app) => {
     console.log('Onboarding, waiting for user...');
-    getUserOnDeck(bayId).then((user) => {
-        if (!user) startIdle(bayId, app);
+    return getUserOnDeck(bayId).then((user) => {
+        if (!user) return startIdle(bayId, app);
         else {
             var endTime = new Date();
             endTime.setMinutes(endTime.getMinutes() + 1);
             cancelOnboardingTimer(bayId, app)
-            updateBayState(bayId, {
+            return updateBayState(bayId, {
                 state: 'onboarding'
                 , endTime: endTime
             }).then((bay) => {
@@ -227,10 +256,10 @@ var startOnboarding = (bayId, app) => {
     });
 };
 exports.startOnboarding = startOnboarding;
-exports.resumerOnboarding = (bayId, app) => {}
+exports.resumeOnboarding = (bayId, app) => {}
 var sendQueue = (bayId) => {
-    getBay(bayId).then((bay) => {
-        getQueue(bayId).then((queue) => {
+    return getBay(bayId).then((bay) => {
+        return getQueue(bayId).then((queue) => {
             if (queue) {
                 sockets.sendToButton(bay._id, 'queue', queue);
                 sockets.sendToQueue(bay._id, 'queue', queue);
@@ -245,24 +274,25 @@ var sendQueue = (bayId) => {
     })
 };
 var startReady = (bayId, user, app) => {
+    console.log('-------Start Ready-------');
     popUser(bayId).then((queue) => {
         //        sendQueue(bayId);
         if (app.locals.timers.onboarding[bayId] != null) {
             app.locals.timers.onboarding[bayId].cancel();
         }
-        console.log('Bay ' + bayId + ' is Ready');
-        var data = {
+        console.log('Bay ' + bayId + ' is Ready for ' + user);
+        return updateBayState(bayId, {
             state: 'ready'
             , user: user
-        }
-        updateBayState(bayId, data).then((bay) => {
-            sockets.sendToQueue(bay._id, 'setState', bay.currentState);
-            sockets.sendToButton(bay._id, 'setState', bay.currentState);
+        }).then((bay) => {
+            return sendStateToClients(bay._id).then(() => {
+                return sendQueue(bay._id);
+            })
         })
     });
 }
 var startGameplay = (bayId, app) => {
-    getBay(bayId).then((bay) => {
+    return getBay(bayId).then((bay) => {
         console.log('start Gameplay on bay ' + bay._id);
         if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
         else {
@@ -278,14 +308,15 @@ var startGameplay = (bayId, app) => {
                 , endTime: endTime
             };
             console.log('Update bay state');
-            updateBayState(bay._id, data).then((bay) => {
+            return updateBayState(bay._id, data).then((bay) => {
                 if (bay) {
-                    console.log(bay);
                     console.log('current time is ' + new Date());
                     console.log('gameplay will end at... ' + bay.currentState.endTime);
                     app.locals.timers.gameplay[bay._id] = scheduler.scheduleJob(bay.currentState.endTime, () => {
                         console.log('gameplay timer expired');
-                        endGameplay(bay._id, app);
+                        return endGameplay(bay._id, app).then(() => {
+                            return sendStateToClients(bay._id);
+                        })
                     });
                     sockets.sendToGame(bay.id, 'startGame', bay.currentState);
                     sockets.sendToButton(bay._id, 'setState', bay.currentState);
@@ -311,6 +342,22 @@ var endGameplay = (bayId, app) => {
         //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
         //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
         startOnboarding(bay._id, app);
+    });
+};
+var endGameplay = (bayId, app) => {
+    if (app.locals.timers.gameplay[bayId] != null) {
+        app.locals.timers.gameplay[bayId].cancel();
+        app.locals.timers.gameplay[bayId] = null;
+        console.log('canceling gameplay timer in endgameplay');
+    }
+    console.log('Gameplay over!');
+    return updateBayState(bayId, {
+        state: 'onboarding'
+    }).then((bay) => {
+        if (bay) sockets.sendToGame(bay.id, 'endGame', bay.currentState);
+        //        sockets.sendToButton(bay._id, 'setState', bay.currentState);
+        //        sockets.sendToQueue(bay._id, 'setState', bay.currentState);
+        return startOnboarding(bay._id, app);
     });
 };
 var addUserToQueue = (bayId, tag) => {
@@ -414,7 +461,7 @@ module.exports.socketHandler = (socket, app) => {
                         var user = queue.user;
                         if (user.rfid.id == req.tag) {
                             console.log('Is current User');
-                            startReady(bay._id, user, app);
+                            startReady(bay._id, queue.user, app);
                         }
                         else addUserToQueue(req.clientId, req.tag);
                     });
