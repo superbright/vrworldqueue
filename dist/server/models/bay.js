@@ -31,7 +31,10 @@ var schema = new mongoose.Schema({
         endTime: {
             type: Date
         },
-        user: {}
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
     },
     playTime: {
         type: Number

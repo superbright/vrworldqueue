@@ -80,10 +80,13 @@ class BayPlay extends Component {
         this.setState({ connected: false });
       });
       socket.on('queue', (res) => {
+          console.log('Got Queue: ');
           console.log(res);
         this.setState({ queue: res });
       });
       socket.on('setState', (res) => {
+          console.log('got Set State');
+          console.log(res);
         this.setState({ play: res, fetching: false });
 
         if (this.state.play.endTime) {
@@ -149,11 +152,14 @@ class BayPlay extends Component {
 
     let playDom;
 
-      
+//      console.log('Re-renderinging...');
+//            console.log(play.state);
+//        console.log(queue);
     switch (play.state) {
+        
       case 'onboarding':
         // last person is done playing but next person hasn't swiped in yet
-            console.log(queue);
+
         playDom = (
           <div className="big-font"><h3>Waiting for {queue[0].user.screenname} to swipe in</h3></div>
         );
