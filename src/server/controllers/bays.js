@@ -25,6 +25,7 @@ exports.getBays = (req, res) => {
     }
     else Bay.find({}, (err, bays) => {
         if (err) res.status(500).send(err);
+
         else res.status(200).send(bays);
     });
 };
