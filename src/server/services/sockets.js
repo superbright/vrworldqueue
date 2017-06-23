@@ -40,15 +40,15 @@ module.exports.setupSockets = (server, app) => {
 };
 var registerSocket = (socket, currentBay, app) => {
     console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
-    if (sockets[currentBay.clientType] == null) {
-        console.error("unknown client type. Disconnecting...");
-        socket.disconnect();
-        return;
-    }
+//    if (sockets[currentBay.clientType] == null) {
+//        console.error("unknown client type. Disconnecting...");
+//        socket.disconnect();
+//        return;
+//    }
     if (sockets[currentBay.clientType][currentBay.clientId]) {
-        console.warn("Client already connected. Disconnecting");
-        sockets[currentBay.clientType][currentBay.clientId].disconnect();
-        sockets[currentBay.clientType][currentBay.clientId] = null;
+        console.warn("Websocket client overlap");
+        //sockets[currentBay.clientType][currentBay.clientId].disconnect();
+        //sockets[currentBay.clientType][currentBay.clientId] = null;
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
     socketState[currentBay.clientType][currentBay.clientId] = true;
