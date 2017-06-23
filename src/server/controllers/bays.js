@@ -77,6 +77,32 @@ var checkState = (bayId, app) => {
         }
     });
 }
+exports.bringUserToFront = (req, res) => {
+    Queue.findById(req.body._id).exec().then((queue) => {
+        if (!queue) res.status(404).send('cannot find queue item');
+        else {
+            getQueue(req.body.bay).then((queue) => {
+                queue[0].timeAdded
+            });
+            queue.timeAdded.setMinutes(queue[0].timeAdded.getMinutes() - 1);
+            queue.save().then((q) => {
+                sendQueue(q.bay);
+                res.status(200).send(q);
+            })
+        }
+    }).catch((err) => {
+        res.status(500).send(err);
+    });
+};
+exports.deleteUserFromQueue = (req, res) => {
+    removeUserFromQueue(req.body.user._id).then((removedQueue) => {
+        console.log('deleted user from queue');
+        return checkState(removedQueue.bay, req.app).then(() => {
+            console.log('sending queue');
+            return sendQueue(removedQueue.bay);
+        });
+    });
+};
 exports.enqueueUser = (req, res) => {
     removeUserFromQueue(req.body.userId).then((removedQueue) => {
         if (removedQueue) {

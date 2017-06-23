@@ -55,6 +55,7 @@ class Bay extends Component {
         play: bay.currentState,
         socket: io(window.location.origin, {
           query: `clientType=${isBigBay ? 'bigqueue' : 'queue'}&clientId=${bayid}`,
+            'forceNew': true
         }),
       });
 
@@ -113,16 +114,17 @@ class Bay extends Component {
           console.log('got set state ');
           console.log(res);
         this.setState({ play: res });
-
         if (res.state === 'ready') {
           // show a temporary modal that tells them to go to the play button
-//            setTimeout(()=>{
                 this.setState({ showModal: true, success: `You're up ${res.user.screenname}!  Go to the next screen!` });
                  setTimeout(this.closeModal, timerparams.modalTimeout);
 
 
-//            }, 1000)
         }
+          else if(res.state === 'error')
+         {
+                  this.setState({showModal: true, error: res.error});
+         }
 
         if (this.state.play.endTime) {
           const interval = setInterval(() => {

@@ -40,15 +40,11 @@ module.exports.setupSockets = (server, app) => {
 };
 var registerSocket = (socket, currentBay, app) => {
     console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
-//    if (sockets[currentBay.clientType] == null) {
-//        console.error("unknown client type. Disconnecting...");
-//        socket.disconnect();
-//        return;
-//    }
     if (sockets[currentBay.clientType][currentBay.clientId]) {
-        console.warn("Websocket client overlap");
-        //sockets[currentBay.clientType][currentBay.clientId].disconnect();
-        //sockets[currentBay.clientType][currentBay.clientId] = null;
+        console.log('socket already connected');
+        socket.emit('setState', {state: 'error', error: 'Page is already open on other tablet'});
+        socket.disconnect();
+        return;
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
     socketState[currentBay.clientType][currentBay.clientId] = true;
@@ -99,8 +95,6 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         }
     }
     var socket = sockets[clientType][clientId];
-    //    console.log('[INFO]: ');
-    //    console.log(request);
     if (!socket) {
         console.log('[WARN]: Socket not found: ' + returnValue.request.clientType + " " + returnValue.request.clientId);
         returnValue.error = "Socket not found";
