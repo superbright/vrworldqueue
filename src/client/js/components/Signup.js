@@ -34,6 +34,10 @@ class Signup extends Component {
     this.clearForm = this.clearForm.bind(this);
   }
 
+  componentWillMount() {
+    document.title = 'Signup';
+  }
+
   handleChange(event) {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;

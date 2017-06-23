@@ -42,6 +42,7 @@ class Admin extends Component {
 
   componentWillMount() {
     this.getUsers();
+    document.title = 'Admin';
   }
 
   getUsers() {
