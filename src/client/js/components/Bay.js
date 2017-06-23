@@ -39,6 +39,7 @@ class Bay extends Component {
     this.closeModal = this.closeModal.bind(this);
     this.confirmUser = this.confirmUser.bind(this);
     this.countDown = this.countDown.bind(this);
+    this.handleCloseOtherBrowser = this.handleCloseOtherBrowser.bind(this);
   }
 
   componentWillMount() {
@@ -184,6 +185,10 @@ class Bay extends Component {
     });
   }
 
+  handleCloseOtherBrowser() {
+    // hi igal, add you handler here
+  }
+
   render() {
     const {
       bay,
@@ -278,7 +283,12 @@ class Bay extends Component {
                         &&
                         <div>
                           <h2>{error}</h2>
-
+                          {
+                            this.state.play.state === 'error'
+                            && (
+                              <button onClick={this.handleCloseOtherBrowser}>Close Other Browser</button>
+                            )
+                          }
                         </div>
                       }
 
