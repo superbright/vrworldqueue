@@ -82,7 +82,6 @@ exports.bringUserToFront = function (req, res) {
             new: true
         }).exec(function (err, q) {
             if (err) res.status(500).send(err);else if (q) {
-                console.log(q);
                 res.status(200).send(q);
                 sendQueue(q.bay);
             } else res.status(404).send('queue not found');
@@ -94,7 +93,6 @@ exports.bringUserToFront = function (req, res) {
     });
 };
 exports.deleteUserFromQueue = function (req, res) {
-    console.log(req.body);
     removeUserFromQueue(req.body.user._id).then(function (removedQueue) {
         console.log('deleted user from queue');
         return checkState(removedQueue.bay, req.app).then(function () {
@@ -288,7 +286,6 @@ exports.resumeOnboarding = function (bayId, app) {};
 var sendQueue = function sendQueue(bayId) {
     return getBay(bayId).then(function (bay) {
         return getQueue(bayId).then(function (queue) {
-            console.log(queue);
             if (queue) {
                 sockets.sendToButton(bay._id, 'queue', queue);
                 sockets.sendToQueue(bay._id, 'queue', queue);

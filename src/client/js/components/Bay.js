@@ -213,7 +213,7 @@ class Bay extends Component {
                   ? (
                     <div className="flex align-center">
                       <img className="big-bay-logo" src={VRWorldStamp} />
-                      <h5>#vrworld</h5>
+                      <h5>#vrworldnyc</h5>
                     </div>
                   ) :
                   <h5>{bay.name}</h5>
@@ -229,7 +229,7 @@ class Bay extends Component {
                       ? (
                         <div className="big-bay-main-logo">
                           <img className="big-bay-logo-bigger" src={VRWorldStamp} />
-                          <h1>#vrworld</h1>
+                          <h1>#vrworldnyc</h1>
                         </div>
                       )
                       : (

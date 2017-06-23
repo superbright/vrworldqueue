@@ -7,10 +7,13 @@ class AdminQueue extends Component {
     this.state = {
       bay: null,
       queue: [],
+      tempDelete: null,
     };
 
     this.fetchQueue = this.fetchQueue.bind(this);
     this.bumpUserUp = this.bumpUserUp.bind(this);
+    this.tempDelete = this.tempDelete.bind(this);
+    this.removeTempDelete = this.removeTempDelete.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
   }
 
@@ -27,7 +30,6 @@ class AdminQueue extends Component {
       console.log('error', err);
     });
   }
-
 
   fetchQueue() {
     const { match: { params: { bayid } } } = this.props;
@@ -57,17 +59,26 @@ class AdminQueue extends Component {
     });
   }
 
-  deleteUser(item) {
+  tempDelete(item) {
+    this.setState({ tempDelete: item });
+  }
+
+  removeTempDelete() {
+    this.setState({ tempDelete: null });
+  }
+
+  deleteUser() {
+    const { tempDelete } = this.state;
     const { match: { params: { bayid } } } = this.props;
-console.log(item);
     return fetch(`/api/bays/${bayid}/user`, {
       method: 'delete',
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
-      body: JSON.stringify(item),
+      body: JSON.stringify(tempDelete),
     }).then(res => res.json()).then(() => {
-        console.log('------fetch queue----');
+      this.setState({ tempDelete: null });
+        
       this.fetchQueue();
     }).catch((err) => {
       console.log('error', err);
@@ -75,7 +86,7 @@ console.log(item);
   }
 
   render() {
-    const { queue, bay } = this.state;
+    const { queue, bay, tempDelete } = this.state;
 
     return (
       <div>
@@ -100,12 +111,27 @@ console.log(item);
                   <h5>{player.user.screenname}</h5>
                   <div>
                     <button onClick={() => this.bumpUserUp(player)}>Move To Top</button>
-                    <button onClick={() => this.deleteUser(player)}>Delete</button>
+                    <button onClick={() => this.tempDelete(player)}>Delete</button>
                   </div>
                 </li>
               ))}
             </ul>
           )
+        }
+
+        {
+          tempDelete &&
+          (<div className="modal flex justify-center align-center modal-error" >
+            <div className="modal-container">
+              <div>
+                <h2>Are you sure you want to Delete {tempDelete.user.screenname}?</h2>
+                <div>
+                  <button className="button-white" onClick={this.deleteUser}>YES</button>
+                  <button className="button-white" onClick={this.removeTempDelete}>NO</button>
+                </div>
+              </div>
+            </div>
+          </div>)
         }
       </div>
     );
