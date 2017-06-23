@@ -46,6 +46,9 @@ class AdminQueue extends Component {
 
     return fetch(`/api/bays/${bayid}/user`, {
       method: 'post',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
       body: JSON.stringify(item),
     }).then(res => res.json()).then(() => {
       this.fetchQueue();
@@ -56,11 +59,15 @@ class AdminQueue extends Component {
 
   deleteUser(item) {
     const { match: { params: { bayid } } } = this.props;
-
+console.log(item);
     return fetch(`/api/bays/${bayid}/user`, {
       method: 'delete',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
       body: JSON.stringify(item),
     }).then(res => res.json()).then(() => {
+        console.log('------fetch queue----');
       this.fetchQueue();
     }).catch((err) => {
       console.log('error', err);

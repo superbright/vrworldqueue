@@ -78,29 +78,45 @@ var checkState = (bayId, app) => {
     });
 }
 exports.bringUserToFront = (req, res) => {
-    Queue.findById(req.body._id).exec().then((queue) => {
-        if (!queue) res.status(404).send('cannot find queue item');
-        else {
-            getQueue(req.body.bay).then((queue) => {
-                queue[0].timeAdded
-            });
-            queue.timeAdded.setMinutes(queue[0].timeAdded.getMinutes() - 1);
-            queue.save().then((q) => {
-                sendQueue(q.bay);
+    console.log('-----Bring User To Front-----');
+    getUserOnDeck(req.body.bay._id).then((user) => {
+        var newTime = user.timeAdded;
+        newTime.setMinutes(newTime.getMinutes() - 1);
+        Queue.findByIdAndUpdate(req.body._id, {
+            $set: {
+                timeAdded: newTime
+            }
+        }, {
+            new: true
+        }).exec((err, q) => {
+            if (err) res.status(500).send(err);
+            else if (q) {
+                console.log(q);
                 res.status(200).send(q);
-            })
-        }
+                sendQueue(q.bay);
+            }
+            else res.status(404).send('queue not found');
+        });
     }).catch((err) => {
+        console.log('-----error------');
+        console.log(err);
         res.status(500).send(err);
     });
-};
+}
 exports.deleteUserFromQueue = (req, res) => {
+    console.log(req.body);
     removeUserFromQueue(req.body.user._id).then((removedQueue) => {
         console.log('deleted user from queue');
         return checkState(removedQueue.bay, req.app).then(() => {
             console.log('sending queue');
-            return sendQueue(removedQueue.bay);
+            sendQueue(removedQueue.bay).then(() => {
+                res.status(200).send({
+                    status: 'ok'
+                });
+            });
         });
+    }).catch((err) => {
+        res.status(500).send(err);
     });
 };
 exports.enqueueUser = (req, res) => {
@@ -291,6 +307,7 @@ exports.resumeOnboarding = (bayId, app) => {}
 var sendQueue = (bayId) => {
     return getBay(bayId).then((bay) => {
         return getQueue(bayId).then((queue) => {
+            console.log(queue);
             if (queue) {
                 sockets.sendToButton(bay._id, 'queue', queue);
                 sockets.sendToQueue(bay._id, 'queue', queue);
