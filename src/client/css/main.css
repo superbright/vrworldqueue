@@ -305,12 +305,17 @@ button.button-white {
 
 }
 
+.big-bay-body {
+  overflow: hidden;
+}
+
 .bay-page.big-bay h1 {
   font-size: 7rem;
 }
 
 .bay-page.big-bay h3 {
   font-size: 5rem;
+  overflow: hidden;
 }
 
 .bay-page.big-bay h4, .bay-page.big-bay h5 {

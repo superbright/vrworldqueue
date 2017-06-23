@@ -42,7 +42,10 @@ class Bay extends Component {
 
   componentWillMount() {
     const { match: { params: { bayid } }, isBigBay } = this.props;
-
+    if (isBigBay) {
+      console.log('here');
+      document.body.className += ' ' + 'big-bay-body';
+    }
     return fetch(`/api/bays/${isBigBay ? 'local/' : ''}${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
