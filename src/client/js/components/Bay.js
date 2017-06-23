@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import Spinner from 'react-spin';
+import VRWorldStamp from '../../images/VRWorld_Stamp.png';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
 import config from '../utils/spinnerConfig';
@@ -210,8 +211,8 @@ class Bay extends Component {
           bay && (
             <div>
               <header className="flex space-between align-center">
+                <img className="big-bay-logo" src={VRWorldStamp} />
                 <h5>{bay.name}</h5>
-                <h5>{bay.game}</h5>
               </header>
               {
                 queue.length === 0

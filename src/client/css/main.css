@@ -321,3 +321,8 @@ button.button-white {
 .bay-page.big-bay h4, .bay-page.big-bay h5 {
   font-size: 3rem;
 }
+
+.big-bay-logo {
+  margin-left: 25px;
+  width: 60px;
+}
