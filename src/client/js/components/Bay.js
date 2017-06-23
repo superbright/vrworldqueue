@@ -97,7 +97,6 @@ class Bay extends Component {
         this.setState({ connected: false });
       });
       socket.on('queue', (res) => {
-          console.log(res);
         this.setState({ queue: res });
       });
       socket.on('userattempt', (res) => {
@@ -111,19 +110,15 @@ class Bay extends Component {
         location.reload();
       });
       socket.on('setState', (res) => {
-          console.log('got set state ');
-          console.log(res);
         this.setState({ play: res });
         if (res.state === 'ready') {
           // show a temporary modal that tells them to go to the play button
-                this.setState({ showModal: true, success: `You're up ${res.user.screenname}!  Go to the next screen!` });
+            this.setState({ showModal: true, success: `You're up ${res.user.screenname}!  Go to the next screen!` });
                  setTimeout(this.closeModal, timerparams.modalTimeout);
-
-
         }
           else if(res.state === 'error')
          {
-                  this.setState({showModal: true, error: res.error});
+            this.setState({showModal: true, error: res.error});
          }
 
         if (this.state.play.endTime) {
