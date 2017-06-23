@@ -211,14 +211,28 @@ class Bay extends Component {
           bay && (
             <div>
               <header className="flex space-between align-center">
-                <img className="big-bay-logo" src={VRWorldStamp} />
+                <div className="flex align-center">
+                  <img className="big-bay-logo" src={VRWorldStamp} />
+                  <h5>#vrworld</h5>
+                </div>
                 <h5>{bay.name}</h5>
               </header>
               {
                 queue.length === 0
                 ? (
                   <div className="simple-container user-search">
-                    <h3>{'There\'s no one in line, register now!'}</h3>
+                    {
+                      isBigBay
+                      ? (
+                        <div className="big-bay-main-logo">
+                          <img className="big-bay-logo-bigger" src={VRWorldStamp} />
+                          <h1>#vrworld</h1>
+                        </div>
+                      )
+                      : (
+                        <h3>{'There\'s no one in line, register now!'}</h3>
+                      )
+                    }
                   </div>
                 )
                 : (
