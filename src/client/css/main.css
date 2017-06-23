@@ -45,6 +45,8 @@ button {
   transition: all 0.25s ease;
   font-size: 14px;
   margin-bottom: 0px;
+  height: 45px;
+  font-size: 2rem;
 }
 
 button:hover {
