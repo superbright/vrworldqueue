@@ -46,6 +46,7 @@ class BayList extends Component {
                 <div className="bay-list-name">
                   <h5><Link to={`/bay/${bay._id}`}>{bay.name} - {bay.game}</Link></h5>
                   <p><Link to={`/bay/${bay._id}/play`}>play button page</Link></p>
+                  <p><Link to={`/admin/queue/${bay._id}`}>queue admin</Link></p>
                 </div>
 
                 <div className="bay-list-count">
