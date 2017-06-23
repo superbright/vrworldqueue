@@ -219,9 +219,9 @@ class Bay extends Component {
                       <h5>#vrworld</h5>
                     </div>
                   ) :
-                  <h5>{bay.game}</h5>
+                  <h5>{bay.name}</h5>
                 }
-                <h5>{bay.name}</h5>
+                <h5>{bay.game}</h5>
               </header>
               {
                 queue.length === 0
