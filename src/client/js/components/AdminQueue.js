@@ -41,11 +41,12 @@ class AdminQueue extends Component {
     });
   }
 
-  bumpUserUp() {
+  bumpUserUp(item) {
     const { match: { params: { bayid } } } = this.props;
 
     return fetch(`/api/bays/${bayid}/user`, {
       method: 'post',
+      body: JSON.stringify(item),
     }).then(res => res.json()).then(() => {
       this.fetchQueue();
     }).catch((err) => {
@@ -53,11 +54,12 @@ class AdminQueue extends Component {
     });
   }
 
-  deleteUser() {
+  deleteUser(item) {
     const { match: { params: { bayid } } } = this.props;
 
     return fetch(`/api/bays/${bayid}/user`, {
       method: 'delete',
+      body: JSON.stringify(item),
     }).then(res => res.json()).then(() => {
       this.fetchQueue();
     }).catch((err) => {
@@ -90,8 +92,8 @@ class AdminQueue extends Component {
                 >
                   <h5>{player.user.screenname}</h5>
                   <div>
-                    <button onClick={this.bumpUserUp}>Move To Top</button>
-                    <button onClick={this.deleteUser}>Delete</button>
+                    <button onClick={() => this.bumpUserUp(player)}>Move To Top</button>
+                    <button onClick={() => this.deleteUser(player)}>Delete</button>
                   </div>
                 </li>
               ))}
