@@ -309,6 +309,8 @@ button.button-white {
 
 .big-bay-body {
   overflow: hidden;
+  background-color: black;
+  color: white;
 }
 
 .bay-page.big-bay h1 {

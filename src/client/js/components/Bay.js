@@ -75,11 +75,12 @@ class Bay extends Component {
   }
 
   fetchQueue() {
-    const { match: { params: { bayid } } } = this.props;
+    const { bay } = this.state;
 
-    return fetch(`/api/bays/${bayid}/queue`, {
+    return fetch(`/api/bays/${bay._id}/queue`, {
       method: 'get',
     }).then(res => res.json()).then((queue) => {
+      console.log('fetching queue', queue);
       this.setState({ queue });
     }).catch((err) => {
       console.log('error', err);
