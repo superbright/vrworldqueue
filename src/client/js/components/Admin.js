@@ -3,6 +3,7 @@ import { Route, Link } from 'react-router-dom';
 import update from 'immutability-helper';
 import AdminList from './AdminList';
 import AdminUser from './AdminUser';
+import AdminQueue from './AdminQueue';
 
 const adminList = [
   {
@@ -70,6 +71,11 @@ class Admin extends Component {
           <h5>vrworld admin {adminid}</h5>
         </header>
 
+        <Route
+          exact
+          path={`${match.url}/queue/:bayid`}
+          component={props => <AdminQueue {...props} />}
+        />
         <Route
           exact
           path={`${match.url}/:adminid/user/:userid`}
