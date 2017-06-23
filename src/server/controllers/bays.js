@@ -4,11 +4,15 @@ var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 var twilioService = require("../services/twilio");
-//var timerconfig = require('../../shared/timerconfig');
 import {
     timerparams
 }
 from '../../shared/timerconfig.js';
+import {
+    messages
+}
+from '../../shared/messages.js'
+console.log(messages);
 //move these to app.locals
 var currentUser = {}
 exports.getBays = (req, res) => {
@@ -384,42 +388,47 @@ var addUserToQueue = (bayId, tag) => {
                 }, (err, bay) => {
                     if (err) sockets.sendToQueue(bay._id, 'userattempt', res);
                     else if (bay) {
-                        Queue.findOne({
-                            user: user._id
-                        }).populate('user bay').exec((err, queue) => {
-                            if (err) {
-                                res.err = err;
-                                sockets.sendToQueue(bay._id, 'userattempt', res);
-                            }
-                            else if (queue) {
-                                if (!queue.bay || !queue.user) delete queue._id;
-                                else
-                                if (bay._id.equals(queue.bay._id)) res.error = "You are already in this queue";
-                                else res.warning = "Would you like to join this queue? You'll lose your place in your other queue.";
-                                res.data = queue;
-                                sockets.sendToQueue(bay._id, 'userattempt', res);
-                            }
-                            else {
-                                res.info = "Would you like to join this queue?"
-                                getQueue(bay._id).then((queue) => {
-                                    if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = "There's no one in front of you. Would you like to play?"
-                                })
-                                var q = new Queue({
-                                    user: user._id
-                                    , bay: bay._id
-                                });
-                                q.populate('user bay', (err) => {
-                                    res.data = q;
+                        if (bay.currentState.state == 'ready' && bay.currentState.user.equals(user._id)) {
+                            sendStateToClients(bay._id);
+                        }
+                        else {
+                            Queue.findOne({
+                                user: user._id
+                            }).populate('user bay').exec((err, queue) => {
+                                if (err) {
+                                    res.err = err;
                                     sockets.sendToQueue(bay._id, 'userattempt', res);
-                                });
-                            }
-                        });
+                                }
+                                else if (queue) {
+                                    if (!queue.bay || !queue.user) delete queue._id;
+                                    else
+                                    if (bay._id.equals(queue.bay._id)) res.error = messages.alreadyinqueue;
+                                    else res.warning = messages.loseyourplace;
+                                    res.data = queue;
+                                    sockets.sendToQueue(bay._id, 'userattempt', res);
+                                }
+                                else {
+                                    res.info = messages.wouldyouliketojoin;
+                                    getQueue(bay._id).then((queue) => {
+                                        if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = messages.wouldyouliketoplay;
+                                    })
+                                    var q = new Queue({
+                                        user: user._id
+                                        , bay: bay._id
+                                    });
+                                    q.populate('user bay', (err) => {
+                                        res.data = q;
+                                        sockets.sendToQueue(bay._id, 'userattempt', res);
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
             }
             else {
                 console.log('[info] User badge is expired')
-                res.error = "badge expired";
+                res.error = messages.badgeexpired;
                 Bay.findOne({
                     id: bayId
                 }, (err, bay) => {
@@ -429,7 +438,7 @@ var addUserToQueue = (bayId, tag) => {
         }
         else {
             console.log('[info] No user associated with tag' + tag);
-            res.error = "user not found";
+            res.error = messages.usernotfound;
             Bay.findOne({
                 id: bayId
             }, (err, bay) => {
