@@ -4,6 +4,7 @@ var Queue = require('../models/queue').Queue;
 var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 var twilioService = require("../services/twilio");
+var analytics = require("../googleanalytics.js");
 import {
     timerparams
 }
@@ -12,8 +13,7 @@ import {
     messages
 }
 from '../../shared/messages.js'
-console.log(messages);
-//move these to app.locals
+    //move these to app.locals
 var currentUser = {}
 exports.getBays = (req, res) => {
     if (req.params.bayId) {
@@ -146,7 +146,10 @@ exports.enqueueUser = (req, res) => {
                 });
                 q.save().then((doc) => {
                     getQueue(doc.bay).then((fullqueue) => {
-                        if (fullqueue) res.status(200).send(fullqueue);
+                        if (fullqueue) {
+                            analytics.sendAnalytics("Bay", "Enqueue User", fullQueue[0].user.screenname, new Date().getMilliseconds(), {});
+                            res.status(200).send(fullqueue);
+                        }
                     });
                 });
             }
@@ -162,6 +165,7 @@ exports.enqueueUser = (req, res) => {
                         sendQueue(bay._id);
                         if (err) res.status(500).send(err);
                         else if (fullQueue) {
+                            analytics.sendAnalytics("Bay", "Enqueue User", fullQueue[0].user.screenname, new Date().getMilliseconds(), {});
                             res.status(200).send(fullQueue);
                         }
                         else res.status(404).send(fullQueue);
@@ -352,6 +356,7 @@ var notifyUserOnDeck = (bayId) => {
 };
 var startGameplay = (bayId, app) => {
     return getBay(bayId).then((bay) => {
+        analytics.sendAnalytics("Bay", "Start Game", bay.game, new Date().getMilliseconds(), {});
         console.log('start Gameplay on bay ' + bay._id);
         if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
         else {

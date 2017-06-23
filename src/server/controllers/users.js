@@ -1,6 +1,10 @@
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
-import {twoAMTomorrow, midnightThisMorning} from '../../shared/util.js';
+import {
+    twoAMTomorrow, midnightThisMorning
+}
+from '../../shared/util.js';
+var analytics = require("../googleanalytics.js");
 exports.getUsers = (req, res) => {
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
@@ -23,7 +27,10 @@ exports.activateUser = (req, res) => {
                 user.rfid.expiresAt = twoAMTomorrow();
                 user.save((err, doc) => {
                     if (err) res.status(500).send(err);
-                    else res.status(200).send(doc);
+                    else {
+                        analytics.sendAnalytics("User", "Activate User", doc.screenname, new Date().getMilliseconds(), {});
+                        res.status(200).send(doc);
+                    }
                 });
             }
         }
@@ -66,17 +73,28 @@ exports.getUserSignature = (req, res) => {
     });
 };
 exports.checkScreenName = (req, res) => {
-  if (req.params.screenname != null) {
-    User.findOne({ screenname: req.params.screenname }, (err, user) => {
-        if (err) res.status(500).send(err);
-        else if (user) {
-            res.json({ status: true, error: 'Screenname already taken'});
-        }
-        else res.json({ status: true });
-    });
-  } else {
-    res.json({ status: false, error: 'must send screenname'})
-  }
+    if (req.params.screenname != null) {
+        User.findOne({
+            screenname: req.params.screenname
+        }, (err, user) => {
+            if (err) res.status(500).send(err);
+            else if (user) {
+                res.json({
+                    status: true
+                    , error: 'Screenname already taken'
+                });
+            }
+            else res.json({
+                status: true
+            });
+        });
+    }
+    else {
+        res.json({
+            status: false
+            , error: 'must send screenname'
+        })
+    }
 }
 exports.postUser = (req, res) => {
     var signature = new Signature({
@@ -109,6 +127,7 @@ exports.postUser = (req, res) => {
     }, (err, doc) => {
         if (err) res.status(500).send(err);
         else {
+            analytics.sendAnalytics("User", "Register User", doc.screenname, new Date().getMilliseconds(), {});
             res.status(200).send(doc);
         }
     });

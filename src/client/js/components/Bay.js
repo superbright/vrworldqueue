@@ -187,6 +187,17 @@ class Bay extends Component {
 
   handleCloseOtherBrowser() {
     // hi igal, add you handler here
+          const { match: { params: { bayid } } } = this.props;
+      fetch(`/api/sockets/`,{
+          method: 'delete',
+        body:JSON.stringify({clientType: 'queue', clientId: bayid}),
+          headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      }).then(res=>res.json()).then((res)=>{
+          console.log(res);
+          location.reload();
+      })
   }
 
   render() {

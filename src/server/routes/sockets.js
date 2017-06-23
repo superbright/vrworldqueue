@@ -31,4 +31,9 @@ router.get('/', (req, res) => {
     console.log(socketService.socketState);
     res.status(200).send(socketService.socketState);
 });
+router.delete('/', (req, res) => {
+    console.log(req.body);
+    socketService.disconnectClient(req.body.clientType, req.body.clientId);
+    res.status(200).send({status:'ok'});
+});
 module.exports = router;

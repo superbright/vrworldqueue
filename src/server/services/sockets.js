@@ -38,11 +38,20 @@ module.exports.setupSockets = (server, app) => {
         registerSocket(socket, currentBay, app);
     });
 };
+module.exports.disconnectClient = (clientType, clientId) => {
+    if (sockets[clientType][clientId]) {
+        sockets[clientType][clientId].disconnect();
+        sockets[clientType][clientId] = null;
+    }
+}
 var registerSocket = (socket, currentBay, app) => {
     console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
-    if (sockets[currentBay.clientType][currentBay.clientId]) {
-        console.log('socket already connected');
-        socket.emit('setState', {state: 'error', error: 'Page is already open on other tablet'});
+    if (sockets[currentBay.clientType][currentBay.clientId] != null) {
+        console.warn('[WARN] socket already connected');
+        socket.emit('setState', {
+            state: 'error'
+            , error: 'Page is already open on other tablet'
+        });
         socket.disconnect();
         return;
     }

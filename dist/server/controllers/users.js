@@ -5,6 +5,7 @@ var _util = require('../../shared/util.js');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 
+var analytics = require("../googleanalytics.js");
 exports.getUsers = function (req, res) {
     if (req.params.userId) User.findById(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
@@ -21,7 +22,10 @@ exports.activateUser = function (req, res) {
             } else {
                 user.rfid.expiresAt = (0, _util.twoAMTomorrow)();
                 user.save(function (err, doc) {
-                    if (err) res.status(500).send(err);else res.status(200).send(doc);
+                    if (err) res.status(500).send(err);else {
+                        analytics.sendAnalytics("User", "Activate User", doc.screenname, new Date().getMilliseconds(), {});
+                        res.status(200).send(doc);
+                    }
                 });
             }
         } else {
@@ -57,13 +61,23 @@ exports.getUserSignature = function (req, res) {
 };
 exports.checkScreenName = function (req, res) {
     if (req.params.screenname != null) {
-        User.findOne({ screenname: req.params.screenname }, function (err, user) {
+        User.findOne({
+            screenname: req.params.screenname
+        }, function (err, user) {
             if (err) res.status(500).send(err);else if (user) {
-                res.json({ status: true, error: 'Screenname already taken' });
-            } else res.json({ status: true });
+                res.json({
+                    status: true,
+                    error: 'Screenname already taken'
+                });
+            } else res.json({
+                status: true
+            });
         });
     } else {
-        res.json({ status: false, error: 'must send screenname' });
+        res.json({
+            status: false,
+            error: 'must send screenname'
+        });
     }
 };
 exports.postUser = function (req, res) {
@@ -96,6 +110,7 @@ exports.postUser = function (req, res) {
         new: true
     }, function (err, doc) {
         if (err) res.status(500).send(err);else {
+            analytics.sendAnalytics("User", "Register User", doc.screenname, new Date().getMilliseconds(), {});
             res.status(200).send(doc);
         }
     });
