@@ -50,7 +50,7 @@ class BayList extends Component {
                 </div>
 
                 <div className="bay-list-count">
-                  0
+                  {bay.queueCount}
                 </div>
 
                 <div className="bay-list-state">

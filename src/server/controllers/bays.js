@@ -25,7 +25,19 @@ exports.getBays = (req, res) => {
     }
     else Bay.find({}, (err, bays) => {
         if (err) res.status(500).send(err);
-        else res.status(200).send(bays);
+        else {
+          var allQueues = bays.map((b, i) => {
+            return getQueue(b._id);
+          });
+
+          Promise.all(allQueues).then(q => {
+            const updated = bays.map((b, i) => {
+              const newB = b.toObject();
+              return { ...newB, queueCount: q[i].length };
+            });
+            res.status(200).send(updated);
+          });
+        }
     });
 };
 exports.getBayByLocalId = (req, res) => {
