@@ -305,14 +305,43 @@ button.button-white {
 
 }
 
+.big-bay-body {
+  overflow: hidden;
+}
+
 .bay-page.big-bay h1 {
   font-size: 7rem;
 }
 
 .bay-page.big-bay h3 {
   font-size: 5rem;
+  overflow: hidden;
 }
 
 .bay-page.big-bay h4, .bay-page.big-bay h5 {
   font-size: 3rem;
+}
+
+.big-bay-logo {
+  margin-left: 25px;
+  width: 60px;
+  height: 60px;
+}
+
+.big-bay-logo-bigger {
+  width: 300px;
+  height: 300px;
+}
+
+.big-bay-main-logo {
+  text-align: center;
+}
+
+.big-bay-main-logo img {
+  margin: 30px 0px;
+}
+
+
+.inline {
+  display: inline-block;
 }

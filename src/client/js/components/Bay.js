@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import Spinner from 'react-spin';
+import VRWorldStamp from '../../images/VRWorld_Stamp.png';
 import SocketConnectionStatus from './SocketConnectionStatus';
 import showRemaining from '../utils/showRemaining';
 import config from '../utils/spinnerConfig';
@@ -42,7 +43,10 @@ class Bay extends Component {
 
   componentWillMount() {
     const { match: { params: { bayid } }, isBigBay } = this.props;
-
+    if (isBigBay) {
+      console.log('here');
+      document.body.className += ' ' + 'big-bay-body';
+    }
     return fetch(`/api/bays/${isBigBay ? 'local/' : ''}${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
@@ -207,14 +211,28 @@ class Bay extends Component {
           bay && (
             <div>
               <header className="flex space-between align-center">
+                <div className="flex align-center">
+                  <img className="big-bay-logo" src={VRWorldStamp} />
+                  <h5>#vrworld</h5>
+                </div>
                 <h5>{bay.name}</h5>
-                <h5>{bay.game}</h5>
               </header>
               {
                 queue.length === 0
                 ? (
                   <div className="simple-container user-search">
-                    <h3>{'There\'s no one in line, register now!'}</h3>
+                    {
+                      isBigBay
+                      ? (
+                        <div className="big-bay-main-logo">
+                          <img className="big-bay-logo-bigger" src={VRWorldStamp} />
+                          <h1>#vrworld</h1>
+                        </div>
+                      )
+                      : (
+                        <h3>{'There\'s no one in line, register now!'}</h3>
+                      )
+                    }
                   </div>
                 )
                 : (
