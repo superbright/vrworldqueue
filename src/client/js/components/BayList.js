@@ -41,7 +41,7 @@ class BayList extends Component {
           </li>
           {
             bays &&
-            bays.map(bay => (
+            bays.sort((a, b) => a.id - b.id).map(bay => (
               <li key={bay._id} className="user-list-item bay-list-item flex space-between align-center">
                 <div className="bay-list-name">
                   <h5><Link to={`/bay/${bay._id}`}>{bay.name} - {bay.game}</Link></h5>
