@@ -347,3 +347,16 @@ button.button-white {
 .inline {
   display: inline-block;
 }
+
+.bay-list-item h5, .bay-list-item p {
+  margin: 0px;
+}
+
+.bay-list-name {
+  width: 50%;
+}
+
+.bay-list-count, .bay-list-state {
+  width: 25%;
+  text-align: right;
+}

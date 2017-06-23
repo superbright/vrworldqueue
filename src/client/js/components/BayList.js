@@ -26,14 +26,35 @@ class BayList extends Component {
     return (
       <div>
         <ul>
+          <li key='bay-header' className="user-list-item bay-list-item flex space-between align-center">
+            <div className="bay-list-name">
+              <p>Bay Name</p>
+            </div>
+
+            <div className="bay-list-count">
+              User Count
+            </div>
+
+            <div className="bay-list-state">
+              Play State
+            </div>
+          </li>
           {
             bays &&
             bays.map(bay => (
-              <li key={bay._id} className="user-list-item flex space-between align-center">
-                <div>
+              <li key={bay._id} className="user-list-item bay-list-item flex space-between align-center">
+                <div className="bay-list-name">
                   <h5><Link to={`/bay/${bay._id}`}>{bay.name} - {bay.game}</Link></h5>
+                  <p><Link to={`/bay/${bay._id}/play`}>play button page</Link></p>
                 </div>
-                <div><h5><Link to={`/bay/${bay._id}/play`}>play button page</Link></h5></div>
+
+                <div className="bay-list-count">
+                  0
+                </div>
+
+                <div className="bay-list-state">
+                  {bay.currentState.state}
+                </div>
               </li>
             ))
           }
