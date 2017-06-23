@@ -16,7 +16,7 @@ class AdminQueue extends Component {
 
   componentWillMount() {
     const { match: { params: { bayid } } } = this.props;
-
+    this.fetchQueue();
     return fetch(`/api/bays/${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
