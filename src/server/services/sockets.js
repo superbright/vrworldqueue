@@ -47,13 +47,15 @@ module.exports.disconnectClient = (clientType, clientId) => {
 var registerSocket = (socket, currentBay, app) => {
     console.log('[Info] Incoming WS Connection from ' + currentBay.clientType + ' # ' + currentBay.clientId);
     if (sockets[currentBay.clientType][currentBay.clientId] != null) {
-        console.warn('[WARN] socket already connected');
-        socket.emit('setState', {
-            state: 'error'
-            , error: 'Page is already open on other tablet'
-        });
-        socket.disconnect();
-        return;
+        if (currentBay.clientType != 'admin') {
+            console.warn('[WARN] socket already connected');
+            socket.emit('setState', {
+                state: 'error'
+                , error: 'Page is already open on other tablet'
+            });
+            socket.disconnect();
+            return;
+        }
     }
     sockets[currentBay.clientType][currentBay.clientId] = socket;
     socketState[currentBay.clientType][currentBay.clientId] = true;

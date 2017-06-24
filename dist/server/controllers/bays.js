@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _timerconfig = require('../../shared/timerconfig.js');
 
 var _messages = require('../../shared/messages.js');
@@ -20,7 +22,19 @@ exports.getBays = function (req, res) {
             if (err) res.status(500).send(err);else if (bay) res.status(200).send(bay);else res.status(404).send("No Bay found with that ID");
         });
     } else Bay.find({}, function (err, bays) {
-        if (err) res.status(500).send(err);else res.status(200).send(bays);
+        if (err) res.status(500).send(err);else {
+            var allQueues = bays.map(function (b, i) {
+                return getQueue(b._id);
+            });
+
+            Promise.all(allQueues).then(function (q) {
+                var updated = bays.map(function (b, i) {
+                    var newB = b.toObject();
+                    return _extends({}, newB, { queueCount: q[i].length });
+                });
+                res.status(200).send(updated);
+            });
+        }
     });
 };
 exports.getBayByLocalId = function (req, res) {
