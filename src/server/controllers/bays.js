@@ -26,17 +26,17 @@ exports.getBays = (req, res) => {
     else Bay.find({}, (err, bays) => {
         if (err) res.status(500).send(err);
         else {
-          var allQueues = bays.map((b, i) => {
-            return getQueue(b._id);
-          });
-
-          Promise.all(allQueues).then(q => {
-            const updated = bays.map((b, i) => {
-              const newB = b.toObject();
-              return { ...newB, queueCount: q[i].length };
+            var allQueues = bays.map((b, i) => {
+                return getQueue(b._id);
             });
-            res.status(200).send(updated);
-          });
+            Promise.all(allQueues).then(q => {
+                const updated = bays.map((b, i) => {
+                    const newB = b.toObject();
+                    return {...newB, queueCount: q[i].length
+                    };
+                });
+                res.status(200).send(updated);
+            });
         }
     });
 };
@@ -150,20 +150,6 @@ exports.enqueueUser = (req, res) => {
                     else console.log('-----User not found');
                 });
                 res.status(200).send([]);
-            }
-            else if (bay.currentState.state == 'onboarding') {
-                var q = new Queue({
-                    user: req.body.userId
-                    , bay: bay._id
-                });
-                q.save().then((doc) => {
-                    getQueue(doc.bay).then((fullqueue) => {
-                        if (fullqueue) {
-                            analytics.sendAnalytics("Bay", "Enqueue User", fullQueue[0].user.screenname, new Date().getMilliseconds(), {});
-                            res.status(200).send(fullqueue);
-                        }
-                    });
-                });
             }
             else {
                 var q = new Queue({

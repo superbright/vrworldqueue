@@ -26,11 +26,11 @@ exports.getBays = function (req, res) {
             var allQueues = bays.map(function (b, i) {
                 return getQueue(b._id);
             });
-
             Promise.all(allQueues).then(function (q) {
                 var updated = bays.map(function (b, i) {
                     var newB = b.toObject();
-                    return _extends({}, newB, { queueCount: q[i].length });
+                    return _extends({}, newB, { queueCount: q[i].length
+                    });
                 });
                 res.status(200).send(updated);
             });
@@ -141,19 +141,6 @@ exports.enqueueUser = function (req, res) {
                     } else console.log('-----User not found');
                 });
                 res.status(200).send([]);
-            } else if (bay.currentState.state == 'onboarding') {
-                var q = new Queue({
-                    user: req.body.userId,
-                    bay: bay._id
-                });
-                q.save().then(function (doc) {
-                    getQueue(doc.bay).then(function (fullqueue) {
-                        if (fullqueue) {
-                            analytics.sendAnalytics("Bay", "Enqueue User", fullQueue[0].user.screenname, new Date().getMilliseconds(), {});
-                            res.status(200).send(fullqueue);
-                        }
-                    });
-                });
             } else {
                 var q = new Queue({
                     user: req.body.userId,
