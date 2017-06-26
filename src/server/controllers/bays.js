@@ -74,19 +74,23 @@ var sendStateToClients = (bayId) => {
 }
 var checkState = (bayId, app) => {
     return getQueue(bayId).then((queue) => {
-        if (!queue.length) {
-            console.log('No one left in queue ' + bayId);
-            return getBay(bayId).then((bay) => {
-                if (bay.currentState.state == 'onboarding') {
+        console.log('No one left in queue ' + bayId);
+        return getBay(bayId).then((bay) => {
+            if (bay.currentState.state == 'onboarding') {
+                if (!queue.length) {
                     console.log('was in onboarding, going to idle...');
                     return startIdle(bayId, app);
-                };
-            });
-        }
-        else {
-            console.log('Still people in queue. Restarting Onboarding...');
-            return startOnboarding(bayId, app);
-        }
+                }
+                else {
+                    console.log('Still people in queue. Restarting Onboarding...');
+                    return startOnboarding(bayId, app);
+                }
+            }
+            else if (bay.currentState.state == 'gameplay') {
+                console.log('In Gameplay, just update queue');
+                return sendQueue(bay._id);
+            }
+        });
     });
 }
 exports.bringUserToFront = (req, res) => {
