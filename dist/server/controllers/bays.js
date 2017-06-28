@@ -45,14 +45,22 @@ exports.getBayByLocalId = function (req, res) {
     });
 };
 exports.upsertBay = function (req, res) {
-    var newBay = new Bay({
-        id: req.body.id,
-        name: req.body.name,
-        game: req.body.game
-    });
-    newBay.save(function (err, doc) {
-        if (err) res.status(500).send(err);
+    var bayData = {};
+    if (req.body.id != null) bayData.id = req.body.id;else {
+        res.status(404).send('Must provide id for bay');
+    }
+    if (req.body.name != null) bayData.name = req.body.id;
+    if (req.body.game != null) bayData.game = req.body.game;
+    if (req.body.instructionFile != null) bayData.instructionFile = req.body.instructionFile;
+    Bay.findOneAndUpdate({
+        id: req.body.id
+    }, bayData, {
+        upsert: true,
+        new: true
+    }).exec().then(function (doc) {
         res.status(200).send(doc);
+    }).catch(function (err) {
+        return res.status(500).send(err);
     });
 };
 var removeUserFromQueue = function removeUserFromQueue(user) {

@@ -3,14 +3,14 @@ const bays = [
         bayid: 0
         , name: 'A-1'
         , game: 'Play Things'
-        , playTime: 1
+        , playTime: 12
         , instructionFile: '/images/instructions/a_1.png'
     , }
     , {
         bayid: 1
         , name: 'A-2'
         , game: 'Fruit Ninja'
-        , playTime: 1
+        , playTime: 10
         , instructionFile: '/images/instructions/a_2.png'
     , }
     , {
