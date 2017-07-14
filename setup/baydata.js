@@ -2,7 +2,7 @@ const bays = [
     {
         bayid: 0
         , name: 'A-1'
-        , game: 'Play Things'
+        , game: 'Plank'
         , playTime: 12
         , instructionFile: '/images/instructions/a_1.png'
     , }
@@ -37,7 +37,7 @@ const bays = [
     , {
         bayid: 5
         , name: 'A-5'
-        , game: 'Superhot'
+        , game: 'Space Pirate Trainer'
         , playTime: 10
         , instructionFile: '/images/instructions/a_5.png'
     , }
@@ -93,8 +93,8 @@ const bays = [
     , {
         bayid: 13
         , name: 'B-1'
-        , game: 'ART PIECE'
-        , playTime: 10
+        , game: 'Brookhaven'
+        , playTime: 12
         , instructionFile: '/images/instructions/b_1.png'
  }
     , {
@@ -114,7 +114,7 @@ const bays = [
     , {
         bayid: 16
         , name: 'B-3'
-        , game: 'Thrill of the Fight'
+        , game: 'Serious Sam'
         , playTime: 10
         , instructionFile: '/images/instructions/b_3.png'
     , }
@@ -128,14 +128,14 @@ const bays = [
     , {
         bayid: 18
         , name: 'B-5'
-        , game: 'The Climb'
+        , game: 'Elven Assassin'
         , playTime: 10
         , instructionFile: '/images/instructions/b_5.png'
  }
     , {
         bayid: 19
         , name: 'B-6'
-        , game: 'Space Pirate Trainer'
+        , game: 'Thrill Of The Fight'
         , playTime: 10
         , instructionFile: '/images/instructions/b_6.png'
  }
@@ -149,8 +149,8 @@ const bays = [
     , {
         bayid: 21
         , name: 'B-8'
-        , game: 'Elven Assassin'
-        , playTime: 10
+        , game: 'The Climb'
+        , playTime: 12
         , instructionFile: '/images/instructions/b_8.png'
  }
     , {
