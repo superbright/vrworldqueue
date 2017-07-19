@@ -1,3 +1,4 @@
+import moment from 'moment';
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 import {
@@ -6,9 +7,21 @@ import {
 from '../../shared/util.js';
 var analytics = require("../googleanalytics.js");
 exports.getUsers = (req, res) => {
+    let dob = null;
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
         if (err) res.status(500).send(err);
-        if (user) res.status(200).send(user);
+        if (user) {
+          if (user.dob) {
+            user = user.toObject();
+            dob = moment(user.dob);
+            user.dob = {
+              month: dob.month(),
+              date: dob.date(),
+              year: dob.year()
+            }
+          };
+          res.status(200).send(user);
+        }
         else res.status(404).send("No User found with that ID");
     });
     else User.find({}, (err, users) => {
@@ -111,6 +124,9 @@ exports.postUser = (req, res) => {
     if (req.body.phone != null) userData.phone = req.body.phone;
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
     if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
+    if (req.body.gender != null) userData.gender = req.body.gender;
+    if (req.body.dob != null) userData.dob = moment(req.body.dob);
+    if (req.body.address != null) userData.address = req.body.address;
     userData.signature = signature._id
     if (req.body.rfid) {
         console.log('Adding RFID');

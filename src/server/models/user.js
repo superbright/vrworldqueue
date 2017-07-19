@@ -16,8 +16,26 @@ var schema = new mongoose.Schema({
     , screenname: {
         type: String
     }
+    , gender: {
+        type: String
+        , emum: ['male', 'female']
+    }
+    , dob: {
+        type: Date
+    }
     , usedVR: {
         type: Boolean
+    }
+    , address: {
+        city: {
+          type: String
+        }
+        , state: {
+          type: String
+        }
+        , country: {
+          type: String
+        }
     }
     , queue: {
         type: mongoose.Schema.Types.ObjectId
@@ -45,8 +63,8 @@ var schema = new mongoose.Schema({
         type: Date
         , default: new Date()
     }
-})
+});
 var User = mongoose.model('User', schema);
 module.exports = {
     User: User
-}
+};
