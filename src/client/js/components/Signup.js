@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import validate from 'validate.js';
+import _ from 'lodash';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 import formConstraints from '../utils/formConstraints';
@@ -13,6 +14,16 @@ const formInit = {
   email: '',
   phone: '',
   screenname: '',
+  gender: '',
+  dob: {
+    month: '',
+    date: '',
+    year: ''
+  },
+  address: {
+    city: '',
+    country: ''
+  }
 };
 
 class Signup extends Component {
@@ -44,10 +55,7 @@ class Signup extends Component {
     const name = target.name;
 
     this.setState({
-      form: {
-        ...this.state.form,
-        [name]: value,
-      },
+      form: _.set(this.state.form, name, value)
     });
   }
 

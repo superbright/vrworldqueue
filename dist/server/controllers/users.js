@@ -1,15 +1,33 @@
 'use strict';
 
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
 var _util = require('../../shared/util.js');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 
 var analytics = require("../googleanalytics.js");
 exports.getUsers = function (req, res) {
+    var dob = null;
     if (req.params.userId) User.findById(req.params.userId, function (err, user) {
         if (err) res.status(500).send(err);
-        if (user) res.status(200).send(user);else res.status(404).send("No User found with that ID");
+        if (user) {
+            if (user.dob) {
+                user = user.toObject();
+                dob = (0, _moment2.default)(user.dob);
+                user.dob = {
+                    month: dob.month(),
+                    date: dob.date(),
+                    year: dob.year()
+                };
+            };
+            res.status(200).send(user);
+        } else res.status(404).send("No User found with that ID");
     });else User.find({}, function (err, users) {
         if (err) res.status(500).send(err);else res.status(200).send(users);
     });
@@ -95,6 +113,9 @@ exports.postUser = function (req, res) {
     if (req.body.phone != null) userData.phone = req.body.phone;
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
     if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
+    if (req.body.gender != null) userData.gender = req.body.gender;
+    if (req.body.dob != null) userData.dob = (0, _moment2.default)(req.body.dob);
+    if (req.body.address != null) userData.address = req.body.address;
     userData.signature = signature._id;
     if (req.body.rfid) {
         console.log('Adding RFID');

@@ -12,8 +12,49 @@ class FormGroup extends Component {
     // scrollIntoView(this.inputRef, { time: 500 });
   }
 
+  renderInput() {
+    const { value, valueID, handleChange } = this.props;
+
+    return (
+      <input
+        type="text"
+        name={valueID}
+        id={valueID}
+        value={value}
+        onChange={handleChange}
+        onFocus={this.handleFocus}
+        ref={(ref) => { this.inputRef = ref; }}
+      />
+    );
+  }
+
+  renderSelect() {
+    const { value, valueID, options, handleChange } = this.props;
+    let selects = [];
+    options.options.forEach((option) => {
+      selects.push(<option key={option.value} value={option.value}>{option.label}</option>);
+    });
+    return (
+      <select
+        name={valueID}
+        id={valueID}
+        value={value}
+        onChange={handleChange}
+      >
+        {selects}
+      </select>
+    );
+  }
+
   render() {
-    const { value, valueID, valueName, required, errors, handleChange } = this.props;
+    const { value, valueID, valueName, required, errors, type } = this.props;
+    let element = '';
+
+    if (type === 'select') {
+      element = this.renderSelect();
+    } else {
+      element = this.renderInput();
+    }
 
     return (
       <div>
@@ -21,15 +62,7 @@ class FormGroup extends Component {
           (value || value === '') &&
           <div className="form-group">
             <label htmlFor={valueID}>{valueName} {required && <span className="small-font">*</span>}</label>
-            <input
-              type="text"
-              name={valueID}
-              id={valueID}
-              value={value}
-              onChange={handleChange}
-              onFocus={this.handleFocus}
-              ref={(ref) => { this.inputRef = ref; }}
-            />
+            {element}
             {errors && errors[valueID] && <div className="error-message">{errors[valueID]}</div>}
           </div>
         }
