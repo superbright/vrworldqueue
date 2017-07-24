@@ -3,21 +3,21 @@ const bays = [
         bayid: 0
         , name: 'A-1'
         , game: 'Plank'
-        , playTime: 12
+        , playTime: 5
         , instructionFile: '/images/instructions/a_1.png'
     , }
     , {
         bayid: 1
         , name: 'A-2'
         , game: 'Fruit Ninja'
-        , playTime: 10
+        , playTime: 4
         , instructionFile: '/images/instructions/a_2.png'
     , }
     , {
         bayid: 2
         , name: 'A-3'
         , game: 'Tilt Brush'
-        , playTime: 10
+        , playTime: 7
         , instructionFile: '/images/instructions/a_3.png'
     , }
     , {
@@ -38,7 +38,7 @@ const bays = [
         bayid: 5
         , name: 'A-5'
         , game: 'Space Pirate Trainer'
-        , playTime: 10
+        , playTime: 7
         , instructionFile: '/images/instructions/a_5.png'
     , }
     , {
@@ -73,112 +73,112 @@ const bays = [
         bayid: 10
         , name: 'A-7'
         , game: 'VR Skeet Shooter'
-        , playTime: 10
+        , playTime: 6
         , instructionFile: '/images/instructions/a_7.png'
     }
     , {
         bayid: 11
         , name: 'A-8'
         , game: 'I Expect You to Die'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/a_8.png'
  }
     , {
         bayid: 12
         , name: 'A-9'
         , game: 'Lucky\'s Tale'
-        , playTime: 10
+        , playTime: 6
         , instructionFile: '/images/instructions/a_9.png'
  }
     , {
         bayid: 13
         , name: 'B-1'
         , game: 'Brookhaven'
-        , playTime: 12
+        , playTime: 10
         , instructionFile: '/images/instructions/b_1.png'
  }
     , {
         bayid: 14
         , name: 'B-2A'
         , game: 'Raw Data'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/b_2a.png'
   }
     , {
         bayid: 15
         , name: 'B-2B'
         , game: 'Raw Data'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/b_2b.png'
  }
     , {
         bayid: 16
         , name: 'B-3'
         , game: 'Serious Sam'
-        , playTime: 10
+        , playTime: 7
         , instructionFile: '/images/instructions/b_3.png'
     , }
     , {
         bayid: 17
         , name: 'B-4'
         , game: 'Serious Sam'
-        , playTime: 10
+        , playTime: 7
         , instructionFile: '/images/instructions/b_4.png'
  }
     , {
         bayid: 18
         , name: 'B-5'
         , game: 'Elven Assassin'
-        , playTime: 10
+        , playTime: 6
         , instructionFile: '/images/instructions/b_5.png'
  }
     , {
         bayid: 19
         , name: 'B-6'
         , game: 'Thrill Of The Fight'
-        , playTime: 10
+        , playTime: 6
         , instructionFile: '/images/instructions/b_6.png'
  }
     , {
         bayid: 20
         , name: 'B-7'
         , game: 'Superhot'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/b_7.png'
  }
     , {
         bayid: 21
         , name: 'B-8'
         , game: 'The Climb'
-        , playTime: 12
+        , playTime: 8
         , instructionFile: '/images/instructions/b_8.png'
  }
     , {
         bayid: 22
         , name: 'B-9'
         , game: 'Rick & Morty'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/b_9.png'
  }
     , {
         bayid: 23
         , name: 'B-10'
         , game: 'Job Simulator'
-        , playTime: 10
+        , playTime: 8
         , instructionFile: '/images/instructions/b_10.png'
  }
     , {
         bayid: 24
         , name: 'B-11'
         , game: 'Tilt Brush'
-        , playTime: 10
+        , playTime: 7
         , instructionFile: '/images/instructions/b_11.png'
     , }
     , {
         bayid: 25
         , name: 'B-12'
         , game: 'Thumper'
-        , playTime: 10
+        , playTime: 6
         , instructionFile: '/images/instructions/b_12.png'
     , }
     , {
