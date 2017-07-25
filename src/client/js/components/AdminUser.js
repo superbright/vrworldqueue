@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
 import _ from 'lodash';
+import moment from 'moment';
 import validate from 'validate.js';
 import UserForm from './UserForm';
 import SocketConnectionStatus from './SocketConnectionStatus';
@@ -159,7 +160,10 @@ class AdminUser extends Component {
                   <div>
                     {
                       activated
-                      ? <div>{'User\'s account activated!'} <button onClick={() => this.activateUser(false)}>Deactivate Account</button></div>
+                      ? <div>
+                          <div>{'User\'s account activated!'} <button onClick={() => this.activateUser(false)}>Deactivate Account</button></div>
+                          <div>Expires At: {moment(user.rfid.expiresAt).format('dddd, h:mm:ss a')}</div>
+                        </div>
                       : <button onClick={this.activateUser}>Activate Account</button>
                     }
                   </div>
@@ -173,6 +177,7 @@ class AdminUser extends Component {
                 handleSubmit={this.handleSubmit}
                 errors={errors}
                 twoButtons
+                admin
               />
             </div>
           )

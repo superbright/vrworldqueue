@@ -21,11 +21,13 @@ const UserForm = ({
     screenname,
     gender = '',
     dob = {},
-    address = {}
+    address = {},
+    timer = '',
   },
   submitText,
   errors,
-  twoButtons
+  twoButtons,
+  admin
 }) => {
   address.city = address.city || '';
   address.country = address.country || '';
@@ -39,6 +41,31 @@ const UserForm = ({
           <div className="form-group">
             <button>{submitText || 'Submit'}</button>
           </div>
+        }
+
+        {
+          admin &&
+          <FormGroup
+            value={timer}
+            valueID="timer"
+            valueName="Time"
+            type="select"
+            errors={errors}
+            handleChange={handleChange}
+            options={{
+            name: 'timer',
+            options: [{
+              label: 'Day',
+              value: ''
+            }, {
+              label: '1 Hour',
+              value: '1'
+            }, {
+              label: '3 Hours',
+              value: '3'
+            }]
+          }}
+          />
         }
 
         <FormGroup
