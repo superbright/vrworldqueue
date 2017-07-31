@@ -116,12 +116,13 @@ exports.postUser = function (req, res) {
     if (req.body.gender != null) userData.gender = req.body.gender;
     if (req.body.dob != null) userData.dob = (0, _moment2.default)(req.body.dob);
     if (req.body.address != null) userData.address = req.body.address;
+    console.log(req.body);
     userData.signature = signature._id;
     if (req.body.rfid) {
         console.log('Adding RFID');
         userData.rfid = {};
         userData.rfid.id = req.body.rfid;
-        userData.rfid.expiresAt = (0, _util.twoAMTomorrow)();
+        userData.rfid.expiresAt = req.body.timer && !isNaN(parseInt(req.body.timer)) ? (0, _moment2.default)().add(req.body.timer, 'h').toDate() : (0, _util.twoAMTomorrow)();
     }
     var query = {
         'email': req.body.email
