@@ -11,8 +11,8 @@
     <!-- <script src="/static/bundle.js">
       </script> -->
       <script type="text/javascript">
-      var cachebuster = Math.round(new Date().getTime() / 1000);
-      document.write('<scr'+'ipt type="text/javascript" src="/static/bundle.js?cb=' +cachebuster+'"></scr' + 'ipt>');
+        var cachebuster = (window.location.hostname !== 'localhost') ? 'v1.2.1' : Math.round(new Date().getTime() / 1000);
+        document.write('<scr'+'ipt type="text/javascript" src="/static/bundle.js?cb=' +cachebuster+'"></scr' + 'ipt>');
       </script>
   </body>
 </html>
