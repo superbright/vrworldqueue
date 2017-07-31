@@ -343,6 +343,7 @@ const bays = [
         , instructionFile: '/images/instructions/m_4f.png'
     , }
 , ];
+
 module.exports = {
-    bays
-, };
+  bays,
+};
