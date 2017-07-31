@@ -9,15 +9,15 @@ const bays = [
     , {
         bayid: 1
         , name: 'A-2'
-        , game: 'Fruit Ninja'
-        , playTime: 4
-        , instructionFile: '/images/instructions/fruit_ninja.png'
+        , game: 'Serious Sam'
+        , playTime: 10
+        , instructionFile: '/images/instructions/serious_sam.png'
     , }
     , {
         bayid: 2
         , name: 'A-3'
         , game: 'Tilt Brush'
-        , playTime: 7
+        , playTime: 8
         , instructionFile: '/images/instructions/tilt_brush.png'
     , }
     , {
@@ -38,7 +38,7 @@ const bays = [
         bayid: 5
         , name: 'A-5'
         , game: 'Space Pirate Trainer'
-        , playTime: 7
+        , playTime: 8
         , instructionFile: '/images/instructions/space_pirate_trainer.png'
     , }
     , {
@@ -101,49 +101,49 @@ const bays = [
         bayid: 14
         , name: 'B-2A'
         , game: 'Raw Data'
-        , playTime: 8
+        , playTime: 12
         , instructionFile: '/images/instructions/raw_data.png'
   }
     , {
         bayid: 15
         , name: 'B-2B'
         , game: 'Raw Data'
-        , playTime: 8
+        , playTime: 12
         , instructionFile: '/images/instructions/raw_data.png'
  }
     , {
         bayid: 16
         , name: 'B-3'
-        , game: 'Serious Sam'
+        , game: 'Thrill of the Fight'
         , playTime: 7
-        , instructionFile: '/images/instructions/serious_sam.png'
+        , instructionFile: '/images/instructions/thrill_of_the_fight.png'
     , }
     , {
         bayid: 17
         , name: 'B-4'
-        , game: 'Serious Sam'
-        , playTime: 7
-        , instructionFile: '/images/instructions/serious_sam.png'
+        , game: 'Fruit Ninja'
+        , playTime: 5
+        , instructionFile: '/images/instructions/fruit_ninja.png'
  }
     , {
         bayid: 18
         , name: 'B-5'
         , game: 'Elven Assassin'
-        , playTime: 6
+        , playTime: 8
         , instructionFile: '/images/instructions/elven_assassin.png'
  }
     , {
         bayid: 19
         , name: 'B-6'
-        , game: 'Thrill Of The Fight'
+        , game: 'Space Pirate Trainer'
         , playTime: 6
-        , instructionFile: '/images/instructions/thrill_of_the_fight.png'
+        , instructionFile: '/images/instructions/space_pirate_trainer.png'
  }
     , {
         bayid: 20
         , name: 'B-7'
         , game: 'Superhot'
-        , playTime: 8
+        , playTime: 11
         , instructionFile: '/images/instructions/superhot.png'
  }
     , {
@@ -178,7 +178,7 @@ const bays = [
         bayid: 25
         , name: 'B-12'
         , game: 'Thumper'
-        , playTime: 6
+        , playTime: 8
         , instructionFile: '/images/instructions/thumper.png'
     , }
     , {
