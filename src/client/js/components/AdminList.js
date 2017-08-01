@@ -6,14 +6,20 @@ class AdminList extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      filteredUsers: props.users || [],
-      searchValue: '',
-    };
-
     this.updateSearch = this.updateSearch.bind(this);
     this.filterUsers = this.filterUsers.bind(this);
     this.updateFilter = debounce(this.updateFilter.bind(this), 1000);
+
+    this.state = {
+      filteredUsers: props.users ? this.sortUsers(props.users) : [],
+      searchValue: '',
+    };
+  }
+
+  sortUsers(users) {
+    return users.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
   }
 
   updateSearch(e) {
@@ -32,9 +38,7 @@ class AdminList extends Component {
     const { users } = this.props;
     const value = searchValue.toLowerCase();
 
-    const sortedUsers = users.sort((a, b) => {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    });
+    const sortedUsers = this.sortUsers(users);
 
 
     return searchValue
