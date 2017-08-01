@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
+import debounce from 'lodash/debounce';
 import { Link } from 'react-router-dom';
 
 class AdminList extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
+      filteredUsers: props.users || [],
       searchValue: '',
     };
 
     this.updateSearch = this.updateSearch.bind(this);
     this.filterUsers = this.filterUsers.bind(this);
+    this.updateFilter = debounce(this.updateFilter.bind(this), 1000);
   }
 
-  updateSearch(event) {
-    const { target: { value } } = event;
+  updateSearch(e) {
+    const { target : { value }} = e;
 
-    this.setState({ searchValue: value });
+    this.setState({searchValue: value});
+    this.updateFilter();
+  }
+
+  updateFilter() {
+    this.setState({ filteredUsers: this.filterUsers() });
   }
 
   filterUsers() {
@@ -41,10 +49,8 @@ class AdminList extends Component {
   }
 
   render() {
-    const { searchValue } = this.state;
+    const { searchValue, filteredUsers } = this.state;
     const { getUsers, match: { params: { adminid } } } = this.props;
-
-    const filteredUsers = this.filterUsers();
 
     return (
       <div>
@@ -62,7 +68,7 @@ class AdminList extends Component {
 
         <ul>
           {
-            filteredUsers.map(user => (
+            filteredUsers.slice(0, 50).map(user => (
               <li
                 className="user-list-item flex space-between align-center"
                 key={user._id}
