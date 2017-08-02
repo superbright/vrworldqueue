@@ -20,7 +20,7 @@ var schema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        emum: ['male', 'female', 'other']
+        emum: ['male', 'female']
     },
     dob: {
         type: Date
