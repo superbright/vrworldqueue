@@ -67,7 +67,7 @@ const UserForm = ({
           }}
           />
         }
-        <p>* required</p>
+
         <FormGroup
           value={firstname}
           valueID="firstname"
@@ -110,7 +110,6 @@ const UserForm = ({
           valueName="Phone"
           errors={errors}
           handleChange={handleChange}
-          required
         />
 
         <FormGroup
@@ -155,9 +154,6 @@ const UserForm = ({
               }, {
                 label: 'Female',
                 value: 'female'
-              }, {
-                label: 'Other',
-                value: 'other'
               }]
             }}
         />
