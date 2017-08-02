@@ -13,6 +13,7 @@ data.bays.forEach(bay => {
         , game: bay.game
         , playTime: bay.playTime
         , instructionFile: bay.instructionFile
+        , bigBayFile: bay.bigBayImageFile
     };
     Bay.findOneAndUpdate({
         id: newBay.id
@@ -25,3 +26,4 @@ data.bays.forEach(bay => {
         console.log(err);
     });
 });
+console.log('All done!');

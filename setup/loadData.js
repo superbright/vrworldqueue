@@ -2,6 +2,7 @@ const data = require('./baydata');
 const Bay = require('../src/server/models/bay').Bay;
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/vrworld');
+return;
 //WARNING, CURRENTLY DESTRUCTIVE
 //Drops table, and updates all the data with new bays
 //this script is only for testing, should not be used for production
