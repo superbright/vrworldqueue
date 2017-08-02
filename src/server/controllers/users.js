@@ -1,5 +1,4 @@
 import moment from 'moment';
-import csv from 'express-csv';
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 import {
@@ -176,41 +175,6 @@ exports.deleteUser = (req, res) => {
         else res.status(404).send("No User found with that ID");
     });
 };
-
-exports.exportUsers = (req, res) => {
-  let userRows = [];
-  User.find({}, (err, users) => {
-    if (err) res.status(500).send(err);
-    userRows = users.map(user => [
-      user.firstname ? user.firstname : '',
-      user.lastname ? user.lastname : '',
-      user.email ? user.email : '',
-      user.phone ? user.phone : '',
-      user.screenname ? user.screenname : '',
-      user.gender ? user.gender : '',
-      user.dob ? moment(user.dob).format('MM-DD-YYYY') : '',
-      user.address.city ? user.address.city : '',
-      user.address.state ? user.address.state : '',
-      user.address.country ? user.address.country : '',
-      user.createdAt ? moment(user.createdAt).format('MM-DD-YYYY') : ''
-    ]);
-    userRows.unshift([
-      'First Name',
-      'Last Name',
-      'Email',
-      'Phone',
-      'Screenname',
-      'Gender',
-      'Date of Birth',
-      'City',
-      'State/Province',
-      'Country',
-      'Created On'
-    ]);
-    res.csv(userRows, '', 200);
-  });
-};
-
 module.exports.socketHandler = (socket) => {
     /* Add Socket Handling Logic Here */
 };

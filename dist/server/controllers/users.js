@@ -4,10 +4,6 @@ var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _expressCsv = require('express-csv');
-
-var _expressCsv2 = _interopRequireDefault(_expressCsv);
-
 var _util = require('../../shared/util.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -120,6 +116,7 @@ exports.postUser = function (req, res) {
     if (req.body.gender != null) userData.gender = req.body.gender;
     if (req.body.dob != null) userData.dob = (0, _moment2.default)(req.body.dob);
     if (req.body.address != null) userData.address = req.body.address;
+    console.log(req.body);
     userData.signature = signature._id;
     if (req.body.rfid) {
         console.log('Adding RFID');
@@ -163,19 +160,6 @@ exports.deleteUser = function (req, res) {
         } else res.status(404).send("No User found with that ID");
     });
 };
-
-exports.exportUsers = function (req, res) {
-    var userRows = [];
-    User.find({}, function (err, users) {
-        if (err) res.status(500).send(err);
-        userRows = users.map(function (user) {
-            return [user.firstname ? user.firstname : '', user.lastname ? user.lastname : '', user.email ? user.email : '', user.phone ? user.phone : '', user.screenname ? user.screenname : '', user.gender ? user.gender : '', user.dob ? (0, _moment2.default)(user.dob).format('MM-DD-YYYY') : '', user.address.city ? user.address.city : '', user.address.state ? user.address.state : '', user.address.country ? user.address.country : '', user.createdAt ? (0, _moment2.default)(user.createdAt).format('MM-DD-YYYY') : ''];
-        });
-        userRows.unshift(['First Name', 'Last Name', 'Email', 'Phone', 'Screenname', 'Gender', 'Date of Birth', 'City', 'State/Province', 'Country', 'Created On']);
-        res.csv(userRows, '', 200);
-    });
-};
-
 module.exports.socketHandler = function (socket) {
     /* Add Socket Handling Logic Here */
 };

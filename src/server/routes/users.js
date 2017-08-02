@@ -3,7 +3,6 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var controller = require('../controllers/users.js');
 router.use(bodyParser.json());
-router.get('/export', controller.exportUsers);
 router.get('/:userId?', controller.getUsers);
 router.get('/:userId/signature', controller.getUserSignature);
 router.post('/screenname/:screenname', controller.checkScreenName);
