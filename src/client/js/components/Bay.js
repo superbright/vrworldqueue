@@ -218,6 +218,7 @@ class Bay extends Component {
 
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
+    const overlay = isBigBay && play.state !== 'ready';
 
     return (
       <div key={bayid} className={`bay-page ${isBigBay ? 'big-bay' : ''}`}>
@@ -332,6 +333,11 @@ class Bay extends Component {
 
                     </div>
                   </div>
+                )
+              }
+              {
+                overlay && bay.bigBayFile && (
+                  <img className="overlay-img" src={`${bay.bigBayFile}`} />
                 )
               }
             </div>

@@ -13,6 +13,9 @@ var schema = new mongoose.Schema({
     , instructionFile: {
         type: String
     }
+    , bigBayFile: {
+        type: String
+    }
     , timeouts: {
         user: {
             type: Date
