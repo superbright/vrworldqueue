@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import io from 'socket.io-client';
-import _ from 'lodash';
+import set from 'lodash/set';
 import moment from 'moment';
 import validate from 'validate.js';
 import UserForm from './UserForm';
@@ -107,7 +107,7 @@ class AdminUser extends Component {
     const name = target.name;
 
     this.setState({
-      user: _.set(this.state.user, name, value)
+      user: set(this.state.user, name, value)
     });
   }
 
