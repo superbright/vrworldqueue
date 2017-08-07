@@ -490,9 +490,9 @@ module.exports.socketHandler = function (socket, app) {
         endGameplay(bayId, app);
     });
     socket.on('rfid', function (data) {
-        var req = JSON.parse(data
+        var req = JSON.parse(data);
         //enqueue user
-        );var res = {};
+        var res = {};
         Bay.findOne({
             id: req.clientId
         }, {}, function (err, bay) {

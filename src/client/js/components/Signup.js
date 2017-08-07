@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import validate from 'validate.js';
-import _ from 'lodash';
+import set from 'lodash/set';
 import Waiver from './Waiver';
 import UserForm from './UserForm';
 import formConstraints from '../utils/formConstraints';
@@ -55,7 +55,7 @@ class Signup extends Component {
     const name = target.name;
 
     this.setState({
-      form: _.set(this.state.form, name, value)
+      form: set(this.state.form, name, value)
     });
   }
 
