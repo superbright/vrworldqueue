@@ -85,6 +85,23 @@ exports.getUserSignature = (req, res) => {
         else res.json("No User found with that ID");
     });
 };
+
+exports.suggestScreenname = (req, res) => {
+  if (req.body.firstname && req.body.lastname) {
+    suggestScreenname(req.body.firstname, req.body.lastname).then((suggestion) => {
+      res.status(200).json({
+        status: !!suggestion,
+        suggestion: suggestion
+      });
+    });
+  } else {
+    res.status(200).json({
+      status: false,
+      error: 'Cannot suggest screenname'
+    });
+  }
+};
+
 exports.checkScreenName = (req, res) => {
     if (req.params.screenname != null) {
         User.findOne({
@@ -125,7 +142,13 @@ exports.postUser = (req, res) => {
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
     if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
     if (req.body.gender != null) userData.gender = req.body.gender;
-    if (req.body.dob != null) userData.dob = moment(req.body.dob);
+    if (req.body.dob != null &&
+        Number.isInteger(req.body.dob.month) &&
+        Number.isInteger(req.body.dob.date) &&
+        Number.isInteger(req.body.dob.year))
+    {
+      userData.dob = moment(req.body.dob);
+    }
     if (req.body.address != null) userData.address = req.body.address;
     userData.signature = signature._id;
     if (req.body.rfid) {
@@ -136,7 +159,7 @@ exports.postUser = (req, res) => {
           moment().add(req.body.timer, 'h').toDate() : twoAMTomorrow();
     }
     var query = {
-        'email': req.body.email
+        'email': req.body.screenname
     };
     User.findOneAndUpdate(query, userData, {
         upsert: true
@@ -175,6 +198,27 @@ exports.deleteUser = (req, res) => {
         else res.status(404).send("No User found with that ID");
     });
 };
+
+var suggestScreenname = async (firstname, lastname, suggestion = '', attempts = 10) => {
+  if (!attempts) {
+    return false;
+  }
+  if (!suggestion) {
+    suggestion = firstname + lastname.substring(0, 1);
+  }
+
+  while (attempts--) {
+    var res = await User.find({screenname: suggestion}).exec();
+    if (!res.length) return suggestion;
+    if (suggestion.length >= firstname.length + lastname.length) {
+      suggestion = firstname + lastname + attempts;
+    } else {
+      suggestion = (firstname+lastname).substring(0, suggestion.length + 1);
+    }
+  }
+  return false;
+};
+
 module.exports.socketHandler = (socket) => {
     /* Add Socket Handling Logic Here */
 };

@@ -40,9 +40,9 @@ class AdminList extends Component {
 
     const sortedUsers = this.sortUsers(users);
 
-
     return searchValue
       ? sortedUsers.filter(u => (
+        u.firstname && u.lastname &&
         `${u.firstname.toLowerCase()} ${u.lastname.toLowerCase()}`.indexOf(value) >= 0
         || (
           u.email &&

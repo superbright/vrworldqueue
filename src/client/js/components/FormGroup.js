@@ -13,7 +13,7 @@ class FormGroup extends Component {
   }
 
   renderInput() {
-    const { value, valueID, handleChange } = this.props;
+    const { value, valueID, handleChange, handleBlur} = this.props;
 
     return (
       <input
@@ -22,7 +22,7 @@ class FormGroup extends Component {
         id={valueID}
         value={value}
         onChange={handleChange}
-        onFocus={this.handleFocus}
+        onBlur={handleBlur || this.handleBlur}
         ref={(ref) => { this.inputRef = ref; }}
       />
     );
