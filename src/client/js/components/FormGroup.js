@@ -13,7 +13,7 @@ class FormGroup extends Component {
   }
 
   renderInput() {
-    const { value, valueID, handleChange, handleBlur} = this.props;
+    const { value, valueID, handleChange, handleBlur } = this.props;
 
     return (
       <input
