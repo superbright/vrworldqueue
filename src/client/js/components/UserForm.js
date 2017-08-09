@@ -13,7 +13,6 @@ const countryOptions = Object.keys(countries).map((code) => {
 const UserForm = ({
   handleChange,
   handleSubmit,
-  handleNameBlur,
   form: {
     firstname,
     lastname,
@@ -69,15 +68,12 @@ const UserForm = ({
           />
         }
 
-        <p>* required</p>
-
         <FormGroup
           value={firstname}
           valueID="firstname"
           valueName="First Name"
           errors={errors}
           handleChange={handleChange}
-          handleBlur={handleNameBlur}
           required
         />
 
@@ -85,16 +81,6 @@ const UserForm = ({
           value={lastname}
           valueID="lastname"
           valueName="Last Name"
-          errors={errors}
-          handleChange={handleChange}
-          handleBlur={handleNameBlur}
-          required
-        />
-
-        <FormGroup
-          value={email}
-          valueID="email"
-          valueName="Email"
           errors={errors}
           handleChange={handleChange}
           required
@@ -110,16 +96,19 @@ const UserForm = ({
         />
 
         <FormGroup
-          value={phone}
-          valueID="phone"
-          valueName="Phone"
+          value={email}
+          valueID="email"
+          valueName="Email"
           errors={errors}
           handleChange={handleChange}
           required
         />
 
-        <DatePicker
-          value={dob}
+        <FormGroup
+          value={phone}
+          valueID="phone"
+          valueName="Phone"
+          errors={errors}
           handleChange={handleChange}
         />
 
@@ -165,11 +154,13 @@ const UserForm = ({
               }, {
                 label: 'Female',
                 value: 'female'
-              }, {
-                  label: 'Other',
-                  value: 'other'
               }]
             }}
+        />
+
+        <DatePicker
+          value={dob}
+          handleChange={handleChange}
         />
 
         <p>* required</p>

@@ -40,7 +40,6 @@ class Signup extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleNameBlur = this.handleNameBlur.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleWaiver = this.handleWaiver.bind(this);
     this.clearForm = this.clearForm.bind(this);
@@ -58,25 +57,6 @@ class Signup extends Component {
     this.setState({
       form: set(this.state.form, name, value)
     });
-  }
-
-  handleNameBlur() {
-    const { firstname, lastname, screenname } = this.state.form;
-    if (firstname && lastname && !screenname) {
-      fetch('/api/users/screenname/suggest', {
-        method: 'post',
-        headers: new Headers({
-          'Content-Type': 'application/json',
-        }),
-        body: JSON.stringify({firstname, lastname })
-      }).then(res => res.json()).then((res) => {
-        if (res.status) {
-          this.setState({
-            form: set(this.state.form, 'screenname', res.suggestion)
-          });
-        }
-      });
-    }
   }
 
   handleSubmit(event) {
@@ -156,7 +136,6 @@ class Signup extends Component {
             form={form}
             handleSubmit={this.handleSubmit}
             handleChange={this.handleChange}
-            handleNameBlur={this.handleNameBlur}
             errors={errors}
           />)
         }
