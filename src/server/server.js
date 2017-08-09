@@ -15,6 +15,7 @@ const app = express();
 const server = http.Server(app);
 var socketController = require('./services/sockets');
 let port = process.env.PORT || 3000;
+let db = process.env.DB || 'vrworld';
 const mongoose = require('mongoose');
 const compiler = webpack(config);
 
@@ -26,8 +27,7 @@ if (process.env.NODE_ENV === 'development') {
   // app.use(require('webpack-hot-middleware')(compiler));
 }
 
-
-mongoose.connect('mongodb://localhost/vrworld');
+mongoose.connect('mongodb://localhost/' + db);
 // verify data on start
 // setup timers
 require("./verifydata")(app);

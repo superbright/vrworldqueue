@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "start": "NODE_ENV=development babel-node src/server/server.js --presets es2015,stage-0",
-    "build": "NODE_ENV=production babel-node src/server/server.js --presets es2015,stage-0"
+    "build": "NODE_ENV=production babel-node src/server/server.js --presets es2015,stage-0",
+    "staging": "NODE_ENV=production PORT=3001 DB=vrwstaging babel-node src/server/server.js --presets es2015,stage-0"
   },
   "author": "Superbright",
   "license": "ISC",
