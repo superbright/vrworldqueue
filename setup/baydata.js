@@ -5,6 +5,7 @@ const bays = [
     , game: 'Plank'
     , playTime: 5
     , instructionFile: '/images/instructions/a_1.png'
+    , bigBayImageFile: '/images/bigbay/plankbranded.png'
     , }
   , {
     bayid: 1
@@ -126,6 +127,7 @@ const bays = [
     , game: 'Thrill of the Fight'
     , playTime: 7
     , instructionFile: '/images/instructions/thrill_of_the_fight.png'
+    , bigBayImageFile: '/images/bigbay/thrilloffightbranded.png'
     , }
   , {
     bayid: 17
@@ -173,6 +175,7 @@ const bays = [
     , game: 'Rick & Morty'
     , playTime: 8
     , instructionFile: '/images/instructions/b_9.png'
+    , bigBayImageFile: '/images/bigbay/rickandmortybranded.png'
   }
   , {
     bayid: 23
