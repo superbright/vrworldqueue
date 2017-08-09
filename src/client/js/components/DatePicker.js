@@ -33,7 +33,7 @@ export default class DatePicker extends Component {
     
     return (
       <div className='form-group'>
-        <label>Date of Birth</label>
+        <label>Date of Birth <span className='small-font'>*</span></label>
         <span>Month: </span>
         <select name='dob.month' value={month} onChange={handleChange}>
           {monthOptions}
