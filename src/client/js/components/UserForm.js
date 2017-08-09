@@ -24,6 +24,7 @@ const UserForm = ({
     dob = {},
     address = {},
     timer = '',
+    source = '',
   },
   submitText,
   errors,
@@ -148,28 +149,78 @@ const UserForm = ({
         />
 
         <FormGroup
-            value={gender}
-            valueID="gender"
-            valueName="Gender"
-            type="select"
-            errors={errors}
-            handleChange={handleChange}
-            options={{
-              name: 'gender',
-              options: [{
-                label: 'Select...',
-                value: ''
-              }, {
-                label: 'Male',
-                value: 'male'
-              }, {
-                label: 'Female',
-                value: 'female'
-              }, {
-                  label: 'Other',
-                  value: 'other'
-              }]
-            }}
+          value={gender}
+          valueID="gender"
+          valueName="Gender"
+          type="select"
+          errors={errors}
+          handleChange={handleChange}
+          options={{
+            name: 'gender',
+            options: [{
+              label: 'Select...',
+              value: ''
+            }, {
+              label: 'Male',
+              value: 'male'
+            }, {
+              label: 'Female',
+              value: 'female'
+            }, {
+                label: 'Other',
+                value: 'other'
+            }]
+          }}
+        />
+
+        <FormGroup
+          value={source}
+          valueID="source"
+          valueName="How Did You Hear About Us?"
+          type="select"
+          errors={errors}
+          handleChange={handleChange}
+          required
+          options={{
+            name: 'source',
+            options: [{
+              label: 'Select...',
+              value: ''
+            }, {
+              label: 'Word of Mouth / Friends',
+              value: 'Word of Mouth / Friends'
+            }, {
+              label: 'Walk-in',
+              value: 'Walk-in'
+            }, {
+              label: 'Online Search',
+              value: 'Online Search'
+            }, {
+              label: 'Yelp',
+              value: 'Yelp'
+            }, {
+              label: 'Google Reviews',
+              value: 'Google Reviews'
+            }, {
+              label: 'TripAdvisor',
+              value: 'TripAdvisor'
+            }, {
+              label: 'Instagram',
+              value: 'Instagram'
+            }, {
+              label: 'Facebook',
+              value: 'Facebook'
+            }, {
+              label: 'TV Ads',
+              value: 'TV Ads'
+            }, {
+              label: 'Online Media',
+              value: 'Online Media'
+            }, {
+              label: 'Other',
+              value: 'Other'
+            }]
+          }}
         />
 
         <p>* required</p>
@@ -183,3 +234,8 @@ const UserForm = ({
 };
 
 export default UserForm;
+/*
+
+
+}, {
+ */

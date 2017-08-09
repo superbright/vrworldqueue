@@ -150,6 +150,7 @@ exports.postUser = (req, res) => {
       userData.dob = moment(req.body.dob);
     }
     if (req.body.address != null) userData.address = req.body.address;
+    if (req.body.source != null) userData.source = req.body.source;
     userData.signature = signature._id;
     if (req.body.rfid) {
         console.log('Adding RFID');

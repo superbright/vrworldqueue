@@ -8,7 +8,7 @@ Lost or damaged ticket(s) will not be entertained.
 
 The tickets may be collected at venue the date of the event 2 hours before the beginning of the event. Purchaser MUST present valid government identification.
 
-The resale of tickets is prohibited. VRWOLRDWIDE reserves the right to cancel any tickets that have been resold.
+The resale of tickets is prohibited. VRWORLDWIDE reserves the right to cancel any tickets that have been resold.
 
 Individuals under sixteen (16) years are not permitted in the premises unless accompanied by a parent or guardian.
 
@@ -25,5 +25,11 @@ The ticket holder agrees to submit to any search for any prohibited items includ
 The ticket holder voluntarily assumes all risk and danger incidental to the event whether occurring prior to, during or subsequent to the actual event, including any death, personal injury, loss, damage or liability.
 
 By purchasing tickets through VR WORLDWIDE, purchaser certifies that purchaser is at least 18 years of age and understands and accepts the foregoing conditions.
+
+I specifically consent to VR Parties having the irrevocable, perpetual and unrestricted right and permission to take, use, re-use, publish, and republish photographic portraits or pictures of me or in which I may be included, in whole or in part, or composite or distorted in character or form, without restriction as to changes or alterations, in conjunction with my own or a fictitious name, or reproductions thereof in color or otherwise, made through any medium at professional studios or elsewhere, and in any and all media now or hereafter known, specifically including but not limited to print media and distribution over the internet for illustration, promotion, art, editorial, advertising, trade, or any other purpose whatsoever.
+
+I hereby waive any right that I may have to inspect or approve the finished product or products and the advertising copy or other matter that may be used in connection with them or the use to which they may be applied.
+
+I hereby release, discharge, and agree to hold harmless Photographer, VR Parties, their heirs, legal representatives, and assigns, and all persons acting under his/her permission or authority or those for whom he/ she is acting, from any liability by virtue of any blurring, distortion, alteration, optical illusion, or use in composite form, whether intentional or otherwise, that may occur or be produced in the taking of such photographs or in any subsequent processing of them, as well as any publication of them, including without limitation any claims for libel or violation of any right of publicity or privacy.
 
 `;

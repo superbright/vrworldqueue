@@ -37,6 +37,9 @@ var schema = new mongoose.Schema({
           type: String
         }
     }
+    , source: {
+        type: String
+    }
     , queue: {
         type: mongoose.Schema.Types.ObjectId
         , ref: 'Queue'
