@@ -2,7 +2,7 @@ import moment from 'moment';
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 import {
-    twoAMTomorrow, midnightThisMorning
+    twoAMTomorrow, midnightThisMorning, isNumeric
 }
 from '../../shared/util.js';
 var analytics = require("../googleanalytics.js");
@@ -143,9 +143,9 @@ exports.postUser = (req, res) => {
     if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
     if (req.body.gender != null) userData.gender = req.body.gender;
     if (req.body.dob != null &&
-        Number.isInteger(req.body.dob.month) &&
-        Number.isInteger(req.body.dob.date) &&
-        Number.isInteger(req.body.dob.year))
+        isNumeric(req.body.dob.month) &&
+        isNumeric(req.body.dob.date) &&
+        isNumeric(req.body.dob.year))
     {
       userData.dob = moment(req.body.dob);
     }
@@ -160,7 +160,7 @@ exports.postUser = (req, res) => {
           moment().add(req.body.timer, 'h').toDate() : twoAMTomorrow();
     }
     var query = {
-        'screenname': req.body.screenname
+        'email': req.body.email
     };
     User.findOneAndUpdate(query, userData, {
         upsert: true
