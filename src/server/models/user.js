@@ -18,7 +18,7 @@ var schema = new mongoose.Schema({
     }
     , gender: {
         type: String
-        , emum: ['male', 'female']
+        , emum: ['male', 'female', 'other']
     }
     , dob: {
         type: Date
@@ -36,6 +36,9 @@ var schema = new mongoose.Schema({
         , country: {
           type: String
         }
+    }
+    , source: {
+        type: String
     }
     , queue: {
         type: mongoose.Schema.Types.ObjectId

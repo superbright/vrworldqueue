@@ -5,6 +5,7 @@ var controller = require('../controllers/users.js');
 router.use(bodyParser.json());
 router.get('/:userId?', controller.getUsers);
 router.get('/:userId/signature', controller.getUserSignature);
+router.post('/screenname/suggest', controller.suggestScreenname);
 router.post('/screenname/:screenname', controller.checkScreenName);
 router.post('/validate', controller.validateUser);
 router.post('/', controller.postUser);
