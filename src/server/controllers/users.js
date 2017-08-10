@@ -160,7 +160,7 @@ exports.postUser = (req, res) => {
           moment().add(req.body.timer, 'h').toDate() : twoAMTomorrow();
     }
     var query = {
-        'email': req.body.screenname
+        'screenname': req.body.screenname
     };
     User.findOneAndUpdate(query, userData, {
         upsert: true
