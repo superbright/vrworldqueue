@@ -30,3 +30,7 @@
       yesterday.setHours(0,0,0,0);
       return yesterday;
  }
+
+ export function isNumeric(n) {
+   return !isNaN(parseFloat(n)) && isFinite(n);
+ }
