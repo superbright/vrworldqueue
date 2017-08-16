@@ -174,7 +174,7 @@ exports.enqueueUser = (req, res) => {
                         sendQueue(bay._id);
                         if (err) res.status(500).send(err);
                         else if (fullQueue) {
-                            analytics.sendBayScan(fullQueue[0].bay, fullQueue[0].user, 'enqueue');
+                            //analytics.sendBayScan(fullQueue[0].bay, fullQueue[0].user, 'enqueue');
                             analytics.sendAnalytics("Bay", "Enqueue User", fullQueue[0].user.screenname, new Date().getMilliseconds(), {});
                             res.status(200).send(fullQueue);
                         }
@@ -367,7 +367,7 @@ var notifyUserOnDeck = (bayId) => {
 var startGameplay = (bayId, app) => {
     return getBay(bayId).then((bay) => {
         analytics.sendAnalytics("Bay", "Start Game", bay.game, new Date().getMilliseconds(), {});
-        analytics.sendGameStart(bay);
+        //analytics.sendGameStart(bay);
         console.log('start Gameplay on bay ' + bay._id);
         if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
         else {
