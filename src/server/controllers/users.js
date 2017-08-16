@@ -142,6 +142,7 @@ exports.postUser = (req, res) => {
     if (req.body.screenname != null) userData.screenname = req.body.screenname;
     if (req.body.createdAt != null) userData.createdAt = req.body.createdAt;
     if (req.body.gender != null) userData.gender = req.body.gender;
+    if (req.body.role != null) userData.role = req.body.role;
     if (req.body.dob != null &&
         Number.isInteger(req.body.dob.month) &&
         Number.isInteger(req.body.dob.date) &&

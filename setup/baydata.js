@@ -157,7 +157,7 @@ const bays = [
     bayid: 20
     , name: 'B-7'
     , game: 'Superhot'
-    , playTime: 11
+    , playTime: 9
     , instructionFile: '/images/instructions/superhot.png'
     , bigBayImageFile: '/images/bigbay/superhotbranded.png'
   }
@@ -165,7 +165,7 @@ const bays = [
     bayid: 21
     , name: 'B-8'
     , game: 'The Climb'
-    , playTime: 8
+    , playTime: 10
     , instructionFile: '/images/instructions/the_climb.png'
     , bigBayImageFile: '/images/bigbay/theclimbbranded.png'
   }

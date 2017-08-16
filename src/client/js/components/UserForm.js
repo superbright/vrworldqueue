@@ -24,6 +24,7 @@ const UserForm = ({
     dob = {},
     address = {},
     timer = '',
+    role = 'user',
     source = '',
   },
   submitText,
@@ -47,27 +48,47 @@ const UserForm = ({
 
         {
           admin &&
-          <FormGroup
-            value={timer}
-            valueID="timer"
-            valueName="Time"
-            type="select"
-            errors={errors}
-            handleChange={handleChange}
-            options={{
-            name: 'timer',
-            options: [{
-              label: 'Day',
-              value: ''
-            }, {
-              label: '1 Hour',
-              value: '1'
-            }, {
-              label: '3 Hours',
-              value: '3'
-            }]
-          }}
-          />
+          <div>
+            <FormGroup
+              value={timer}
+              valueID="timer"
+              valueName="Time"
+              type="select"
+              errors={errors}
+              handleChange={handleChange}
+              options={{
+              name: 'timer',
+              options: [{
+                label: 'Day',
+                value: ''
+              }, {
+                label: '1 Hour',
+                value: '1'
+              }, {
+                label: '3 Hours',
+                value: '3'
+              }]
+            }}
+            />
+            <FormGroup
+              value={role}
+              valueID="role"
+              valueName="Role"
+              type="select"
+              errors={errors}
+              handleChange={handleChange}
+              options={{
+                name: 'role',
+                options: [{
+                  label: 'Customer',
+                  value: 'user'
+                }, {
+                  label: 'Guide',
+                  value: 'admin'
+                }]
+              }}
+            />
+          </div>
         }
 
         <p>* required</p>
