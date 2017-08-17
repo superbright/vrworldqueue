@@ -76,18 +76,18 @@ const bays = [
   , {
     bayid: 10
     , name: 'A-7'
-    , game: 'VR Skeet Shooter'
+    , game: 'Icaros'
     , playTime: 6
     , instructionFile: '/images/instructions/skeet_shooter.png'
-    , bigBayImageFile: '/images/bigbay/skeetshooterbranded.png'
+    , bigBayImageFile: '/images/bigbay/icarosbranded.png'
   }
   , {
     bayid: 11
     , name: 'A-8'
-    , game: 'I Expect You to Die'
+    , game: 'Icaros'
     , playTime: 8
     , instructionFile: '/images/instructions/i_expect_you_to_die.png'
-    , bigBayImageFile: '/images/bigbay/iexpectyoutodiebranded.png'
+    , bigBayImageFile: '/images/bigbay/icarosbranded.png'
   }
   , {
     bayid: 12
