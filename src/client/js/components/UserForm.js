@@ -10,6 +10,43 @@ const countryOptions = Object.keys(countries).map((code) => {
   };
 });
 
+const shuffle = arr => arr.sort(() => (Math.random() - 0.5));
+
+const sourceOptions = [{
+    label: 'Word of Mouth / Friends',
+    value: 'Word of Mouth / Friends'
+  }, {
+    label: 'Walk-in',
+    value: 'Walk-in'
+  }, {
+    label: 'Online Search',
+    value: 'Online Search'
+  }, {
+    label: 'Yelp',
+    value: 'Yelp'
+  }, {
+    label: 'Google Reviews',
+    value: 'Google Reviews'
+  }, {
+    label: 'TripAdvisor',
+    value: 'TripAdvisor'
+  }, {
+    label: 'Instagram',
+    value: 'Instagram'
+  }, {
+    label: 'Facebook',
+    value: 'Facebook'
+  }, {
+    label: 'TV Ads',
+    value: 'TV Ads'
+  }, {
+    label: 'Online Media',
+    value: 'Online Media'
+  }, {
+    label: 'Other',
+    value: 'Other'
+}];
+
 const UserForm = ({
   handleChange,
   handleSubmit,
@@ -137,6 +174,7 @@ const UserForm = ({
           valueName="Phone"
           errors={errors}
           handleChange={handleChange}
+          required
         />
 
         <FormGroup
@@ -206,40 +244,7 @@ const UserForm = ({
             options: [{
               label: 'Select...',
               value: ''
-            }, {
-              label: 'Word of Mouth / Friends',
-              value: 'Word of Mouth / Friends'
-            }, {
-              label: 'Walk-in',
-              value: 'Walk-in'
-            }, {
-              label: 'Online Search',
-              value: 'Online Search'
-            }, {
-              label: 'Yelp',
-              value: 'Yelp'
-            }, {
-              label: 'Google Reviews',
-              value: 'Google Reviews'
-            }, {
-              label: 'TripAdvisor',
-              value: 'TripAdvisor'
-            }, {
-              label: 'Instagram',
-              value: 'Instagram'
-            }, {
-              label: 'Facebook',
-              value: 'Facebook'
-            }, {
-              label: 'TV Ads',
-              value: 'TV Ads'
-            }, {
-              label: 'Online Media',
-              value: 'Online Media'
-            }, {
-              label: 'Other',
-              value: 'Other'
-            }]
+            }, ...shuffle(sourceOptions)]
           }}
         />
 
