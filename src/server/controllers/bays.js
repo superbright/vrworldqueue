@@ -441,13 +441,17 @@ var addUserToQueue = (bayId, tag) => {
   }, (err, user) => {
     if (err) console.log('[error] Cant enqueue user... ' + err);
     else if (user) {
-      if (user.rfid.expiresAt > new Date()) {
+      if (user.rfid.expiresAt > new Date() || user.role === 'admin') {
         Bay.findOne({
           id: bayId
         }, (err, bay) => {
           if (err) sockets.sendToQueue(bay._id, 'userattempt', res);
           else if (bay) {
-            if (bay.currentState.state == 'ready' && bay.currentState.user.equals(user._id)) {
+            if (user.role === 'admin') {
+              res.user = user;
+              res.bay = bay;
+              sockets.sendToQueue(bay._id, 'admin', res);
+            } else if (bay.currentState.state == 'ready' && bay.currentState.user.equals(user._id)) {
               sendStateToClients(bay._id);
             }
             else {
@@ -469,7 +473,7 @@ var addUserToQueue = (bayId, tag) => {
                   res.info = messages.wouldyouliketojoin;
                   getQueue(bay._id).then((queue) => {
                     if (queue && bay.currentState.state != 'gameplay' && bay.currentState.state != 'ready') res.info = messages.wouldyouliketoplay;
-                  })
+                  });
                   var q = new Queue({
                     user: user._id
                     , bay: bay._id
@@ -525,9 +529,9 @@ module.exports.socketHandler = (socket, app) => {
     endGameplay(bayId, app);
   });
   socket.on('rfid', (data) => {
-    var req = JSON.parse(data)
+    var req = JSON.parse(data);
     //enqueue user
-    var res = {}
+    var res = {};
     Bay.findOne({
       id: req.clientId
     }, {}, (err, bay) => {

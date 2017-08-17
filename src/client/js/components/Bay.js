@@ -32,6 +32,7 @@ class Bay extends Component {
       secondsLeft: '--',
       interval: null,
       fetching: false,
+      isAdmin: false
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -108,6 +109,9 @@ class Bay extends Component {
         }
         return this.setState({ error: null, userAttempt: res, showModal: true });
       });
+      socket.on('admin', () => {
+        return this.setState({isAdmin: true});
+      })
       socket.on('refresh', () => {
         location.reload();
       });
@@ -213,12 +217,17 @@ class Bay extends Component {
       secondsLeft,
       fetching,
       userAttempt,
+      isAdmin
     } = this.state;
     const { isBigBay } = this.props;
 
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
     const overlay = isBigBay && play.state !== 'ready';
+
+    if (isAdmin) {
+      window.location.replace('/admin/queue/' + bay._id);
+    }
 
     return (
       <div key={bayid} className={`bay-page ${isBigBay ? 'big-bay' : ''}`}>

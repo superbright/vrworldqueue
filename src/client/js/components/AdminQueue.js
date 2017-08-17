@@ -15,6 +15,7 @@ class AdminQueue extends Component {
     this.tempDelete = this.tempDelete.bind(this);
     this.removeTempDelete = this.removeTempDelete.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.handleBackToQueue = this.handleBackToQueue.bind(this);
   }
 
   componentWillMount() {
@@ -85,6 +86,10 @@ class AdminQueue extends Component {
     });
   }
 
+  handleBackToQueue() {
+    window.location.replace('/bay/' + this.state.bay._id);
+  }
+
   render() {
     const { queue, bay, tempDelete } = this.state;
 
@@ -94,6 +99,7 @@ class AdminQueue extends Component {
           <h5>Bay {bay ? bay.name : ''} ADMIN</h5>
           <h5>{bay ? bay.game : ''}</h5>
         </header>
+        <button onClick={this.handleBackToQueue}>Back To Queue</button>
         {
           queue.length === 0
           ? (
