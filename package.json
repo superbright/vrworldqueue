@@ -19,6 +19,7 @@
     "googleapis": "^19.0.0",
     "immutability-helper": "^2.2.2",
     "lodash": "^4.17.4",
+    "mixpanel": "^0.7.0",
     "moment": "^2.18.1",
     "mongoose": "^4.10.5",
     "node-schedule": "^1.2.3",

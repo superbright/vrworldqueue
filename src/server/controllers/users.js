@@ -1,4 +1,5 @@
 import moment from 'moment';
+var mixpanel = require('../analytics.js');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 import {
@@ -6,6 +7,7 @@ import {
 }
 from '../../shared/util.js';
 var analytics = require("../googleanalytics.js");
+
 exports.getUsers = (req, res) => {
     let dob = null;
     if (req.params.userId) User.findById(req.params.userId, (err, user) => {
@@ -169,6 +171,7 @@ exports.postUser = (req, res) => {
     }, (err, doc) => {
         if (err) res.status(500).send(err);
         else {
+            mixpanel.registerUser(doc);
             analytics.sendAnalytics("User", "Register User", doc.screenname, new Date().getMilliseconds(), {});
             res.status(200).send(doc);
         }
