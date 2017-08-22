@@ -8,6 +8,8 @@ router.get('/local/:bayId', controller.getBayByLocalId);
 router.post('/', controller.upsertBay);
 router.post('/:bayId/enqueue', controller.enqueueUser);
 router.get('/:bayId/dequeue', controller.dequeueUser);
+router.get('/:bayId/pause', controller.pauseGameplay);
+router.get('/:bayId/resume', controller.resumeGameplay);
 router.delete('/:bayId', controller.deleteBay);
 router.get('/:bayId/queue', controller.getQueue);
 router.post('/:bayId/user', controller.bringUserToFront);

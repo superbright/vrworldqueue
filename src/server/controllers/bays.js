@@ -218,6 +218,72 @@ exports.deleteBay = (req, res) => {
     else res.status(404).send("No Bay found with that ID");
   });
 };
+
+exports.pauseGameplay = (req, res) => {
+  var app = req.app;
+  console.log('moo: hit pause. bayId: ' + req.params.bayId);
+  getBay(req.params.bayId).then((bay) => {
+    if (!bay) console.log(`[ERROR] cannot find bay ${req.params.bayId}`);
+    else if (bay.currentState.state === 'gameplay') {
+      console.log('moo: in gameplay');
+      var now = new Date();
+      var pausedState = {
+        state: 'paused',
+        remainingTime: Math.floor((bay.currentState.endTime - now) / 1000)
+      };
+      console.log(bay.currentState.endTime, pausedState);
+      if (app.locals.timers.gameplay[bay._id] != null) {
+        console.log(`[BAY] [${bay.id}] deleting gameplay timer`);
+        app.locals.timers.gameplay[bay._id].cancel();
+        app.locals.timers.gameplay[bay._id] = null;
+        console.log('moo: canceling timer. game state is ' + bay.currentState.state);
+      }
+      console.log('moo: about to update bays');
+      return updateBayState(bay._id, pausedState).then((bay) => {
+        console.log('moo: Updated bay state. game state is ', bay.currentState);
+        sendStateToClients(bay._id, app);
+        res.status(200).send(bay);
+      });
+    } else {
+      console.log(`[ERROR] [BAY] [${bay.id}] cannot pause since game is not in gameplay`);
+    }
+  });
+};
+
+exports.resumeGameplay = (req, res) => {
+  var app = req.app;
+
+  getBay(req.params.bayId).then((bay) => {
+    if (!bay) console.log(`[ERROR] cannot find bay ${req.params.bayId}`);
+    else if (bay.currentState.state === 'paused') {
+      var endTime = new Date();
+      if (app.locals.timers.gameplay[bay._id] != null) {
+        console.log(`[BAY] [${bay.id}] deleting gameplay timer`);
+        app.locals.timers.gameplay[bay._id].cancel();
+        app.locals.timers.gameplay[bay._id] = null;
+        console.log('moo: canceling timer. game state is ' + bay.currentState.state);
+      }
+      endTime.setSeconds(endTime.getSeconds() + bay.currentState.remainingTime);
+      return updateBayState(bay._id, {
+        state: 'gameplay',
+        endTime: endTime
+      }).then((bay) => {
+        app.locals.timers.gameplay[bay._id] = scheduler.scheduleJob(bay.currentState.endTime, () => {
+          console.log('gameplay timer expired');
+          return endGameplay(bay._id, app).then(() => {
+            return sendStateToClients(bay._id).then(() => {
+            });
+          })
+        });
+        sendStateToClients(bay._id, app);
+        res.status(200).send(bay);
+      });
+    } else {
+      console.log(`[ERROR] [BAY] [${bay.id}] cannot resume since game is not paused`);
+    }
+  });
+};
+
 module.exports.clearQueue = (req, res) => {
   Queue.remove({
     bay: req.params.bayId
@@ -227,6 +293,7 @@ module.exports.clearQueue = (req, res) => {
   });
 }
 var updateBayState = (bayId, data) => {
+  console.log(`[DEBUG] [BAY] [${bayId}] updating bay state to`, data);
   return Bay.findByIdAndUpdate(bayId, {
     $set: {
       currentState: data
