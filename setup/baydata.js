@@ -18,10 +18,10 @@ const bays = [
   , {
     bayid: 2
     , name: 'A-3'
-    , game: 'Tilt Brush'
-    , playTime: 8
-    , instructionFile: '/images/instructions/tilt_brush.png'
-    , bigBayImageFile: '/images/bigbay/tiltbrushbranded.png'
+    , game: 'Superhot'
+    , playTime: 9
+    , instructionFile: '/images/instructions/superhot.png'
+    , bigBayImageFile: '/images/bigbay/superhotbranded.png'
     , }
   , {
     bayid: 3
