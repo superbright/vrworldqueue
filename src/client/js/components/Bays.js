@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom';
 import Bay from './Bay';
 import BayList from './BayList';
 import BayPlay from './BayPlay';
+import AdminQueue from './AdminQueue';
 
 class Bays extends Component {
   render() {
@@ -28,6 +29,11 @@ class Bays extends Component {
           exact
           path={`${match.url}/:bayid/play`}
           component={BayPlay}
+        />
+        <Route
+          exact
+          path={`${match.url}/:bayid/queue`}
+          component={AdminQueue}
         />
         <Route
           exact

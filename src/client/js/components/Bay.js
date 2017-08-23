@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import io from 'socket.io-client';
 import Spinner from 'react-spin';
 import VRWorldStamp from '../../images/VRWorld_Stamp.png';
@@ -32,6 +33,7 @@ class Bay extends Component {
       secondsLeft: '--',
       interval: null,
       fetching: false,
+      isAdmin: false
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -40,6 +42,7 @@ class Bay extends Component {
     this.confirmUser = this.confirmUser.bind(this);
     this.countDown = this.countDown.bind(this);
     this.handleCloseOtherBrowser = this.handleCloseOtherBrowser.bind(this);
+    this.closeSocket = this.closeSocket.bind(this);
   }
 
   componentWillMount() {
@@ -108,6 +111,9 @@ class Bay extends Component {
         }
         return this.setState({ error: null, userAttempt: res, showModal: true });
       });
+      socket.on('admin', () => {
+        this.closeSocket().then(() => this.setState({isAdmin: true}));
+      })
       socket.on('refresh', () => {
         location.reload();
       });
@@ -186,18 +192,22 @@ class Bay extends Component {
   }
 
   handleCloseOtherBrowser() {
-    // hi igal, add you handler here
-          const { match: { params: { bayid } } } = this.props;
-      fetch(`/api/sockets/`,{
-          method: 'delete',
-        body:JSON.stringify({clientType: 'queue', clientId: bayid}),
-          headers: new Headers({
+    this.closeSocket()
+      .then(res=>res.json()).then((res)=>{
+        console.log(res);
+        location.reload();
+    });
+  }
+
+  closeSocket() {
+    const { match: { params: { bayid } } } = this.props;
+    return fetch(`/api/sockets/`,{
+      method: 'delete',
+      body:JSON.stringify({clientType: 'queue', clientId: bayid}),
+      headers: new Headers({
         'Content-Type': 'application/json',
       }),
-      }).then(res=>res.json()).then((res)=>{
-          console.log(res);
-          location.reload();
-      })
+    });
   }
 
   render() {
@@ -213,12 +223,17 @@ class Bay extends Component {
       secondsLeft,
       fetching,
       userAttempt,
+      isAdmin
     } = this.state;
     const { isBigBay } = this.props;
 
     const { match: { params: { bayid } } } = this.props;
     const [onDeck, ...restOfQueue] = queue;
     const overlay = isBigBay && play.state !== 'ready';
+
+    if (isAdmin) {
+      return (<Redirect to={{ pathname: `/bay/${bay._id}/queue` }} />);
+    }
 
     return (
       <div key={bayid} className={`bay-page ${isBigBay ? 'big-bay' : ''}`}>

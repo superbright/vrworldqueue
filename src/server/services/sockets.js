@@ -92,10 +92,10 @@ exports.sendToBigQueue = (queueId, endpoint, message, callback) => {
 };
 exports.sendToAdmin = (adminId, endpoint, message, callback) => {
     exports.sendToClient('admin', adminId, endpoint, message, callback);
-}
+};
 exports.sendBlob = (req, callback) => {
     exports.sendToClient(req.clientType, req.clientId, req.endpoint, req.message, callback);
-}
+};
 exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
     var returnValue = {
         request: {
@@ -104,7 +104,7 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
             , endpoint: endpoint
             , message: message
         }
-    }
+    };
     var socket = sockets[clientType][clientId];
     if (!socket) {
         console.log('[WARN]: Socket not found: ' + returnValue.request.clientType + " " + returnValue.request.clientId);
@@ -119,7 +119,7 @@ exports.sendToClient = (clientType, clientId, endpoint, message, callback) => {
         returnValue.status = "ok";
     }
     callback && callback(returnValue);
-}
+};
 console.log('This is definitely latest code');
 exports.sockets = sockets;
 exports.socketState = socketState;
