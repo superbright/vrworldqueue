@@ -5,6 +5,7 @@ var scheduler = require("node-schedule");
 var sockets = require('../services/sockets');
 var twilioService = require("../services/twilio");
 var analytics = require("../googleanalytics.js");
+var mixpanel = require('../analytics.js');
 import {
   timerparams
 }
@@ -152,6 +153,9 @@ exports.enqueueUser = (req, res) => {
     }
   }).then(() => {
     getBay(req.params.bayId).then((bay) => {
+      User.findById(req.body.userId, (err, user) => {
+        mixpanel.sendBayScan(bay, user);
+      });
       if (!bay.currentState || bay.currentState.state == 'idle') {
         User.findById(req.body.userId, (err, doc) => {
           if (doc) {
@@ -436,7 +440,7 @@ var notifyUserOnDeck = (bayId) => {
 var startGameplay = (bayId, app) => {
   return getBay(bayId).then((bay) => {
     analytics.sendAnalytics("Bay", "Start Game", bay.game, new Date().getMilliseconds(), {});
-    //analytics.sendGameStart(bay);
+    mixpanel.sendGameStart(bay);
     console.log('start Gameplay on bay ' + bay._id);
     if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
     else {
