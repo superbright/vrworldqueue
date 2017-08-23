@@ -88,6 +88,13 @@ class BayPlay extends Component {
           console.log('got Set State');
           console.log(res);
         this.setState({ play: res, fetching: false });
+        if (this.state.play.remainingTime) {
+          clearInterval(this.state.interval);
+          this.setState({
+            minsLeft: Math.floor(this.state.play.remainingTime / 60),
+            secondsLeft: Math.floor(this.state.play.remainingTime % 60),
+          })
+        }
 
         if (this.state.play.endTime) {
           const interval = setInterval(() => {
@@ -202,7 +209,7 @@ class BayPlay extends Component {
               play.state !== 'idle'
               &&
               <div>
-                <h2>{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
+                <h2 className={play.state === 'paused' ? 'blink' : ''} >{numToString(minsLeft)}:{numToString(secondsLeft)}</h2>
                 {
                   fetching
                   ? <Spinner config={{ ...config, color: '#ffffff' }} />

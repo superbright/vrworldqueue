@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 
 class AdminQueue extends Component {
   constructor() {
@@ -8,6 +9,8 @@ class AdminQueue extends Component {
       bay: null,
       queue: [],
       tempDelete: null,
+      redirect: false,
+      bayState: null,
     };
 
     this.fetchQueue = this.fetchQueue.bind(this);
@@ -15,6 +18,8 @@ class AdminQueue extends Component {
     this.tempDelete = this.tempDelete.bind(this);
     this.removeTempDelete = this.removeTempDelete.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.pauseGameplay = this.pauseGameplay.bind(this);
+    this.resumeGameplay = this.resumeGameplay.bind(this);
   }
 
   componentWillMount() {
@@ -23,9 +28,7 @@ class AdminQueue extends Component {
     return fetch(`/api/bays/${bayid}`, {
       method: 'get',
     }).then(res => res.json()).then((bay) => {
-      this.setState({
-        bay,
-      });
+      this.setState({bay});
     }).catch((err) => {
       console.log('error', err);
     });
@@ -59,6 +62,26 @@ class AdminQueue extends Component {
     });
   }
 
+  pauseGameplay() {
+    const { match: { params: { bayid } } } = this.props;
+
+    return fetch(`/api/bays/${bayid}/pause`, {
+      method: 'GET'
+    }).then(res => res.json()).then((bay) => {
+      this.setState({bay});
+    });
+  }
+
+  resumeGameplay() {
+    const { match: { params: { bayid } } } = this.props;
+
+    return fetch(`/api/bays/${bayid}/resume`, {
+      method: 'GET'
+    }).then(res => res.json()).then((bay) => {
+      this.setState({bay});
+    });
+  }
+
   tempDelete(item) {
     this.setState({ tempDelete: item });
   }
@@ -86,7 +109,12 @@ class AdminQueue extends Component {
   }
 
   render() {
-    const { queue, bay, tempDelete } = this.state;
+    const { queue, bay, tempDelete, redirect } = this.state;
+    const state = bay ? bay.currentState.state : 'idle';
+
+    if (redirect) {
+      return (<Redirect to={{ pathname: `/bay/${this.state.bay._id}` }} push />);
+    }
 
     return (
       <div>
@@ -94,6 +122,15 @@ class AdminQueue extends Component {
           <h5>Bay {bay ? bay.name : ''} ADMIN</h5>
           <h5>{bay ? bay.game : ''}</h5>
         </header>
+        <button onClick={() => this.setState({redirect: true})}>Back To Queue</button>
+        {
+          state === 'gameplay' &&
+          (<button onClick={this.pauseGameplay}>Pause Game</button>)
+        }
+        {
+          state === 'paused' &&
+          (<button onClick={this.resumeGameplay}>Resume Game</button>)
+        }
         {
           queue.length === 0
           ? (
