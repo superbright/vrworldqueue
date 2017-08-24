@@ -26,16 +26,18 @@ const bays = [
   , {
     bayid: 3
     , name: 'A-4A'
-    , game: 'Icaros'
-    , playTime: 10
-    , instructionFile: '/images/instructions/a_4a.png'
+    , game: 'Raw Data'
+    , playTime: 12
+    , instructionFile: '/images/instructions/raw_data.png'
+    , bigBayImageFile: '/images/bigbay/rawdatabranded.png'
     , }
   , {
     bayid: 4
     , name: 'A-4B'
-    , game: 'Icaros'
-    , playTime: 10
-    , instructionFile: '/images/instructions/a_4b.png'
+    , game: 'Raw Data'
+    , playTime: 12
+    , instructionFile: '/images/instructions/raw_data.png'
+    , bigBayImageFile: '/images/bigbay/rawdatabranded.png'
     , }
   , {
     bayid: 5

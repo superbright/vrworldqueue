@@ -1,12 +1,11 @@
 import moment from 'moment';
-var mixpanel = require('../analytics.js');
+var analytics = require('../analytics.js');
 var User = require('../models/user').User;
 var Signature = require('../models/signature').Signature;
 import {
-    twoAMTomorrow, midnightThisMorning
+    twoAMTomorrow, midnightThisMorning, isNumeric
 }
 from '../../shared/util.js';
-var analytics = require("../googleanalytics.js");
 
 exports.getUsers = (req, res) => {
     let dob = null;
@@ -43,7 +42,7 @@ exports.activateUser = (req, res) => {
                 user.save((err, doc) => {
                     if (err) res.status(500).send(err);
                     else {
-                        analytics.sendAnalytics("User", "Activate User", doc.screenname, new Date().getMilliseconds(), {});
+                        //analytics.sendAnalytics("User", "Activate User", doc.screenname, new Date().getMilliseconds(), {});
                         res.status(200).send(doc);
                     }
                 });
@@ -146,9 +145,9 @@ exports.postUser = (req, res) => {
     if (req.body.gender != null) userData.gender = req.body.gender;
     if (req.body.role != null) userData.role = req.body.role;
     if (req.body.dob != null &&
-        Number.isInteger(req.body.dob.month) &&
-        Number.isInteger(req.body.dob.date) &&
-        Number.isInteger(req.body.dob.year))
+      isNumeric(req.body.dob.month) &&
+      isNumeric(req.body.dob.date) &&
+      isNumeric(req.body.dob.year))
     {
       userData.dob = moment(req.body.dob);
     }
@@ -168,12 +167,14 @@ exports.postUser = (req, res) => {
     User.findOneAndUpdate(query, userData, {
         upsert: true
         , new: true
-    }, (err, doc) => {
+        , passRawResult: true
+    }, (err, doc, raw) => {
         if (err) res.status(500).send(err);
         else {
-            mixpanel.registerUser(doc);
-            analytics.sendAnalytics("User", "Register User", doc.screenname, new Date().getMilliseconds(), {});
-            res.status(200).send(doc);
+          if (!raw.lastErrorObject.updatedExisting) {
+            analytics.registerUser(doc);
+          }
+          res.status(200).send(doc);
         }
     });
 };
