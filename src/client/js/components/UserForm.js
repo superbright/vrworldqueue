@@ -60,7 +60,7 @@ const UserForm = ({
     gender = '',
     dob = {},
     address = {},
-    timer = '',
+    rfid = {},
     role = 'user',
     source = '',
   },
@@ -87,8 +87,8 @@ const UserForm = ({
           admin &&
           <div>
             <FormGroup
-              value={timer}
-              valueID="timer"
+              value={rfid.timer || ''}
+              valueID="rfid.timer"
               valueName="Time"
               type="select"
               errors={errors}
@@ -99,11 +99,8 @@ const UserForm = ({
                 label: 'Day',
                 value: ''
               }, {
-                label: '1 Hour',
-                value: '1'
-              }, {
-                label: '3 Hours',
-                value: '3'
+                label: '2 Hours',
+                value: '2'
               }]
             }}
             />

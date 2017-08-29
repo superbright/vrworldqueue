@@ -76,17 +76,14 @@ class AdminUser extends Component {
       this.setState({ errors });
     } else {
       this.setState({ errors: null });
-      let data;
+
       if (tempRFID) {
-        data = { ...user, rfid: tempRFID };
-      } else {
-        const { rfid, ...restOfUser } = user;
-        data = restOfUser;
+        user.rfid.id = tempRFID;
       }
 
       fetch('/api/users', {
         method: 'post',
-        body: JSON.stringify(data),
+        body: JSON.stringify(user),
         headers: new Headers({
           'Content-Type': 'application/json',
         }),
@@ -132,9 +129,6 @@ class AdminUser extends Component {
   render() {
     const { user, tempRFID, errors, connected } = this.state;
     const { match: { params: { userid, adminid } } } = this.props;
-    const activated = user
-      ? (new Date(user.rfid.expiresAt).getTime() - new Date().getTime()) > 0
-      : false;
 
     return (
       <div className="admin-user-page simple-container" key={userid}>
@@ -158,21 +152,17 @@ class AdminUser extends Component {
               {
                 user.rfid.id && (
                   <div>
-                    {
-                      activated
-                      ? <div>
-                          <div>{'User\'s account activated!'} <button onClick={() => this.activateUser(false)}>Deactivate Account</button></div>
-                          <div>Expires At: {moment(user.rfid.expiresAt).format('dddd, h:mm:ss a')}</div>
-                        </div>
-                      : <button onClick={this.activateUser}>Activate Account</button>
-                    }
+                    <div>
+                      <div>Currently Active: {user.rfid.activated ? 'YES' : 'NO'}</div>
+                      <div>Valid Until: {moment(user.rfid.expiresAt).format('dddd, h:mm:ss a')}</div>
+                    </div>
                   </div>
                 )
               }
 
               <UserForm
                 form={user}
-                submitText={'update user'}
+                submitText={'save user'}
                 handleChange={this.handleChange}
                 handleSubmit={this.handleSubmit}
                 errors={errors}

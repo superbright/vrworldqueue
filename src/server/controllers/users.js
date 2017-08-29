@@ -134,6 +134,8 @@ exports.postUser = (req, res) => {
             , contentType: 'image/png'
         }
     });
+    const rfid = req.body.rfid;
+
     signature.save();
     var userData = {};
     if (req.body.firstname != null) userData.firstname = req.body.firstname;
@@ -154,12 +156,17 @@ exports.postUser = (req, res) => {
     if (req.body.address != null) userData.address = req.body.address;
     if (req.body.source != null) userData.source = req.body.source;
     userData.signature = signature._id;
-    if (req.body.rfid) {
+    if (rfid) {
         console.log('Adding RFID');
-        userData.rfid = {};
-        userData.rfid.id = req.body.rfid;
-        userData.rfid.expiresAt = req.body.timer && !isNaN(parseInt(req.body.timer)) ?
-          moment().add(req.body.timer, 'h').toDate() : twoAMTomorrow();
+        userData.rfid = rfid;
+        userData.rfid.id = rfid.id;
+        userData.rfid.expiresAt = twoAMTomorrow();
+        if (rfid.timer && !isNaN(parseInt(rfid.timer))) {
+          userData.rfid.activated = false;
+          userData.rfid.timer = rfid.timer;
+        } else {
+          userData.rfid.activated = true;
+        }
     }
     var query = {
         'screenname': req.body.screenname
