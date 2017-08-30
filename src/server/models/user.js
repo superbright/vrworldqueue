@@ -61,6 +61,13 @@ var schema = new mongoose.Schema({
             type: Date
             , default: new Date(new Date().setHours(0, 0, 0, 0))
         }
+        , activated: {
+            type: Boolean
+            , default: false
+        }
+        , timer: {
+            type: Number
+        }
     }
     , createdAt: {
         type: Date

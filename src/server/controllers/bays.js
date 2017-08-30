@@ -1,3 +1,4 @@
+import moment from 'moment';
 var Bay = require('../models/bay').Bay;
 var User = require('../models/user').User;
 var Queue = require('../models/queue').Queue;
@@ -6,10 +7,7 @@ var sockets = require('../services/sockets');
 var twilioService = require("../services/twilio");
 var analytics = require("../googleanalytics.js");
 var mixpanel = require('../analytics.js');
-import {
-  timerparams
-}
-  from '../../shared/timerconfig.js';
+
 import {
   messages
 }
@@ -225,11 +223,9 @@ exports.deleteBay = (req, res) => {
 
 exports.pauseGameplay = (req, res) => {
   var app = req.app;
-  console.log('moo: hit pause. bayId: ' + req.params.bayId);
   getBay(req.params.bayId).then((bay) => {
     if (!bay) console.log(`[ERROR] cannot find bay ${req.params.bayId}`);
     else if (bay.currentState.state === 'gameplay') {
-      console.log('moo: in gameplay');
       var now = new Date();
       var pausedState = {
         state: 'paused',
@@ -240,11 +236,8 @@ exports.pauseGameplay = (req, res) => {
         console.log(`[BAY] [${bay.id}] deleting gameplay timer`);
         app.locals.timers.gameplay[bay._id].cancel();
         app.locals.timers.gameplay[bay._id] = null;
-        console.log('moo: canceling timer. game state is ' + bay.currentState.state);
       }
-      console.log('moo: about to update bays');
       return updateBayState(bay._id, pausedState).then((bay) => {
-        console.log('moo: Updated bay state. game state is ', bay.currentState);
         sendStateToClients(bay._id, app);
         res.status(200).send(bay);
       });
@@ -265,7 +258,6 @@ exports.resumeGameplay = (req, res) => {
         console.log(`[BAY] [${bay.id}] deleting gameplay timer`);
         app.locals.timers.gameplay[bay._id].cancel();
         app.locals.timers.gameplay[bay._id] = null;
-        console.log('moo: canceling timer. game state is ' + bay.currentState.state);
       }
       endTime.setSeconds(endTime.getSeconds() + bay.currentState.remainingTime);
       return updateBayState(bay._id, {
@@ -441,6 +433,7 @@ var startGameplay = (bayId, app) => {
   return getBay(bayId).then((bay) => {
     analytics.sendAnalytics("Bay", "Start Game", bay.game, new Date().getMilliseconds(), {});
     mixpanel.sendGameStart(bay);
+    activateUser(bay.currentState.user);
     console.log('start Gameplay on bay ' + bay._id);
     if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
     else {
@@ -628,3 +621,25 @@ module.exports.socketHandler = (socket, app) => {
     });
   });
 };
+
+var activateUser = (user) => {
+  const rfid = user.rfid;
+
+  if (!rfid.activated && rfid.timer) {
+    rfid.activated = true;
+    rfid.expiresAt = moment().add(rfid.timer, 'h');
+
+    User.findOneAndUpdate({
+      _id: user._id
+    }, {
+      rfid
+    }, {
+      new: true
+    }).then((user, err) => {
+      if (err) console.log(`[ERROR] [USER] [${user.screenname}] cannot activate user`);
+      else {
+        console.log(`[INFO] [USER] [${user.screenname}] activated. Expires at ${moment(user.rfid.expiresAt).format('dddd, h:mm:ss a')}`);
+      }
+    })
+  }
+}
