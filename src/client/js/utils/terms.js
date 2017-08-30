@@ -10,7 +10,7 @@ The tickets may be collected at venue the date of the event 2 hours before the b
 
 The resale of tickets is prohibited. VRWORLDWIDE reserves the right to cancel any tickets that have been resold.
 
-Individuals under sixteen (16) years are not permitted in the premises unless accompanied by a parent or guardian.
+Individuals under fourteen (14) years are not permitted in the premises unless accompanied by a parent or guardian.
 
 VR WORLDWIDE reserves the right without refund or compensation to refuse admission to any persons whose conduct is disorderly or unbecoming.
 
