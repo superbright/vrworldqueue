@@ -77,6 +77,7 @@ var sendStateToClients = (bayId) => {
     sockets.sendToButton(bay._id, 'setState', bay.currentState);
     sockets.sendToQueue(bay._id, 'setState', bay.currentState);
     sockets.sendToBigQueue(bay.id, 'setState', bay.currentState);
+    sockets.sendToQueueAdmin(bay._id, 'setState', bay.currentState);
   });
 }
 var checkState = (bayId, app) => {
@@ -432,8 +433,10 @@ var notifyUserOnDeck = (bayId) => {
 var startGameplay = (bayId, app) => {
   return getBay(bayId).then((bay) => {
     analytics.sendAnalytics("Bay", "Start Game", bay.game, new Date().getMilliseconds(), {});
-    mixpanel.sendGameStart(bay);
-    activateUser(bay.currentState.user);
+    if (bay.currentState.user) {
+      mixpanel.sendGameStart(bay);
+      activateUser(bay.currentState.user);
+    }
     console.log('start Gameplay on bay ' + bay._id);
     if (bay.currentState.state == 'gameplay') console.log('Already playing game on game ' + bay._id);
     else {
@@ -601,7 +604,7 @@ module.exports.socketHandler = (socket, app) => {
     }, {}, (err, bay) => {
       console.log(req.tag + 'tapped in');
       if (req.clientType == 'game') {
-        console.log('Bay ' + bay._id + 'in state: ' + bay.currentState.state);
+        console.log('Bay #' + bay.id + 'in state: ' + bay.currentState.state);
         if (bay.currentState.state == 'onboarding') {
           console.log('Check if correct user');
           getUserOnDeck(bay._id).then((queue) => {

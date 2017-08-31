@@ -370,6 +370,13 @@ button.button-white {
   text-align: right;
 }
 
+.admin-button-container {
+  text-align: center;
+}
+.admin-button-container div {
+  margin: 10px;
+}
+
 .blink {
   -webkit-animation: blink .75s linear infinite;
   -moz-animation: blink .75s linear infinite;
