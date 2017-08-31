@@ -18,10 +18,10 @@ const bays = [
   , {
     bayid: 2
     , name: 'A-3'
-    , game: 'Plank'
-    , playTime: 5
-    , instructionFile: '/images/instructions/a_1.png'
-    , bigBayImageFile: '/images/bigbay/plankbranded.png'
+    , game: 'Superhot'
+    , playTime: 9
+    , instructionFile: '/images/instructions/superhot.png'
+    , bigBayImageFile: '/images/bigbay/superhotbranded.png'
     , }
   , {
     bayid: 3
