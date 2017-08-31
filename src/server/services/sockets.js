@@ -1,11 +1,11 @@
 var bayController = require('../controllers/bays');
 var rfidController = require('../controllers/rfid');
-var signatureController = require('../controllers/signatures');
 var userController = require('../controllers/users');
 let sockets = {
     game: {}
     , button: {}
     , queue: {}
+    , queueAdmin: {}
     , admin: {}
     , registration: {}
     , global: {}
@@ -15,6 +15,7 @@ let socketState = {
     game: {}
     , button: {}
     , queue: {}
+    , queueAdmin: {}
     , admin: {}
     , registration: {}
     , global: {}
@@ -89,6 +90,9 @@ exports.sendToQueue = (queueId, endpoint, message, callback) => {
 };
 exports.sendToBigQueue = (queueId, endpoint, message, callback) => {
     exports.sendToClient('bigqueue', queueId, endpoint, message, callback);
+};
+exports.sendToQueueAdmin = (queueId, endpoint, message, callback) => {
+    exports.sendToClient('queueAdmin', queueId, endpoint, message, callback);
 };
 exports.sendToAdmin = (adminId, endpoint, message, callback) => {
     exports.sendToClient('admin', adminId, endpoint, message, callback);
