@@ -18,10 +18,10 @@ const bays = [
   , {
     bayid: 2
     , name: 'A-3'
-    , game: 'Superhot'
-    , playTime: 9
-    , instructionFile: '/images/instructions/superhot.png'
-    , bigBayImageFile: '/images/bigbay/superhotbranded.png'
+    , game: 'Plank'
+    , playTime: 5
+    , instructionFile: '/images/instructions/a_1.png'
+    , bigBayImageFile: '/images/bigbay/plankbranded.png'
     , }
   , {
     bayid: 3
@@ -110,18 +110,16 @@ const bays = [
   , {
     bayid: 14
     , name: 'B-2A'
-    , game: 'Raw Data'
-    , playTime: 12
+    , game: 'Arizona Sunshine'
+    , playTime: 9
     , instructionFile: '/images/instructions/raw_data.png'
-    , bigBayImageFile: '/images/bigbay/rawdatabranded.png'
   }
   , {
     bayid: 15
     , name: 'B-2B'
-    , game: 'Raw Data'
-    , playTime: 12
+    , game: 'Arizona Sunshine'
+    , playTime: 9
     , instructionFile: '/images/instructions/raw_data.png'
-    , bigBayImageFile: '/images/bigbay/rawdatabranded.png'
   }
   , {
     bayid: 16
